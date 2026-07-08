@@ -1,0 +1,58 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Represents an authenticated user in Recruit India and stores their career progress, bookmarks, and mock application history.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique user ID from Firebase Authentication"
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User's full name"
+        },
+        "profile": {
+          "type": "object",
+          "description": "User profile details like phone, location, education, activeGoal"
+        },
+        "enrolledCourses": {
+          "type": "array",
+          "description": "List of courses user is enrolled in"
+        },
+        "completedModules": {
+          "type": "array",
+          "description": "List of completed module IDs from skills/courses"
+        },
+        "checkedChecklist": {
+          "type": "array",
+          "description": "List of checked career progress checklist IDs"
+        },
+        "earnedCertificates": {
+          "type": "array",
+          "description": "List of earned certificate metadata"
+        },
+        "savedItems": {
+          "type": "array",
+          "description": "Bookmarked postings, schemes, and courses"
+        },
+        "applications": {
+          "type": "array",
+          "description": "User's mock application history"
+        }
+      },
+      "required": ["uid", "email", "displayName"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Active user profiles containing career progress, bookmarks, and application history."
+    }
+  }
+}

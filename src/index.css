@@ -1,0 +1,192 @@
+@import "tailwindcss";
+
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee 40s linear infinite;
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Custom styles for government tables */
+.gov-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gov-table th {
+  background-color: #881337; /* rose-900 */
+  color: white;
+  padding: 8px 12px;
+  font-weight: bold;
+  text-align: center;
+  border: 2px solid #5c091d;
+}
+
+.gov-table td {
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+}
+
+.gov-table tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e11d48;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #fb7185;
+}
+
+/* Custom 3D perspective and scrolling styling */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.perspective-2000 {
+  perspective: 2000px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* 3D hover tilt dynamic class */
+.hover-3d-tilt {
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+  transform: perspective(1000px) rotateX(1.5deg) rotateY(-1.5deg);
+}
+.hover-3d-tilt:hover {
+  transform: perspective(1000px) rotateX(4deg) rotateY(-4deg) translateZ(15px);
+  box-shadow: 0 20px 40px rgba(124, 58, 237, 0.25);
+}
+
+@keyframes scroll-left-3d {
+  0% {
+    transform: translate3d(0, 0, 0) rotateY(-3deg) rotateX(2deg);
+  }
+  50% {
+    transform: translate3d(-25%, 0, 30px) rotateY(1deg) rotateX(-2deg);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0) rotateY(-3deg) rotateX(2deg);
+  }
+}
+
+@keyframes scroll-right-3d {
+  0% {
+    transform: translate3d(-50%, 0, 0) rotateY(3deg) rotateX(-2deg);
+  }
+  50% {
+    transform: translate3d(-25%, 0, 30px) rotateY(-1deg) rotateX(2deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotateY(3deg) rotateX(-2deg);
+  }
+}
+
+.animate-scroll-3d-fast {
+  animation: scroll-left-3d 25s linear infinite;
+}
+
+.animate-scroll-3d-normal {
+  animation: scroll-left-3d 45s linear infinite;
+}
+
+.animate-scroll-3d-slow {
+  animation: scroll-left-3d 70s linear infinite;
+}
+
+.animate-scroll-right-3d {
+  animation: scroll-right-3d 45s linear infinite;
+}
+
+/* Float Animation */
+@keyframes float-y {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1.5deg);
+  }
+}
+
+.animate-float-3d {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+/* Print optimizations */
+@media print {
+  /* Reset the canvas background to white for paper printing */
+  body, html, #root {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+  
+  /* Hide non-printable app containers (navigation header, footer, tickers, sidebars) */
+  header, footer, nav, aside, button, .print\:hidden, [role="banner"], .no-print, #print-posting-btn {
+    display: none !important;
+  }
+
+  /* Expand main containers to use the entire printable page width */
+  main, .max-w-6xl, .max-w-7xl, .mx-auto {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Keep the primary posting container clean and clear */
+  .bg-slate-50 {
+    background-color: #f8fafc !important;
+  }
+
+  .bg-white {
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  /* Prevent page-breaks inside crucial tables & sections */
+  tr, table, blockquote, .gov-table {
+    page-break-inside: avoid !important;
+  }
+
+  /* Force print background graphics & text contrast */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+

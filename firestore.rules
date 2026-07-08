@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Validate that document IDs only contain alpha-numeric and dashes/underscores
+    function isValidId(id) {
+      return id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId && isValidId(userId);
+    }
+  }
+}
