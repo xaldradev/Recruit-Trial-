@@ -136,7 +136,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         </button>
 
         {/* Logo and Headings */}
-        <div className="text-center space-y-2 mb-6">
+        <div className="text-center space-y-2 mb-8">
           <div className="inline-flex p-3 bg-gradient-to-tr from-[#7c3aed] to-[#a855f7] rounded-2xl border border-purple-400/40 shadow-[0_0_15px_rgba(124,58,237,0.4)]">
             <ShieldCheck className="w-6 h-6 text-white" />
           </div>
@@ -163,13 +163,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </div>
         )}
 
-        {/* Active Auth Provider Selection Banner */}
-        <div className="mb-6 p-4 bg-purple-950/40 border border-[#3b218f] rounded-2xl">
-          <div className="flex items-center gap-2 mb-2 text-cyan-400 text-xs font-black uppercase tracking-wider">
-            <Sparkles className="w-4 h-4 animate-pulse" />
-            <span>Recommended & Active Method</span>
-          </div>
-          
+        {/* Auth Provider Selection */}
+        <div className="space-y-4">
           <button
             type="button"
             onClick={handleGoogleSignIn}
@@ -195,40 +190,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               </div>
             )}
           </button>
-
-          {/* Baby Steps / Easy Guide */}
-          <div className="mt-4 space-y-2 bg-[#05030d] p-3 rounded-xl border border-purple-950/60 text-[10px] leading-relaxed text-slate-300">
-            <p className="font-extrabold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-              <span>🚀</span> BABY STEPS TO SIGN IN SUCCESS:
-            </p>
-            <div className="flex gap-2">
-              <span className="font-mono text-cyan-400 font-extrabold bg-[#110b2b] px-1.5 py-0.5 rounded border border-purple-900/30 shrink-0 h-fit">Step 1</span>
-              <span>Look at the top-right corner of the web preview and click the <strong>"Open in New Tab"</strong> button. <em>(Highly recommended to bypass browser popup blockers inside iframes!)</em></span>
-            </div>
-            <div className="flex gap-2">
-              <span className="font-mono text-cyan-400 font-extrabold bg-[#110b2b] px-1.5 py-0.5 rounded border border-purple-900/30 shrink-0 h-fit">Step 2</span>
-              <span>Click the big <strong>"CONTINUE WITH GOOGLE"</strong> button above.</span>
-            </div>
-            <div className="flex gap-2">
-              <span className="font-mono text-cyan-400 font-extrabold bg-[#110b2b] px-1.5 py-0.5 rounded border border-purple-900/30 shrink-0 h-fit">Step 3</span>
-              <span>Choose your Google Account in the secure Google window. You will be instantly logged in!</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Secondary Info: Email / Password Status */}
-        <div className="p-3.5 bg-slate-950/60 border border-slate-900 rounded-xl space-y-1.5 text-[10px]">
-          <div className="flex items-center gap-1.5 text-slate-400 font-bold uppercase tracking-wider">
-            <Lock className="w-3 h-3 text-slate-500" />
-            <span>Email & Password Registration</span>
-          </div>
-          <p className="text-slate-500 leading-relaxed font-medium">
-            Email & Password auth is currently disabled in your Firebase console. Because of Firebase starter-tier configuration limits, please use <strong className="text-purple-400">Google Sign-In</strong> which is fully configured and active!
-          </p>
         </div>
 
         {/* Footnote information assurance */}
-        <div className="mt-6 pt-4 border-t border-purple-950/80 flex items-center justify-center gap-1 text-[8px] font-mono text-slate-500 tracking-wider">
+        <div className="mt-8 pt-4 border-t border-purple-950/80 flex items-center justify-center gap-1.5 text-[8px] font-mono text-slate-500 tracking-wider">
           <Sparkles className="w-3 h-3 text-cyan-400" />
           <span>ZERO-TRUST SECURE GOOGLE AUTHENTICATION</span>
         </div>

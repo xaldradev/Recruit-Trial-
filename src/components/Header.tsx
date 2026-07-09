@@ -37,12 +37,17 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [countdown, setCountdown] = useState({ hours: 23, minutes: 45, seconds: 20 });
   const [isHeaderLangOpen, setIsHeaderLangOpen] = useState(false);
+  const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
   const headerLangRef = useRef<HTMLDivElement>(null);
+  const moreDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (headerLangRef.current && !headerLangRef.current.contains(event.target as Node)) {
         setIsHeaderLangOpen(false);
+      }
+      if (moreDropdownRef.current && !moreDropdownRef.current.contains(event.target as Node)) {
+        setIsMoreDropdownOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -109,6 +114,9 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
     { id: 'contact', label: 'Contact', hasDropdown: false }
   ];
 
+  const primaryLinks = navLinks.filter(l => !['privacy', 'terms', 'refunds', 'payments', 'contact'].includes(l.id));
+  const secondaryLinks = navLinks.filter(l => ['privacy', 'terms', 'refunds', 'payments', 'contact'].includes(l.id));
+
   return (
     <header className="sticky top-0 z-50 bg-[#090714] border-b border-[#211b3d] text-white shadow-xl">
       
@@ -159,7 +167,7 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
 
         {/* Center: Desktop Navigation links */}
         <nav className="hidden xl:flex items-center gap-1">
-          {navLinks.map((link) => (
+          {primaryLinks.map((link) => (
             <button
               key={link.id}
               onClick={() => onTabChange(link.id)}
@@ -178,6 +186,48 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
               )}
             </button>
           ))}
+
+          {/* More Dropdown (Vertically expands when clicked) */}
+          <div className="relative" ref={moreDropdownRef}>
+            <button
+              onClick={() => setIsMoreDropdownOpen(!isMoreDropdownOpen)}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+                secondaryLinks.some(l => l.id === activeTab)
+                  ? 'bg-[#221f42] text-white border border-[#4c3ba0]/50'
+                  : 'text-slate-300 hover:text-white hover:bg-[#15122e]/60'
+              }`}
+            >
+              <span>More Policies</span>
+              <ChevronDown className={`w-3 h-3 opacity-60 transition-transform duration-350 ${isMoreDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            <AnimatePresence>
+              {isMoreDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute left-0 mt-2 w-48 bg-[#0c0820] border border-[#2d1b54] rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.6)] backdrop-blur-md z-50 overflow-hidden py-1.5 text-left"
+                >
+                  {secondaryLinks.map((link) => (
+                    <button
+                      key={link.id}
+                      onClick={() => {
+                        onTabChange(link.id);
+                        setIsMoreDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-xs font-bold transition-all cursor-pointer hover:bg-white/5 flex items-center justify-between ${
+                        activeTab === link.id ? 'bg-[#7c3aed]/25 text-purple-200' : 'text-slate-300 hover:text-white'
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </nav>
 
         {/* Right Side: CTA and Mobile toggle */}
