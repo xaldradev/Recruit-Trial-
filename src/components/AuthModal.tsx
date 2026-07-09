@@ -141,220 +141,96 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <ShieldCheck className="w-6 h-6 text-white" />
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
-            {activeMode === 'signin' ? 'Sign In' : activeMode === 'signup' ? 'Create Account' : 'Reset Password'}
+            Recruit India Auth Portal
           </h2>
-          <p className="text-xs text-slate-400 max-w-[280px] mx-auto leading-normal">
-            {activeMode === 'signin' 
-              ? 'Access your saved progress, bookmarks, and mock histories.' 
-              : activeMode === 'signup' 
-              ? 'Join Recruit India to sync your progress across devices.' 
-              : 'Enter your registered email to receive a password recovery link.'
-            }
+          <p className="text-xs text-slate-400 max-w-[320px] mx-auto leading-normal">
+            Sign in securely to save your progress, bookmark courses, track job application statuses, and unlock all interactive dashboards.
           </p>
         </div>
 
         {/* Error/Success alerts */}
         {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-200 text-xs flex items-center gap-2.5">
-            <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-200 text-xs flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
             <span className="font-semibold leading-relaxed">{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-200 text-xs flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 animate-bounce" />
+          <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-200 text-xs flex items-start gap-2.5">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5 animate-bounce" />
             <span className="font-semibold leading-relaxed">{success}</span>
           </div>
         )}
 
-        {/* Mode selection tabs */}
-        {activeMode !== 'forgot' && (
-          <div className="flex bg-[#05030d] p-1 border border-purple-950/80 rounded-xl mb-5 text-xs font-bold">
-            <button
-              onClick={() => {
-                setActiveMode('signin');
-                setError(null);
-                setSuccess(null);
-              }}
-              className={`flex-1 py-2 rounded-lg transition-all text-center cursor-pointer ${
-                activeMode === 'signin' 
-                  ? 'bg-[#3b218f] text-white shadow-md' 
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => {
-                setActiveMode('signup');
-                setError(null);
-                setSuccess(null);
-              }}
-              className={`flex-1 py-2 rounded-lg transition-all text-center cursor-pointer ${
-                activeMode === 'signup' 
-                  ? 'bg-[#3b218f] text-white shadow-md' 
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Sign Up
-            </button>
+        {/* Active Auth Provider Selection Banner */}
+        <div className="mb-6 p-4 bg-purple-950/40 border border-[#3b218f] rounded-2xl">
+          <div className="flex items-center gap-2 mb-2 text-cyan-400 text-xs font-black uppercase tracking-wider">
+            <Sparkles className="w-4 h-4 animate-pulse" />
+            <span>Recommended & Active Method</span>
           </div>
-        )}
-
-        {/* Main form */}
-        <form onSubmit={handleAuthSubmit} className="space-y-4">
-          {activeMode === 'signup' && (
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block pl-1">
-                Your Full Name
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                  <User className="w-4 h-4" />
-                </span>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Rajesh Kumar"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-[#05030d] border border-purple-900/40 focus:border-cyan-400 text-white placeholder-slate-700 text-xs font-bold rounded-xl pl-9 pr-4 py-3 focus:outline-none focus:ring-1 focus:ring-cyan-400/25 transition-all"
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block pl-1">
-              Email Address
-            </label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                <Mail className="w-4 h-4" />
-              </span>
-              <input
-                type="email"
-                required
-                placeholder="rajesh@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#05030d] border border-purple-900/40 focus:border-cyan-400 text-white placeholder-slate-700 text-xs font-bold rounded-xl pl-9 pr-4 py-3 focus:outline-none focus:ring-1 focus:ring-cyan-400/25 transition-all"
-              />
-            </div>
-          </div>
-
-          {activeMode !== 'forgot' && (
-            <div className="space-y-1">
-              <div className="flex justify-between items-center px-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  Password
-                </label>
-                {activeMode === 'signin' && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveMode('forgot');
-                      setError(null);
-                      setSuccess(null);
-                    }}
-                    className="text-[9px] font-black text-purple-400 hover:text-purple-300 uppercase tracking-wider cursor-pointer"
-                  >
-                    Forgot?
-                  </button>
-                )}
-              </div>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                  <Lock className="w-4 h-4" />
-                </span>
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#05030d] border border-purple-900/40 focus:border-cyan-400 text-white placeholder-slate-700 text-xs font-bold rounded-xl pl-9 pr-4 py-3 focus:outline-none focus:ring-1 focus:ring-cyan-400/25 transition-all"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Submit button */}
+          
           <button
-            type="submit"
+            type="button"
+            onClick={handleGoogleSignIn}
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-extrabold text-xs uppercase tracking-widest py-3 px-6 rounded-xl shadow-[0_4px_15px_rgba(124,58,237,0.3)] hover:shadow-[0_4px_20px_rgba(124,58,237,0.45)] cursor-pointer flex items-center justify-center gap-2 transform active:scale-95 transition-all mt-4"
+            className="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-extrabold text-xs uppercase tracking-widest py-3.5 px-6 rounded-xl shadow-[0_0_20px_rgba(124,58,237,0.4)] cursor-pointer flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] disabled:opacity-50"
           >
             {isLoading ? (
-              <>
+              <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin text-white" />
-                <span>PROCESSING...</span>
-              </>
-            ) : activeMode === 'signin' ? (
-              <span>SIGN IN TO ENGINE</span>
-            ) : activeMode === 'signup' ? (
-              <span>CREATE ACCOUNT</span>
+                <span>SIGNING IN...</span>
+              </div>
             ) : (
-              <span>SEND RESET LINK</span>
+              <div className="flex items-center gap-3">
+                <svg className="w-4 h-4 shrink-0 bg-white rounded-full p-0.5" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                  <g transform="matrix(1, 0, 0, 1, 0, 0)">
+                    <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.57h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.4C21.68,11.83 21.56,11.43 21.35,11.1z" fill="#4285F4" />
+                    <path d="M12,20.62c2.43,0 4.47,-0.8 5.96,-2.18l-3.3,-2.57c-0.9,0.6 -2.08,0.97 -3.3,0.97 -2.34,0 -4.33,-1.58 -5.04,-3.7H2.9v2.66C4.38,18.73 7.97,20.62 12,20.62z" fill="#34A853" />
+                    <path d="M6.96,13.14a5.2,5.2 0 0 1 0,-3.28V7.2H2.9a8.96,8.96 0 0 0 0,7.9l4.06,-3.26z" fill="#FBBC05" />
+                    <path d="M12,5.38c1.32,0 2.5,0.45 3.44,1.35l2.58,-2.58C16.46,2.73 14.43,1.9 12,1.9 7.97,1.9 4.38,3.79 2.9,6.54L6.96,9.8C7.67,7.68 9.66,5.38 12,5.38z" fill="#EA4335" />
+                  </g>
+                </svg>
+                <span>CONTINUE WITH GOOGLE</span>
+              </div>
             )}
           </button>
-        </form>
 
-        {activeMode !== 'forgot' && (
-          <>
-            <div className="relative my-4 flex items-center justify-center">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-purple-950/80"></div>
-              </div>
-              <span className="relative px-3 bg-[#0d092c] text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                Or Continue With
-              </span>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleGoogleSignIn}
-              disabled={isLoading}
-              className="w-full bg-[#05030d] hover:bg-[#0a061b] text-white font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl border border-purple-900/40 hover:border-purple-500/50 flex items-center justify-center gap-3 transition-all cursor-pointer active:scale-95 disabled:opacity-55 disabled:pointer-events-none"
-            >
-              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                <g transform="matrix(1, 0, 0, 1, 0, 0)">
-                  <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.57h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.4C21.68,11.83 21.56,11.43 21.35,11.1z" fill="#4285F4" />
-                  <path d="M12,20.62c2.43,0 4.47,-0.8 5.96,-2.18l-3.3,-2.57c-0.9,0.6 -2.08,0.97 -3.3,0.97 -2.34,0 -4.33,-1.58 -5.04,-3.7H2.9v2.66C4.38,18.73 7.97,20.62 12,20.62z" fill="#34A853" />
-                  <path d="M6.96,13.14a5.2,5.2 0 0 1 0,-3.28V7.2H2.9a8.96,8.96 0 0 0 0,7.9l4.06,-3.26z" fill="#FBBC05" />
-                  <path d="M12,5.38c1.32,0 2.5,0.45 3.44,1.35l2.58,-2.58C16.46,2.73 14.43,1.9 12,1.9 7.97,1.9 4.38,3.79 2.9,6.54L6.96,9.8C7.67,7.68 9.66,5.38 12,5.38z" fill="#EA4335" />
-                </g>
-              </svg>
-              <span>Continue with Google</span>
-            </button>
-            <p className="mt-3 text-center text-[10px] text-slate-400 font-medium leading-relaxed bg-[#05030d] p-2.5 rounded-xl border border-purple-950/50">
-              💡 <span className="text-purple-300 font-bold">Pop-up Tip:</span> If Google Sign-In windows get blocked or closed automatically in preview, please use the <strong className="text-cyan-400">"Open in New Tab"</strong> button on the top-right of the screen to sign in perfectly.
+          {/* Baby Steps / Easy Guide */}
+          <div className="mt-4 space-y-2 bg-[#05030d] p-3 rounded-xl border border-purple-950/60 text-[10px] leading-relaxed text-slate-300">
+            <p className="font-extrabold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+              <span>🚀</span> BABY STEPS TO SIGN IN SUCCESS:
             </p>
-          </>
-        )}
-
-        {/* Back option for forgot password mode */}
-        {activeMode === 'forgot' && (
-          <div className="text-center mt-4">
-            <button
-              onClick={() => {
-                setActiveMode('signin');
-                setError(null);
-                setSuccess(null);
-              }}
-              className="text-[10px] font-black text-purple-400 hover:text-purple-300 uppercase tracking-widest cursor-pointer flex items-center justify-center gap-1 mx-auto"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>Back to Sign In</span>
-            </button>
+            <div className="flex gap-2">
+              <span className="font-mono text-cyan-400 font-extrabold bg-[#110b2b] px-1.5 py-0.5 rounded border border-purple-900/30 shrink-0 h-fit">Step 1</span>
+              <span>Look at the top-right corner of the web preview and click the <strong>"Open in New Tab"</strong> button. <em>(Highly recommended to bypass browser popup blockers inside iframes!)</em></span>
+            </div>
+            <div className="flex gap-2">
+              <span className="font-mono text-cyan-400 font-extrabold bg-[#110b2b] px-1.5 py-0.5 rounded border border-purple-900/30 shrink-0 h-fit">Step 2</span>
+              <span>Click the big <strong>"CONTINUE WITH GOOGLE"</strong> button above.</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="font-mono text-cyan-400 font-extrabold bg-[#110b2b] px-1.5 py-0.5 rounded border border-purple-900/30 shrink-0 h-fit">Step 3</span>
+              <span>Choose your Google Account in the secure Google window. You will be instantly logged in!</span>
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* Secondary Info: Email / Password Status */}
+        <div className="p-3.5 bg-slate-950/60 border border-slate-900 rounded-xl space-y-1.5 text-[10px]">
+          <div className="flex items-center gap-1.5 text-slate-400 font-bold uppercase tracking-wider">
+            <Lock className="w-3 h-3 text-slate-500" />
+            <span>Email & Password Registration</span>
+          </div>
+          <p className="text-slate-500 leading-relaxed font-medium">
+            Email & Password auth is currently disabled in your Firebase console. Because of Firebase starter-tier configuration limits, please use <strong className="text-purple-400">Google Sign-In</strong> which is fully configured and active!
+          </p>
+        </div>
 
         {/* Footnote information assurance */}
         <div className="mt-6 pt-4 border-t border-purple-950/80 flex items-center justify-center gap-1 text-[8px] font-mono text-slate-500 tracking-wider">
           <Sparkles className="w-3 h-3 text-cyan-400" />
-          <span>ZERO-TRUST SECURE AUTH SYSTEM</span>
+          <span>ZERO-TRUST SECURE GOOGLE AUTHENTICATION</span>
         </div>
 
       </div>
