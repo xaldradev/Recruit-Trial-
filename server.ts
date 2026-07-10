@@ -204,7 +204,7 @@ app.all('/__/auth/*', async (req, res) => {
 });
 
 // Firebase Web API Key for client/auth REST API (from firebase-applet-config.json)
-const FIREBASE_API_KEY = "AIzaSyBDzgG169kTE_IDXTZ3lnRQfgZW3Bu2xvM";
+const FIREBASE_API_KEY = "AIzaSyBDzgG169KTE_IDXTZ3lnRQfgZW3Bu2xvM";
 
 // API endpoints for Server-Side Auth Proxy
 app.post('/api/auth/signup', async (req, res) => {

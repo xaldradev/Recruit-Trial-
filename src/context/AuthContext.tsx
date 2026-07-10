@@ -274,92 +274,161 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const firebaseUser = userCredential.user;
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
 
-    const loggedUser: User = {
-      uid: firebaseUser.uid,
-      email: firebaseUser.email,
-      displayName: firebaseUser.displayName
-    };
-    setUser(loggedUser);
-    localStorage.setItem('recruit_user', JSON.stringify(loggedUser));
+      const loggedUser: User = {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName
+      };
+      setUser(loggedUser);
+      localStorage.setItem('recruit_user', JSON.stringify(loggedUser));
 
-    // Fetch user document
-    const data = await loadAndSyncUserData(firebaseUser);
-    setUserData(data);
+      // Fetch user document
+      const data = await loadAndSyncUserData(firebaseUser);
+      setUserData(data);
+    } catch (clientErr: any) {
+      console.warn("Client sign-in failed. Trying server-side proxy fallback...", clientErr);
+      
+      try {
+        const response = await fetch('/api/auth/signin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const resData = await response.json();
+        if (response.ok && resData?.success && resData?.user) {
+          const loggedUser: User = {
+            uid: resData.user.uid,
+            email: resData.user.email,
+            displayName: resData.user.displayName
+          };
+          setUser(loggedUser);
+          localStorage.setItem('recruit_user', JSON.stringify(loggedUser));
+          setUserData(resData.userData);
+          return;
+        } else {
+          throw new Error(resData?.error || 'Server-side sign-in failed.');
+        }
+      } catch (serverErr: any) {
+        console.error("Server-side proxy fallback failed:", serverErr);
+        // Highlight the possible API Key restriction in Google Cloud Console
+        let customMessage = clientErr.message || 'Authentication failed.';
+        if (customMessage.includes('api-key-not-valid')) {
+          customMessage = 'Firebase Client Error: (auth/api-key-not-valid). Please check if your Google Cloud API Key is restricted to select domains/APIs in your GCP Console -> Credentials, or let us assist you!';
+        }
+        throw new Error(customMessage);
+      }
+    }
   };
 
   const signUp = async (email: string, password: string, name: string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const firebaseUser = userCredential.user;
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
 
-    // Update display name in Firebase Auth
-    await updateProfile(firebaseUser, { displayName: name });
+      // Update display name in Firebase Auth
+      await updateProfile(firebaseUser, { displayName: name });
 
-    const initialData: UserData = {
-      uid: firebaseUser.uid,
-      email: firebaseUser.email || '',
-      displayName: name,
-      profile: {
-        name: name,
+      const initialData: UserData = {
+        uid: firebaseUser.uid,
         email: firebaseUser.email || '',
-        phone: '+91 98765 43210',
-        location: 'Delhi NCR',
-        education: 'Graduate',
-        activeGoal: 'Government & Public Sector Career'
-      },
-      enrolledCourses: [],
-      completedModules: {},
-      checkedChecklist: {},
-      earnedCertificates: [],
-      savedItems: [
-        { id: '1', title: 'PM Mudra Loan Scheme', type: 'Scheme', desc: 'Collateral free funding' },
-        { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
-      ],
-      applications: []
-    };
+        displayName: name,
+        profile: {
+          name: name,
+          email: firebaseUser.email || '',
+          phone: '+91 98765 43210',
+          location: 'Delhi NCR',
+          education: 'Graduate',
+          activeGoal: 'Government & Public Sector Career'
+        },
+        enrolledCourses: [],
+        completedModules: {},
+        checkedChecklist: {},
+        earnedCertificates: [],
+        savedItems: [
+          { id: '1', title: 'PM Mudra Loan Scheme', type: 'Scheme', desc: 'Collateral free funding' },
+          { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
+        ],
+        applications: []
+      };
 
-    // Attempt registration/sync via server-side first
-    try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: name
-        })
-      });
-      if (response.ok) {
-        const resData = await response.json();
-        if (resData?.success && resData?.userData) {
-          setUserData(resData.userData);
-          localStorage.setItem(`recruit_user_data_${firebaseUser.uid}`, JSON.stringify(resData.userData));
-          return;
+      // Attempt registration/sync via server-side first
+      try {
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: name
+          })
+        });
+        if (response.ok) {
+          const resData = await response.json();
+          if (resData?.success && resData?.userData) {
+            setUserData(resData.userData);
+            localStorage.setItem(`recruit_user_data_${firebaseUser.uid}`, JSON.stringify(resData.userData));
+            return;
+          }
         }
+      } catch (err) {
+        console.warn("Server signup endpoint failed, using client fallback", err);
       }
-    } catch (err) {
-      console.warn("Server signup endpoint failed, using client fallback", err);
-    }
 
-    // Direct Client-side Firestore write fallback
-    const docRef = doc(db, 'users', firebaseUser.uid);
-    try {
-      await setDoc(docRef, initialData);
-    } catch (err) {
-      console.warn("Client-side setDoc on signup failed, continuing offline", err);
-    }
+      // Direct Client-side Firestore write fallback
+      const docRef = doc(db, 'users', firebaseUser.uid);
+      try {
+        await setDoc(docRef, initialData);
+      } catch (err) {
+        console.warn("Client-side setDoc on signup failed, continuing offline", err);
+      }
 
-    const loggedUser: User = {
-      uid: firebaseUser.uid,
-      email: firebaseUser.email,
-      displayName: name
-    };
-    setUser(loggedUser);
-    setUserData(initialData);
-    localStorage.setItem('recruit_user', JSON.stringify(loggedUser));
-    localStorage.setItem(`recruit_user_data_${firebaseUser.uid}`, JSON.stringify(initialData));
+      const loggedUser: User = {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: name
+      };
+      setUser(loggedUser);
+      setUserData(initialData);
+      localStorage.setItem('recruit_user', JSON.stringify(loggedUser));
+      localStorage.setItem(`recruit_user_data_${firebaseUser.uid}`, JSON.stringify(initialData));
+    } catch (clientErr: any) {
+      console.warn("Client sign-up failed. Trying server-side proxy fallback...", clientErr);
+      
+      try {
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, name })
+        });
+        
+        const resData = await response.json();
+        if (response.ok && resData?.success && resData?.user) {
+          const loggedUser: User = {
+            uid: resData.user.uid,
+            email: resData.user.email,
+            displayName: resData.user.displayName
+          };
+          setUser(loggedUser);
+          localStorage.setItem('recruit_user', JSON.stringify(loggedUser));
+          setUserData(resData.userData);
+          return;
+        } else {
+          throw new Error(resData?.error || 'Server-side registration failed.');
+        }
+      } catch (serverErr: any) {
+        console.error("Server-side proxy fallback failed:", serverErr);
+        let customMessage = clientErr.message || 'Registration failed.';
+        if (customMessage.includes('api-key-not-valid')) {
+          customMessage = 'Firebase Client Error: (auth/api-key-not-valid). Please check if your Google Cloud API Key is restricted in your GCP Console -> Credentials!';
+        }
+        throw new Error(customMessage);
+      }
+    }
   };
 
   const signInWithGoogle = async () => {
