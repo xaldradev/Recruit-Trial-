@@ -1,11 +1,11 @@
 {
-  "projectId": "psychic-tide-htj8l",
-  "appId": "1:178329049358:web:e99b17a0a37908ce3bdf5f",
-  "apiKey": "AIzaSyC_jd2c5-43NakD9bgRNXtCbi7p0-6Lnlk",
-  "authDomain": "psychic-tide-htj8l.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-recruitorginindi-c82bf65a-f645-4614-aa88-e0ffe79ca95e",
-  "storageBucket": "psychic-tide-htj8l.firebasestorage.app",
-  "messagingSenderId": "178329049358",
+  "projectId": "recruit-auth-515f9",
+  "appId": "1:842016391655:web:048fbd6992f3e28cc4bd42",
+  "apiKey": "AIzaSyBDzgG169kTE_IDXTZ3lnRQfgZW3Bu2xvM",
+  "authDomain": "recruit-auth-515f9.firebaseapp.com",
+  "firestoreDatabaseId": "",
+  "storageBucket": "recruit-auth-515f9.firebasestorage.app",
+  "messagingSenderId": "842016391655",
   "measurementId": "",
-  "oAuthClientId": "178329049358-tqv4n8tft4ovsmb0h0tdej4s148nlq0h.apps.googleusercontent.com"
+  "oAuthClientId": ""
 }

@@ -15,9 +15,9 @@ let adminApp: any = null;
 let adminDb: any = null;
 try {
   adminApp = admin.initializeApp({
-    projectId: 'psychic-tide-htj8l',
+    projectId: 'recruit-auth-515f9',
   });
-  adminDb = getFirestore(adminApp, 'ai-studio-recruitorginindi-c82bf65a-f645-4614-aa88-e0ffe79ca95e');
+  adminDb = getFirestore(adminApp);
   console.log('Firebase Admin SDK initialized successfully.');
 } catch (err) {
   console.error('Failed to initialize Firebase Admin SDK:', err);
@@ -113,7 +113,7 @@ function logActivity(type: string, description: string, metadata?: any) {
 
 // 0. Firebase Authentication Reverse Proxy for Custom Domain Hosting on Railway VPS
 app.all('/__/auth/*', async (req, res) => {
-  const firebaseAuthUrl = `https://psychic-tide-htj8l.firebaseapp.com${req.originalUrl}`;
+  const firebaseAuthUrl = `https://recruit-auth-515f9.firebaseapp.com${req.originalUrl}`;
   try {
     const headers: Record<string, string> = {};
     for (const [key, value] of Object.entries(req.headers)) {
@@ -143,10 +143,10 @@ app.all('/__/auth/*', async (req, res) => {
     });
 
     if (headers['origin']) {
-      headers['origin'] = 'https://psychic-tide-htj8l.firebaseapp.com';
+      headers['origin'] = 'https://recruit-auth-515f9.firebaseapp.com';
     }
     if (headers['referer']) {
-      headers['referer'] = 'https://psychic-tide-htj8l.firebaseapp.com/';
+      headers['referer'] = 'https://recruit-auth-515f9.firebaseapp.com/';
     }
 
     const fetchOptions: RequestInit = {
@@ -187,7 +187,7 @@ app.all('/__/auth/*', async (req, res) => {
 });
 
 // Firebase Web API Key for client/auth REST API (from firebase-applet-config.json)
-const FIREBASE_API_KEY = "AIzaSyC_jd2c5-43NakD9bgRNXtCbi7p0-6Lnlk";
+const FIREBASE_API_KEY = "AIzaSyBDzgG169kTE_IDXTZ3lnRQfgZW3Bu2xvM";
 
 // API endpoints for Server-Side Auth Proxy
 app.post('/api/auth/signup', async (req, res) => {
