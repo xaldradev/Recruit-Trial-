@@ -518,6 +518,22 @@ export default function App() {
   const handleAddApplication = (newApp: Application) => {
     const updated = [newApp, ...applications];
     setApplications(updated);
+
+    // Log the user-triggered activity
+    try {
+      const newAct = {
+        id: `act-${Date.now()}`,
+        type: 'job',
+        title: 'Job Application Submitted',
+        description: `Formally submitted candidate registration slip for "${newApp.postingTitle || 'Government Opportunity'}". Receipt ID: ${newApp.registrationNumber || 'REC-' + Math.floor(100000 + Math.random() * 900000)}`,
+        timestamp: new Date().toISOString()
+      };
+      const existing = JSON.parse(localStorage.getItem('recruit_activities') || '[]');
+      localStorage.setItem('recruit_activities', JSON.stringify([newAct, ...existing].slice(0, 15)));
+    } catch (e) {
+      console.error("Error logging application activity:", e);
+    }
+
     if (user) {
       updateApplications(updated).catch(err => console.error("Failed to sync application to firestore:", err));
     } else {
@@ -753,17 +769,17 @@ export default function App() {
       case 'jobs':
         return renderJobsBoard();
       case 'career':
-        return <CareerPage />;
+        return <CareerPage onOpenAuth={() => setIsAuthModalOpen(true)} />;
       case 'resume':
         return <ResumePage />;
       case 'interview':
         return <InterviewPage />;
       case 'business':
-        return <BusinessPage />;
+        return <BusinessPage onOpenAuth={() => setIsAuthModalOpen(true)} />;
       case 'schemes':
         return <SchemesPage />;
       case 'courses':
-        return <CoursesPage />;
+        return <CoursesPage onOpenAuth={() => setIsAuthModalOpen(true)} />;
       case 'syllabus':
         return <SchoolSyllabusPage />;
       case 'dashboard':
@@ -1022,6 +1038,46 @@ export default function App() {
 
           </div>
         </section>
+
+        {/* PROMINENT NATIONAL REGISTER SIGNUP CALLOUT */}
+        {!user && (
+          <section className="bg-gradient-to-r from-[#1c124c] via-[#0f0a28] to-[#1c124c] border-2 border-purple-500/30 rounded-[2.5rem] p-8 md:p-10 text-left relative overflow-hidden shadow-[0_20px_50px_rgba(124,58,237,0.2)] animate-in fade-in slide-in-from-bottom duration-300">
+            <div className="absolute right-0 top-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute left-10 bottom-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+              <div className="lg:col-span-8 space-y-4">
+                <div className="inline-flex items-center gap-1.5 bg-[#fbbf24]/10 text-[#fcd34d] border border-[#fbbf24]/30 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                  ⭐ Join 12,000+ Aspirants Registered This Month
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
+                  Formulate Your Permanent National Career Profile
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl font-semibold leading-relaxed">
+                  Connecting via Google Sign-In securely registers your candidacy on our Firestore Cloud database. Track course completions, save government matching schemes, preserve live AI speech interview ratings, and backup all your active application slips securely!
+                </p>
+                
+                <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-[11px] font-bold text-purple-300">
+                  <span className="flex items-center gap-1.5">🛡️ 100% Secured by Firebase</span>
+                  <span className="flex items-center gap-1.5">📝 Save Live ATS Resume History</span>
+                  <span className="flex items-center gap-1.5">🏆 Verify Academic Credentials</span>
+                </div>
+              </div>
+              
+              <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 w-full shrink-0">
+                <button 
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="w-full py-4 px-6 bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-600 hover:from-purple-400 hover:to-blue-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-xl transition-all hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span className="text-base">🚀</span> Connect Securely Now
+                </button>
+                <div className="text-[10px] text-slate-400 font-bold text-center w-full mt-1">
+                  Connect instantly via Google OAuth or Email Registry
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* INTERACTIVE 3D ORBITAL ECOSYSTEM ENGINE */}
         <Interactive3DOrbit setActiveTab={setActiveTab} setSelectedPosting={setSelectedPosting} />
@@ -1653,6 +1709,27 @@ export default function App() {
             </button>
           </div>
         </div>
+
+        {/* INLINE REGISTRATION PROMPT FOR OPPORTUNITY TRACKING */}
+        {!user && (
+          <div className="bg-gradient-to-r from-blue-900/10 via-indigo-950/20 to-blue-950/10 border border-blue-500/25 rounded-3xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-left animate-in fade-in slide-in-from-top-3 duration-250">
+            <div className="space-y-1">
+              <span className="text-[9px] font-black uppercase text-blue-400 font-mono tracking-widest block">🔒 SECURITY GATEWAY</span>
+              <h4 className="text-xs font-black text-white">
+                Want to Save Your Job Preferences & Download Official Receipts?
+              </h4>
+              <p className="text-[11px] text-slate-300 font-medium max-w-xl leading-relaxed">
+                Create a permanent Candidate Account to save active government matching schemes, lock in resume grades, track exam dates, and print official computer-generated application slips.
+              </p>
+            </div>
+            <button 
+              onClick={() => setIsAuthModalOpen(true)}
+              className="px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md shrink-0 active:scale-95 hover:scale-[1.02]"
+            >
+              Sign Up / Login Now
+            </button>
+          </div>
+        )}
 
         {/* Live AI Opportunity Crawler & Sync Panel */}
         <div className="bg-gradient-to-r from-[#0d1527] via-[#091e2b] to-[#0d1527] text-white p-5 rounded-3xl shadow-xl border border-emerald-950/50 flex flex-col md:flex-row justify-between items-center gap-4 relative overflow-hidden group">

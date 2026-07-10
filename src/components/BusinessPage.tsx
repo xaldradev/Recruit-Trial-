@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Sparkles, Landmark, Rocket, CheckSquare, Plus, DollarSign, ArrowRight, HelpCircle, FileCheck, Info } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 interface FundingOption {
   schemeName: string;
@@ -17,7 +18,8 @@ interface Validation {
   growthMilestones: string[];
 }
 
-export default function BusinessPage() {
+export default function BusinessPage({ onOpenAuth }: { onOpenAuth?: () => void }) {
+  const { user } = useAuth();
   const [idea, setIdea] = useState('');
   const [sector, setSector] = useState('Agri-Tech / Farming');
   const [investment, setInvestment] = useState('₹50,000 - ₹5,000,000');
@@ -90,6 +92,27 @@ export default function BusinessPage() {
         <h2 className="text-2xl md:text-3xl font-black mt-2 tracking-tight">MSME & Startup Idea Validator</h2>
         <p className="text-xs text-slate-400 mt-1 max-w-xl">Validate local business concepts. Assess market viability, map immediate MSME registration pathways, check CGTMSE or Mudra funding eligibility, and draft project launch frameworks.</p>
       </div>
+
+      {/* SECURITY REGISTRATION NOTICE BANNER FOR STARTUP CHECKS */}
+      {!user && (
+        <div className="bg-gradient-to-r from-blue-950/20 via-[#0e163d]/30 to-blue-950/20 border border-blue-500/25 rounded-3xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 text-left">
+          <div className="space-y-1">
+            <span className="text-[9px] font-black uppercase text-blue-400 font-mono tracking-widest block">💼 MSME STARTUP REGISTRY</span>
+            <h4 className="text-xs font-black text-white">
+              Backup Your Mudra Loan Eligibility & Business Roadmaps
+            </h4>
+            <p className="text-[11px] text-slate-300 font-medium max-w-2xl">
+              Currently generating checklists as a Guest. Connect with Google Sign-In to secure your business feasibility reports, export drafts directly, and link your credentials with local state microfinance schemes permanently.
+            </p>
+          </div>
+          <button 
+            onClick={onOpenAuth}
+            className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md shrink-0 active:scale-95 hover:scale-[1.02]"
+          >
+            Create Entrepreneur Profile
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         

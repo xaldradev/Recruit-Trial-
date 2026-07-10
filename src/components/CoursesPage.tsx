@@ -425,7 +425,7 @@ function renderMarkdown(content: string) {
   return <div className="space-y-1">{elements}</div>;
 }
 
-export default function CoursesPage() {
+export default function CoursesPage({ onOpenAuth }: { onOpenAuth?: () => void }) {
   const { user, userData, updateCareerProgress } = useAuth();
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -1763,6 +1763,27 @@ Keep in mind:
           </button>
         </div>
       </div>
+
+      {/* SECURITY REGISTRATION NOTICE BANNER */}
+      {!user && (
+        <div className="bg-gradient-to-r from-purple-950/20 via-[#1d144d]/30 to-purple-950/20 border border-purple-500/25 rounded-3xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 text-left">
+          <div className="space-y-1">
+            <span className="text-[9px] font-black uppercase text-purple-400 font-mono tracking-widest block">🔒 SECURE ACADEMY PORTAL</span>
+            <h4 className="text-xs font-black text-white">
+              Claim Your Government-Accredited ISO Certification
+            </h4>
+            <p className="text-[11px] text-slate-300 font-medium max-w-2xl">
+              You are currently practicing in Guest mode. Register your National Career profile with Google Sign-In to backup your module checkmarks, quiz attempts, and unlock verified completion certificates with validation barcodes!
+            </p>
+          </div>
+          <button 
+            onClick={onOpenAuth}
+            className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md shrink-0 active:scale-95 hover:scale-[1.02]"
+          >
+            Create Free Account
+          </button>
+        </div>
+      )}
 
       {/* NEW COURSE PROGRESS & INTERACTIVE ANALYTICS DASHBOARD */}
       {showDashboard && (() => {

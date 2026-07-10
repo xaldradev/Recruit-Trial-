@@ -117,6 +117,9 @@ export default function ResumePage() {
     setIsAnalyzing(true);
     setAnalysisResult(null);
 
+    let finalScore = 74;
+    let finalRating = 'Good';
+
     try {
       const response = await fetch('/api/analyze-resume', {
         method: 'POST',
@@ -132,6 +135,10 @@ export default function ResumePage() {
 
       const data = await response.json();
       setAnalysisResult(data);
+      if (data && typeof data.atsScore === 'number') {
+        finalScore = data.atsScore;
+        finalRating = data.rating || 'Good';
+      }
     } catch (err) {
       console.error(err);
       // Fallback
@@ -153,6 +160,21 @@ Your resume lists solid software experience, particularly with **React**, **Node
       });
     } finally {
       setIsAnalyzing(false);
+
+      // Log resume analysis activity
+      try {
+        const resumeAct = {
+          id: `act-${Date.now()}`,
+          type: 'resume',
+          title: 'Resume ATS Profile Analyzed',
+          description: `Ran resume diagnostics. Keyword matching rate evaluated at ${finalScore}% (${finalRating}).`,
+          timestamp: new Date().toISOString()
+        };
+        const existing = JSON.parse(localStorage.getItem('recruit_activities') || '[]');
+        localStorage.setItem('recruit_activities', JSON.stringify([resumeAct, ...existing].slice(0, 15)));
+      } catch (e) {
+        console.error("Error logging resume activity:", e);
+      }
     }
   };
 

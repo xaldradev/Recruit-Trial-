@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Sparkles, Map, TrendingUp, HelpCircle, Clipboard, ChevronRight, BookOpen, Clock, Award, ShieldCheck } from 'lucide-react';
 import InteractiveD3Roadmap from './InteractiveD3Roadmap';
+import { useAuth } from '../context/AuthContext';
 
 interface RoadmapPhase {
   phaseNumber: number;
@@ -19,7 +20,8 @@ interface CareerRoadmap {
   salaryExpectation: string;
 }
 
-export default function CareerPage() {
+export default function CareerPage({ onOpenAuth }: { onOpenAuth?: () => void }) {
+  const { user } = useAuth();
   const [targetField, setTargetField] = useState('Technology');
   const [targetRole, setTargetRole] = useState('Full Stack Web Developer');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -81,6 +83,21 @@ export default function CareerPage() {
         result = 'Entrepreneurship, MSME trading, and Startups fit your high-agency preference. Check out Mudra funding programs and the Business board!';
       }
       setAssessmentResult(result);
+
+      // Log career assessment activity
+      try {
+        const quizAct = {
+          id: `act-${Date.now()}`,
+          type: 'quiz',
+          title: 'Career Assessment Completed',
+          description: `Took the AROHI personality diagnostic. Primary matched sector: ${techVotes >= govVotes && techVotes >= bizVotes ? 'Technology' : govVotes >= techVotes && govVotes >= bizVotes ? 'Civil Services/Govt' : 'Business Launchpad'}.`,
+          timestamp: new Date().toISOString()
+        };
+        const existing = JSON.parse(localStorage.getItem('recruit_activities') || '[]');
+        localStorage.setItem('recruit_activities', JSON.stringify([quizAct, ...existing].slice(0, 15)));
+      } catch (e) {
+        console.error("Error logging career assessment activity:", e);
+      }
     }
   };
 
@@ -158,6 +175,27 @@ export default function CareerPage() {
         <h2 className="text-2xl md:text-3xl font-black mt-2 tracking-tight">AI Career Counselor</h2>
         <p className="text-xs text-slate-400 mt-1 max-w-xl">Take a smart personality/skills assessment or directly input your career goal to let AROHI blueprint a personalized roadmap to landing your dream job.</p>
       </div>
+
+      {/* SECURITY REGISTRATION NOTICE BANNER FOR ROADMAPS */}
+      {!user && (
+        <div className="bg-gradient-to-r from-rose-950/20 via-[#3a1520]/30 to-rose-950/20 border border-rose-500/25 rounded-3xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 text-left">
+          <div className="space-y-1">
+            <span className="text-[9px] font-black uppercase text-rose-400 font-mono tracking-widest block">🎓 AI CAREER COUNSELOR REGISTRY</span>
+            <h4 className="text-xs font-black text-white">
+              Save Your AI Career Assessments & D3 Skill Roadmaps
+            </h4>
+            <p className="text-[11px] text-slate-300 font-medium max-w-2xl">
+              You are currently using career counselor roadmaps as a Guest. Connect with Google Sign-In to backup your assessment results, preserve customized skill pathways, and sync speech-evaluated mock interviews!
+            </p>
+          </div>
+          <button 
+            onClick={onOpenAuth}
+            className="px-5 py-2.5 bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md shrink-0 active:scale-95 hover:scale-[1.02]"
+          >
+            Create Counselor Account
+          </button>
+        </div>
+      )}
 
       {/* D3-based Interactive Career Roadmap Visualization */}
       <InteractiveD3Roadmap initialField={targetField} onFieldChange={setTargetField} />
