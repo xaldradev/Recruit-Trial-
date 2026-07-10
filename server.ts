@@ -14,11 +14,28 @@ dotenv.config();
 let adminApp: any = null;
 let adminDb: any = null;
 try {
-  adminApp = admin.initializeApp({
-    projectId: 'recruit-auth-515f9',
-  });
+  const serviceAccountVar = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (serviceAccountVar) {
+    try {
+      const serviceAccount = JSON.parse(serviceAccountVar);
+      adminApp = admin.initializeApp({
+        credential: (admin as any).credential.cert(serviceAccount),
+        projectId: 'recruit-auth-515f9',
+      });
+      console.log('Firebase Admin SDK initialized successfully with service account credential.');
+    } catch (parseErr) {
+      console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT env variable:', parseErr);
+      adminApp = admin.initializeApp({
+        projectId: 'recruit-auth-515f9',
+      });
+    }
+  } else {
+    adminApp = admin.initializeApp({
+      projectId: 'recruit-auth-515f9',
+    });
+    console.log('Firebase Admin SDK initialized with default credentials.');
+  }
   adminDb = getFirestore(adminApp);
-  console.log('Firebase Admin SDK initialized successfully.');
 } catch (err) {
   console.error('Failed to initialize Firebase Admin SDK:', err);
 }

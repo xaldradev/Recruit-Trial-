@@ -8,7 +8,10 @@ import {
   sendPasswordResetEmail, 
   updateProfile,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  OAuthProvider,
+  signInWithPhoneNumber,
+  RecaptchaVerifier
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
@@ -49,6 +52,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  signInWithApple: () => Promise<void>;
+  signInWithPhone: (phoneNumber: string, recaptchaVerifier: any) => Promise<any>;
   signOutUser: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updateUserProfile: (profile: Partial<UserProfile>) => Promise<void>;
@@ -56,7 +61,7 @@ interface AuthContextType {
     enrolledCourses?: string[];
     completedModules?: Record<string, string[]>;
     checkedChecklist?: Record<string, boolean>;
-    earnedCertificates?: string[];
+    earnedCertificates?: Record<string, any> | string[];
   }) => Promise<void>;
   updateBookmarks: (savedItems: Array<{ id: string; title: string; type: string; desc: string }>) => Promise<void>;
   updateApplications: (applications: Application[]) => Promise<void>;
@@ -377,6 +382,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUserData(data);
   };
 
+  const signInWithApple = async () => {
+    const provider = new OAuthProvider('apple.com');
+    const result = await signInWithPopup(auth, provider);
+    const firebaseUser = result.user;
+
+    const loggedUser: User = {
+      uid: firebaseUser.uid,
+      email: firebaseUser.email,
+      displayName: firebaseUser.displayName || 'Apple User'
+    };
+    setUser(loggedUser);
+    localStorage.setItem('recruit_user', JSON.stringify(loggedUser));
+
+    // Fetch user document
+    const data = await loadAndSyncUserData(firebaseUser);
+    setUserData(data);
+  };
+
+  const signInWithPhone = async (phoneNumber: string, recaptchaVerifier: any) => {
+    const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+    return confirmationResult;
+  };
+
   const signOutUser = async () => {
     await signOut(auth);
     setUser(null);
@@ -570,6 +598,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signIn,
       signUp,
       signInWithGoogle,
+      signInWithApple,
+      signInWithPhone,
       signOutUser,
       resetPassword,
       updateUserProfile,
