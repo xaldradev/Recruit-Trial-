@@ -321,6 +321,51 @@ app.all('/__/auth/*', async (req, res) => {
 // Firebase Web API Key for client/auth REST API (from firebase-applet-config.json)
 const FIREBASE_API_KEY = "AIzaSyBDzgG169KTE_IDXTZ3lnRQfgZW3Bu2xvM";
 
+// API Endpoint to save custom Arohi avatar uploaded by the user to local storage and sync it to the workspace server-side
+app.post('/api/save-arohi-avatar', (req, res) => {
+  const { imageBase64 } = req.body;
+  if (!imageBase64) {
+    return res.status(400).json({ error: 'No image data provided' });
+  }
+
+  try {
+    // Check if it's a data URL, and extract only the base64 part
+    let base64Data = imageBase64;
+    if (imageBase64.includes(';base64,')) {
+      base64Data = imageBase64.split(';base64,')[1];
+    }
+
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    // We will save it as Arohi.jpg in the workspace root
+    const rootDir = process.cwd();
+    const filePath = path.join(rootDir, 'Arohi.jpg');
+    fs.writeFileSync(filePath, buffer);
+    console.log('[Server] Successfully saved Arohi.jpg to workspace root!');
+
+    // Also write it directly to the dist folder if it exists, so it serves immediately in production without rebuild
+    const distPath = path.join(rootDir, 'dist');
+    if (fs.existsSync(distPath)) {
+      const distFilePath = path.join(distPath, 'arohi.png');
+      fs.writeFileSync(distFilePath, buffer);
+      console.log('[Server] Successfully saved arohi.png to dist folder for immediate service!');
+    }
+
+    // Also save it to an assets folder if it exists
+    const assetsDir = path.join(rootDir, 'assets');
+    if (fs.existsSync(assetsDir)) {
+      const assetsFilePath = path.join(assetsDir, 'Arohi.jpg');
+      fs.writeFileSync(assetsFilePath, buffer);
+      console.log('[Server] Successfully saved Arohi.jpg to assets folder!');
+    }
+
+    return res.json({ success: true, message: 'Arohi avatar successfully saved and synchronized on the server!' });
+  } catch (err: any) {
+    console.error('Failed to save Arohi avatar:', err);
+    return res.status(500).json({ error: 'Failed to save avatar: ' + err.message });
+  }
+});
+
 // API endpoints for Server-Side Auth Proxy
 app.post('/api/auth/signup', async (req, res) => {
   const { email, password, name } = req.body;
