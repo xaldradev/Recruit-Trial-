@@ -29,6 +29,7 @@ import WelcomeLanding from './components/WelcomeLanding';
 import ArohiAvatar from './components/ArohiAvatar';
 
 import { initialPostings } from './data/initialData';
+import { INITIAL_REVIEWS, Review } from './data/reviewsData';
 import { Posting, Application, CategoryType } from './types';
 import { Award, Crown, CheckCircle, Landmark, Bell, ArrowUpRight, ShieldCheck, Sparkles, Bot, GraduationCap, Briefcase, ChevronRight, Mic, MicOff, ArrowLeft, Home, Compass, Map, RotateCcw, Star, Users, MapPin, RefreshCw, Quote, Plus, MessageSquare, MessageCircle, Zap, Coins } from 'lucide-react';
 
@@ -73,81 +74,7 @@ const INITIAL_MOCK_APPLICATIONS: Application[] = [
   }
 ];
 
-interface Review {
-  id: string;
-  name: string;
-  city: string;
-  state: string; // 'Odisha' or other Indian states
-  rating: number; // 1-5
-  comment: string;
-  date: string;
-}
-
-const INITIAL_REVIEWS: Review[] = [
-  {
-    id: 'rev-1',
-    name: 'Debasish Mohanty',
-    city: 'Bhubaneswar',
-    state: 'Odisha',
-    rating: 5,
-    comment: "The Drone Piloting & Agri-Spraying certification course was incredibly comprehensive! Arohi's AI-Guided Auto-Pilot study modes made the technical mapping formulas extremely simple to master.",
-    date: '24 Jun 2026'
-  },
-  {
-    id: 'rev-2',
-    name: 'Priyanka Sen',
-    city: 'Kolkata',
-    state: 'West Bengal',
-    rating: 5,
-    comment: "I used the ATS Resume evaluation tool to check my application for the Railway RRB Assistant Loco Pilot (ALP) posting. It flagged three missing high-impact engineering keywords. Highly recommended!",
-    date: '21 Jun 2026'
-  },
-  {
-    id: 'rev-3',
-    name: 'Subrata Sahoo',
-    city: 'Cuttack',
-    state: 'Odisha',
-    rating: 5,
-    comment: "Excellent startup resources on Udyam registrations and Mudra Loans. The business checklist helped us secure our Shishu microfinance verification seamlessly.",
-    date: '18 Jun 2026'
-  },
-  {
-    id: 'rev-4',
-    name: 'Ananya Rao',
-    city: 'Hyderabad',
-    state: 'Telangana',
-    rating: 5,
-    comment: "The quantitative aptitude preparation guides are top-notch. Arohi's mock exam preparation suggestions feel like having a private career counselor sitting next to you.",
-    date: '15 Jun 2026'
-  },
-  {
-    id: 'rev-5',
-    name: 'Meera Patnaik',
-    city: 'Berhampur',
-    state: 'Odisha',
-    rating: 5,
-    comment: "It is extremely hard to find accurate local state schemes. The Matchmaker in this app instantly found active central subsidies and Mukhyamantri schemes that saved us lakhs in initial setup costs.",
-    date: '12 Jun 2026'
-  },
-  {
-    id: 'rev-6',
-    name: 'Rohan Das',
-    city: 'Balasore',
-    state: 'Odisha',
-    rating: 4,
-    comment: "Very smooth interface. The automated application slips print perfectly with computer-generated security codes. Best next-gen recruitment platform in India.",
-    date: '10 Jun 2026'
-  },
-  {
-    id: 'rev-7',
-    name: 'Vikram Malhotra',
-    city: 'New Delhi',
-    state: 'Delhi',
-    rating: 5,
-    comment: "The mock interview simulator gave me the direct feedback I needed to refine my answers. Having realistic AI assessments before face-to-face panels is a massive advantage.",
-    date: '08 Jun 2026'
-  }
-];
+// INITIAL_REVIEWS and Review interface are imported from ./data/reviewsData
 
 export default function App() {
   const { user, userData, updateApplications } = useAuth();
@@ -1063,11 +990,11 @@ export default function App() {
                   Formulate Your Permanent National Career Profile
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-300 max-w-2xl font-semibold leading-relaxed">
-                  Connecting via Google Sign-In securely registers your candidacy on our Firestore Cloud database. Track course completions, save government matching schemes, preserve live AI speech interview ratings, and backup all your active application slips securely!
+                  Connecting via Google Sign-In securely registers your candidacy to a secure cloud-synced account. Track course completions, save government matching schemes, preserve live AI speech interview ratings, and backup all your active application slips securely!
                 </p>
                 
                 <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-[11px] font-bold text-purple-300">
-                  <span className="flex items-center gap-1.5">🛡️ 100% Secured by Firebase</span>
+                  <span className="flex items-center gap-1.5">🛡️ 100% Secure & Encrypted</span>
                   <span className="flex items-center gap-1.5">📝 Save Live ATS Resume History</span>
                   <span className="flex items-center gap-1.5">🏆 Verify Academic Credentials</span>
                 </div>
@@ -2879,31 +2806,76 @@ export default function App() {
 
       {/* Floating assistant bubble in bottom right corner */}
       {(!isChatOpen || isChatMinimized) && (
-        <button
-          onClick={() => {
-            if (isChatOpen) {
-              // Toggle closed or restore if minimized
-              if (isChatMinimized) {
-                setIsChatMinimized(false);
-              } else {
-                setIsChatOpen(false);
-              }
-            } else {
-              setIsChatOpen(true);
-              setIsChatMinimized(false);
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: 50 }}
+          animate={{ 
+            opacity: 1, 
+            scale: 1, 
+            y: [0, -10, 0],
+          }}
+          transition={{
+            opacity: { duration: 0.5 },
+            scale: { duration: 0.5 },
+            y: {
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
             }
           }}
-          className="fixed bottom-6 right-6 bg-[#7c3aed] hover:bg-[#6d28d9] active:scale-95 text-white p-3 sm:p-3.5 rounded-full shadow-[0_4px_20px_rgba(124,58,237,0.45)] border border-[#a78bfa]/40 z-50 flex items-center justify-center gap-2 group transition-all duration-300"
-          title="Talk to AROHI"
+          className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2"
         >
-          <div className="w-7 h-7 rounded-full overflow-hidden shrink-0">
-            <ArohiAvatar className="w-full h-full" />
-          </div>
-          <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-out text-xs font-black uppercase tracking-wider whitespace-nowrap">
-            {isChatOpen && !isChatMinimized ? 'Close AROHI' : 'Ask AROHI'}
-          </span>
-          <span className="absolute top-0 right-0 w-3 h-3 bg-[#00e676] rounded-full border-2 border-[#090714] animate-pulse"></span>
-        </button>
+          {/* Creative floating prompt with heartbeat effect to attract the user */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, x: 10 }}
+            animate={{ 
+              opacity: [0.95, 1, 0.95],
+              scale: [0.98, 1.02, 0.98],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="bg-gradient-to-r from-[#17103a] to-[#6327d4] text-white px-3.5 py-1.5 rounded-2xl rounded-br-none border border-[#7c3aed]/55 text-[11px] font-extrabold tracking-wide uppercase shadow-[0_6px_20px_rgba(124,58,237,0.4)] backdrop-blur-md flex items-center gap-2 select-none"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00e676] animate-ping shrink-0"></span>
+            <span>Ask Arohi! ✨</span>
+          </motion.div>
+
+          {/* Core circular button fully showing Arohi's image */}
+          <button
+            onClick={() => {
+              if (isChatOpen) {
+                if (isChatMinimized) {
+                  setIsChatMinimized(false);
+                } else {
+                  setIsChatOpen(false);
+                }
+              } else {
+                setIsChatOpen(true);
+                setIsChatMinimized(false);
+              }
+            }}
+            className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full p-0 bg-transparent active:scale-95 transition-all duration-300 shadow-[0_8px_32px_rgba(124,58,237,0.5)] border-2 border-[#a78bfa]/50 hover:border-[#a78bfa] cursor-pointer overflow-visible group"
+            title="Talk to AROHI"
+          >
+            {/* The Arohi image filling the entire button */}
+            <div className="w-full h-full rounded-full overflow-hidden">
+              <ArohiAvatar className="w-full h-full scale-[1.08] object-cover transition-transform duration-500 group-hover:scale-120" />
+            </div>
+
+            {/* Glowing ring animation */}
+            <span className="absolute inset-0 rounded-full border-2 border-purple-400/40 animate-ping opacity-60 pointer-events-none"></span>
+
+            {/* Hover tooltip label */}
+            <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-slate-950/95 border border-purple-500/50 text-slate-100 font-bold px-3 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none tracking-wide">
+              {isChatOpen && !isChatMinimized ? 'Close AROHI' : 'Ask AROHI'}
+            </span>
+
+            {/* Active green status light */}
+            <span className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-[#00e676] rounded-full border-2 border-[#090714] z-10 shadow-[0_0_8px_#00e676]"></span>
+          </button>
+        </motion.div>
       )}
 
       {/* Simulated Premium Checkout Modal */}

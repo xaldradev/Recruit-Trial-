@@ -2175,32 +2175,34 @@ app.get('/sitemap.xml', (req, res) => {
 });
 
 // Dynamic route to serve any uploaded Arohi image from the project root with any extension (png, jpg, jpeg, webp)
-app.get('/arohi.png', (req, res) => {
+app.get(['/arohi.png', '/arohi.jpg', '/Arohi.jpg', '/Arohi.png', '/arohi.jpeg', '/Arohi.jpeg'], (req, res) => {
   const rootDir = process.cwd();
   try {
-    const files = fs.readdirSync(rootDir);
-    // Find any file that starts with "arohi" or contains "arohi" (case-insensitive) and has an image extension
-    const imageFile = files.find(file => {
-      const lower = file.toLowerCase();
-      return (lower.startsWith('arohi') || lower.includes('arohi')) && 
-             (lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.webp'));
-    });
+    // List of directories to search, in order of priority (public and dist first, then assets, then root)
+    const searchDirs = [
+      path.join(rootDir, 'public'),
+      path.join(rootDir, 'dist'),
+      path.join(rootDir, 'assets'),
+      rootDir
+    ];
 
-    if (imageFile) {
-      return res.sendFile(path.join(rootDir, imageFile));
-    }
-    
-    // Also check the assets folder if it has any such files
-    const assetsDir = path.join(rootDir, 'assets');
-    if (fs.existsSync(assetsDir)) {
-      const assetsFiles = fs.readdirSync(assetsDir);
-      const assetsImageFile = assetsFiles.find(file => {
-        const lower = file.toLowerCase();
-        return (lower.startsWith('arohi') || lower.includes('arohi')) && 
-               (lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.webp'));
-      });
-      if (assetsImageFile) {
-        return res.sendFile(path.join(assetsDir, assetsImageFile));
+    for (const dir of searchDirs) {
+      if (fs.existsSync(dir)) {
+        const files = fs.readdirSync(dir);
+        // Find any file that starts with "arohi" or contains "arohi" (case-insensitive) and has an image extension
+        const imageFile = files.find(file => {
+          const lower = file.toLowerCase();
+          return (lower.startsWith('arohi') || lower.includes('arohi')) && 
+                 (lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.webp'));
+        });
+
+        if (imageFile) {
+          const fullPath = path.join(dir, imageFile);
+          // Verify it's a file
+          if (fs.statSync(fullPath).isFile()) {
+            return res.sendFile(fullPath);
+          }
+        }
       }
     }
   } catch (err) {

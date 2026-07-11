@@ -328,7 +328,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <p className="text-xs text-slate-400 leading-normal">
                 {otpSent 
                   ? `Please enter the verification code sent to ${phoneNumber}.` 
-                  : 'Fast, secure phone validation via Firebase SMS authentication.'}
+                  : 'Fast, secure phone validation via secure SMS authentication.'}
               </p>
             </div>
 

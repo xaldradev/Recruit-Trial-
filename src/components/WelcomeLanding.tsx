@@ -222,54 +222,6 @@ export default function WelcomeLanding({ onEnter, setActiveTab, language, onLang
   return (
     <div className="relative w-full h-screen min-h-[580px] sm:min-h-[640px] bg-[#020208] text-white flex flex-col justify-between overflow-hidden font-sans select-none">
       
-      {/* Top Floating Language Dropdown Selector */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2" ref={langDropdownRef}>
-        <div className="relative">
-          <button 
-            onClick={() => setIsLangOpen(!isLangOpen)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#120d2b]/80 hover:bg-[#1b143f]/80 border border-[#3e2b85]/50 rounded-full text-xs font-semibold text-slate-200 hover:text-white transition-all shadow-md backdrop-blur-md cursor-pointer min-w-[85px] justify-between"
-          >
-            <div className="flex items-center gap-1">
-              <Globe className="w-3.5 h-3.5 text-purple-400 animate-spin" style={{ animationDuration: '15s' }} />
-              <span className="font-extrabold text-[11px] tracking-wide text-purple-200">
-                {LANGUAGES_LIST.find(l => l.code === language)?.symbol || 'AA'}
-              </span>
-            </div>
-            <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform duration-300 ${isLangOpen ? 'rotate-180' : ''}`} />
-          </button>
-          
-          <div 
-            className={`absolute left-1/2 -translate-x-1/2 mt-2 w-52 max-h-72 overflow-y-auto bg-[#0d091e]/95 border border-[#3e2b85]/70 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all duration-300 scrollbar-thin scrollbar-thumb-purple-900/50 scrollbar-track-transparent ${
-              isLangOpen 
-                ? 'opacity-100 scale-100 pointer-events-auto' 
-                : 'opacity-0 scale-95 pointer-events-none'
-            } z-[60]`}
-          >
-            <div className="px-3.5 py-2 border-b border-[#2b1f5c]/40 text-[10px] text-slate-400 font-bold uppercase tracking-wider sticky top-0 bg-[#0d091e] z-10">
-              {getTranslation('selectLang', language)}
-            </div>
-            {LANGUAGES_LIST.map((lang) => (
-              <button
-                key={lang.code}
-                onClick={() => {
-                  onLanguageChange(lang.code as Language);
-                  setIsLangOpen(false);
-                }}
-                className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-all flex items-center justify-between cursor-pointer hover:bg-white/5 ${
-                  language === lang.code ? 'bg-[#7c3aed]/25 text-purple-200 font-bold' : 'text-slate-300 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="w-8 text-center text-[10px] font-bold bg-[#1b143f] px-1.5 py-0.5 rounded border border-[#3e2b85]/50 text-slate-300">{lang.symbol}</span>
-                  <span>{lang.native} {lang.english ? `(${lang.english})` : ''}</span>
-                </div>
-                {language === lang.code && <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* 1. Deep space backdrop with floating pink/blue light streaks and bokeh */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Neon Light Streaks */}
@@ -366,7 +318,7 @@ export default function WelcomeLanding({ onEnter, setActiveTab, language, onLang
           </motion.div>
 
           {/* Texts */}
-          <div className="space-y-1 sm:space-y-2">
+          <div className="space-y-1 sm:space-y-2 flex flex-col items-center">
             <motion.span 
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -393,6 +345,54 @@ export default function WelcomeLanding({ onEnter, setActiveTab, language, onLang
             >
               {getTranslation('dreamPrepare', language)}
             </motion.span>
+
+            {/* Language Selector Button centered below the prepare slogan */}
+            <div className="pt-2.5 z-50 flex items-center justify-center gap-2 relative" ref={langDropdownRef}>
+              <div className="relative">
+                <button 
+                  onClick={() => setIsLangOpen(!isLangOpen)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#120d2b]/90 hover:bg-[#1b143f]/90 border border-[#3e2b85]/70 rounded-full text-xs font-semibold text-slate-200 hover:text-white transition-all shadow-[0_4px_15px_rgba(124,58,237,0.3)] backdrop-blur-md cursor-pointer min-w-[90px] justify-between"
+                >
+                  <div className="flex items-center gap-1">
+                    <Globe className="w-3.5 h-3.5 text-purple-400 animate-spin" style={{ animationDuration: '15s' }} />
+                    <span className="font-extrabold text-[11px] tracking-wide text-purple-200">
+                      {LANGUAGES_LIST.find(l => l.code === language)?.symbol || 'AA'}
+                    </span>
+                  </div>
+                  <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform duration-300 ${isLangOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                <div 
+                  className={`absolute left-1/2 -translate-x-1/2 mt-2 w-52 max-h-72 overflow-y-auto bg-[#0d091e]/95 border border-[#3e2b85]/70 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all duration-300 scrollbar-thin scrollbar-thumb-purple-900/50 scrollbar-track-transparent ${
+                    isLangOpen 
+                      ? 'opacity-100 scale-100 pointer-events-auto' 
+                      : 'opacity-0 scale-95 pointer-events-none'
+                  } z-[60]`}
+                >
+                  <div className="px-3.5 py-2 border-b border-[#2b1f5c]/40 text-[10px] text-slate-400 font-bold uppercase tracking-wider sticky top-0 bg-[#0d091e] z-10">
+                    {getTranslation('selectLang', language)}
+                  </div>
+                  {LANGUAGES_LIST.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        onLanguageChange(lang.code as Language);
+                        setIsLangOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-all flex items-center justify-between cursor-pointer hover:bg-white/5 ${
+                        language === lang.code ? 'bg-[#7c3aed]/25 text-purple-200 font-bold' : 'text-slate-300 hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="w-8 text-center text-[10px] font-bold bg-[#1b143f] px-1.5 py-0.5 rounded border border-[#3e2b85]/50 text-slate-300">{lang.symbol}</span>
+                        <span>{lang.native} {lang.english ? `(${lang.english})` : ''}</span>
+                      </div>
+                      {language === lang.code && <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
 

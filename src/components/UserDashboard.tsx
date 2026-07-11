@@ -554,7 +554,7 @@ export default function UserDashboard({
                 <span className="bg-amber-500/25 text-amber-300 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">UNSAVED PROGRESS</span>
               </h4>
               <p className="text-xs text-slate-300 mt-1.5 font-semibold leading-relaxed max-w-xl">
-                You are utilizing localized state caches. Connect with Firebase secure sign-in to backup your career matching bookmarks, enrolled courses progress, checklist achievements, and job application histories persistently across devices!
+                You are utilizing localized state caches. Connect with secure cloud sign-in to backup your career matching bookmarks, enrolled courses progress, checklist achievements, and job application histories persistently across devices!
               </p>
             </div>
           </div>
