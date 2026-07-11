@@ -525,6 +525,13 @@ export default function UserDashboard({
       desc: 'If not interested in jobs, transform your vision into an MSME business.',
       price: '₹399/mo',
       perks: ['PMEGP & Mudra loan checklist', 'Odisha state startup benefits', 'Validating business scalability', 'Udyam micro registration steps']
+    },
+    {
+      id: 'path4',
+      title: 'Path 4: Class 1-10 Student Support',
+      desc: 'Interactive school curriculum, high-quality unique chapters, and personalized academic guidance.',
+      price: '₹399/mo',
+      perks: ['NCERT mapped curriculum & unique notes', 'Personalized chapter quiz feedback', 'Sciences & Languages syllabus notes', '24/7 School support from AROHI AI']
     }
   ];
 

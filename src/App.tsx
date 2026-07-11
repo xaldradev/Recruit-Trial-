@@ -354,7 +354,15 @@ export default function App() {
   // Load subscriptions from local storage
   const [subscriptions, setSubscriptions] = useState<Record<string, boolean>>(() => {
     const saved = localStorage.getItem('recruit_subscriptions');
-    return saved ? JSON.parse(saved) : { path1: false, path2: false, path3: false };
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return { path1: false, path2: false, path3: false, path4: false, ...parsed };
+      } catch (e) {
+        // Fallback
+      }
+    }
+    return { path1: false, path2: false, path3: false, path4: false };
   });
 
   const [checkoutPath, setCheckoutPath] = useState<{ id: string; title: string; price: string } | null>(null);
@@ -1089,15 +1097,15 @@ export default function App() {
         <section className="space-y-6">
           <div className="text-left space-y-1.5">
             <div className="inline-flex items-center gap-1.5 bg-[#fbbf24]/10 text-[#fcd34d] border border-[#fbbf24]/30 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-              👑 Elite Career Ecosystem
+            👑 Elite Career & Academic Ecosystem
             </div>
-            <h3 className="text-2xl md:text-3xl font-black text-white tracking-tight">Three Strategic Professional Paths</h3>
+            <h3 className="text-2xl md:text-3xl font-black text-white tracking-tight">Four Strategic Support & Career Paths</h3>
             <p className="text-xs text-slate-300 max-w-3xl font-semibold leading-relaxed">
               Explore your ideal track below. Our monthly assistance plan starting from a budgeted rate of <span className="text-yellow-300 font-extrabold">₹399/Month</span> empowers you with active expert guidelines and continuous support.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* PATH 1 CARD */}
             <div className="bg-gradient-to-br from-[#101c5c] via-[#090b24] to-[#040512] border-2 border-blue-500/30 hover:border-blue-400/80 rounded-[2.5rem] p-7 text-left flex flex-col justify-between transition-all duration-500 group shadow-[0_20px_50px_rgba(59,130,246,0.3)] hover:shadow-[0_30px_70px_rgba(59,130,246,0.5)] hover:scale-[1.02] relative overflow-hidden">
@@ -1322,6 +1330,82 @@ export default function App() {
                     }`}
                   >
                     {subscriptions.path3 ? 'Subscribed ✓' : 'Subscribe'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* PATH 4 CARD */}
+            <div className="bg-gradient-to-br from-[#111e58] via-[#060b24] to-[#020410] border-2 border-indigo-500/30 hover:border-indigo-400/80 rounded-[2.5rem] p-7 text-left flex flex-col justify-between transition-all duration-500 group shadow-[0_20px_50px_rgba(99,102,241,0.3)] hover:shadow-[0_30px_70px_rgba(99,102,241,0.5)] hover:scale-[1.02] relative overflow-hidden">
+              <div className="absolute -top-12 -right-12 w-36 h-36 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/30 transition-colors"></div>
+              <div className="space-y-5">
+                <div className="flex justify-between items-center">
+                  <div className="bg-gradient-to-tr from-indigo-600 to-blue-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-[0_8px_25px_rgba(99,102,241,0.4)] border border-indigo-400/30">
+                    📚
+                  </div>
+                  <span className="text-[10px] bg-indigo-500/25 text-indigo-100 font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full border border-indigo-400/30 shadow-sm">
+                    Path 4: Class 1-10
+                  </span>
+                </div>
+                
+                <div className="space-y-2">
+                  <h4 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none group-hover:text-indigo-100 transition-colors">
+                    School Support Path
+                  </h4>
+                  <p className="text-sm text-slate-200 leading-relaxed font-medium">
+                    Syllabus explorer for Class 1-10 students. Access high-quality unique chapters for Languages and Sciences mapped to standard curricula.
+                  </p>
+                </div>
+
+                <div className="space-y-2.5 border-t border-slate-800/60 pt-5">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Elite Benefits Included:</span>
+                  <div className="space-y-2 text-xs font-semibold text-slate-200">
+                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
+                      <span className="text-emerald-400 text-sm">✓</span>
+                      <span>Unique high-quality chapter notes</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
+                      <span className="text-emerald-400 text-sm">✓</span>
+                      <span>Interactive school syllabus explorer</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
+                      <span className="text-emerald-400 text-sm">✓</span>
+                      <span>24/7 School support from AROHI AI</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-slate-800/60 mt-6 space-y-3.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Assistance Fee</span>
+                  <div className="text-right">
+                    <span className="text-2xl font-black text-white tracking-tight">₹399</span>
+                    <span className="text-xs font-semibold text-slate-400"> / month</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <button 
+                    onClick={() => setActiveTab('syllabus')}
+                    className="bg-white/10 hover:bg-white/15 text-white border border-white/20 hover:border-white/30 font-extrabold text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all text-center cursor-pointer active:scale-95"
+                  >
+                    Open Syllabus
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (subscriptions.path4) {
+                        handleSubscribe('path4');
+                      } else {
+                        setCheckoutPath({ id: 'path4', title: 'Path 4: Class 1-10 Student Support Plan', price: '₹399/Month' });
+                      }
+                    }}
+                    className={`font-black text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all cursor-pointer text-center active:scale-95 ${
+                      subscriptions.path4 
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
+                        : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-[0_4px_15px_rgba(99,102,241,0.4)] border border-indigo-400/20'
+                    }`}
+                  >
+                    {subscriptions.path4 ? 'Subscribed ✓' : 'Subscribe'}
                   </button>
                 </div>
               </div>

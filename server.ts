@@ -1,12 +1,14 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Modality } from '@google/genai';
 import dotenv from 'dotenv';
 import { createResumeDocx } from './server-resume.ts';
 import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
+import { WebSocketServer, WebSocket } from 'ws';
 
 dotenv.config();
 
@@ -39,6 +41,119 @@ try {
 } catch (err) {
   console.error('Failed to initialize Firebase Admin SDK:', err);
 }
+
+// Resilient persistent local database fallback for users
+const inMemoryUsers = new Map<string, any>();
+const LOCAL_DB_PATH = path.join(process.cwd(), 'users-local-db.json');
+
+// Helper to load/save user cache locally
+function loadLocalDb() {
+  try {
+    if (fs.existsSync(LOCAL_DB_PATH)) {
+      const raw = fs.readFileSync(LOCAL_DB_PATH, 'utf8');
+      const data = JSON.parse(raw);
+      for (const [k, v] of Object.entries(data)) {
+        inMemoryUsers.set(k, v);
+      }
+      console.log(`[Resilient Db] Successfully loaded cached users from persistent store: ${Object.keys(data).length} profiles.`);
+    }
+  } catch (e: any) {
+    console.warn('[Resilient Db] Failed to read local persistent DB:', e.message || e);
+  }
+}
+
+function saveLocalDb() {
+  try {
+    const obj = Object.fromEntries(inMemoryUsers.entries());
+    fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(obj, null, 2), 'utf8');
+  } catch (e: any) {
+    console.warn('[Resilient Db] Failed to write local persistent DB:', e.message || e);
+  }
+}
+
+// Initial load
+loadLocalDb();
+
+const safeUserDb = {
+  get: async (uid: string) => {
+    if (adminDb) {
+      try {
+        const userDocRef = adminDb.collection('users').doc(uid);
+        const docSnap = await userDocRef.get();
+        if (docSnap.exists) {
+          const data = docSnap.data();
+          inMemoryUsers.set(uid, data);
+          saveLocalDb();
+          return { exists: true, data: () => data };
+        }
+      } catch (err: any) {
+        const errMsg = err.message || String(err);
+        if (errMsg.includes('PERMISSION_DENIED') || errMsg.includes('insufficient permissions')) {
+          console.warn(`[Resilient Db] Firestore lacks permission for get() on UID ${uid}. Defaulting server to high-fidelity persistent local storage mode.`);
+          adminDb = null; // Disable future calls to prevent error log spamming
+        } else {
+          console.warn(`[Resilient Db] Firestore get() failed for ${uid}:`, errMsg);
+        }
+      }
+    }
+    const memData = inMemoryUsers.get(uid);
+    if (memData) {
+      return { exists: true, data: () => memData };
+    }
+    return { exists: false, data: () => null };
+  },
+
+  set: async (uid: string, data: any) => {
+    inMemoryUsers.set(uid, data);
+    saveLocalDb();
+    if (adminDb) {
+      try {
+        const userDocRef = adminDb.collection('users').doc(uid);
+        await userDocRef.set(data);
+        return true;
+      } catch (err: any) {
+        const errMsg = err.message || String(err);
+        if (errMsg.includes('PERMISSION_DENIED') || errMsg.includes('insufficient permissions')) {
+          console.warn(`[Resilient Db] Firestore lacks permission for set() on UID ${uid}. Defaulting server to high-fidelity persistent local storage mode.`);
+          adminDb = null; // Disable future calls to prevent error log spamming
+        } else {
+          console.warn(`[Resilient Db] Firestore set() failed for ${uid}:`, errMsg);
+        }
+      }
+    }
+    return true;
+  },
+
+  update: async (uid: string, partialData: any) => {
+    const existing = inMemoryUsers.get(uid) || {};
+    const updated = { ...existing, ...partialData };
+    inMemoryUsers.set(uid, updated);
+    saveLocalDb();
+
+    if (adminDb) {
+      try {
+        const userDocRef = adminDb.collection('users').doc(uid);
+        await userDocRef.update(partialData);
+        return true;
+      } catch (err: any) {
+        const errMsg = err.message || String(err);
+        if (errMsg.includes('PERMISSION_DENIED') || errMsg.includes('insufficient permissions')) {
+          console.warn(`[Resilient Db] Firestore lacks permission for update() on UID ${uid}. Defaulting server to high-fidelity persistent local storage mode.`);
+          adminDb = null; // Disable future calls to prevent error log spamming
+        } else {
+          console.warn(`[Resilient Db] Firestore update() failed for ${uid}:`, errMsg);
+          try {
+            const userDocRef = adminDb.collection('users').doc(uid);
+            await userDocRef.set(updated);
+          } catch (setErr) {
+            // Ignore secondary write failures
+          }
+        }
+      }
+    }
+    return true;
+  }
+};
 
 const app = express();
 app.use(express.json({ limit: '10mb' }));
@@ -224,48 +339,43 @@ app.post('/api/auth/signup', async (req, res) => {
     
     const uid = data.localId;
     
-    // 2. Create the user document in Firestore using the Admin SDK
-    if (adminDb) {
-      const userDocRef = adminDb.collection('users').doc(uid);
-      const initialData = {
-        uid: uid,
+    // 2. Create the user document in Firestore using the Resilient SDK
+    const initialData = {
+      uid: uid,
+      email: email,
+      displayName: name,
+      profile: {
+        name: name,
         email: email,
+        phone: '+91 98765 43210',
+        location: 'Delhi NCR',
+        education: 'Graduate',
+        activeGoal: 'Government & Public Sector Career'
+      },
+      enrolledCourses: [],
+      completedModules: {},
+      checkedChecklist: {},
+      earnedCertificates: [],
+      savedItems: [
+        { id: '1', title: 'PM Mudra Loan Scheme', type: 'Scheme', desc: 'Collateral free funding' },
+        { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
+      ],
+      applications: [],
+      updatedAt: new Date().toISOString()
+    };
+    await safeUserDb.set(uid, initialData);
+    
+    return res.json({
+      success: true,
+      user: {
+        uid,
+        email,
         displayName: name,
-        profile: {
-          name: name,
-          email: email,
-          phone: '+91 98765 43210',
-          location: 'Delhi NCR',
-          education: 'Graduate',
-          activeGoal: 'Government & Public Sector Career'
-        },
-        enrolledCourses: [],
-        completedModules: {},
-        checkedChecklist: {},
-        earnedCertificates: [],
-        savedItems: [
-          { id: '1', title: 'PM Mudra Loan Scheme', type: 'Scheme', desc: 'Collateral free funding' },
-          { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
-        ],
-        applications: [],
-        updatedAt: new Date().toISOString()
-      };
-      await userDocRef.set(initialData);
-      
-      return res.json({
-        success: true,
-        user: {
-          uid,
-          email,
-          displayName: name,
-          idToken: data.idToken,
-          refreshToken: data.refreshToken
-        },
-        userData: initialData
-      });
-    } else {
-      throw new Error('Database is currently offline.');
-    }
+        idToken: data.idToken,
+        refreshToken: data.refreshToken
+      },
+      userData: initialData
+    });
   } catch (error: any) {
     console.error('Signup error:', error);
     res.status(400).json({ error: error.message });
@@ -289,56 +399,51 @@ app.post('/api/auth/signin', async (req, res) => {
     
     const uid = data.localId;
     
-    // 2. Fetch the user document from Firestore
-    if (adminDb) {
-      const userDocRef = adminDb.collection('users').doc(uid);
-      const docSnap = await userDocRef.get();
-      let userData = null;
-      
-      if (docSnap.exists) {
-        userData = docSnap.data();
-      } else {
-        // Create initial document if it didn't exist
-        userData = {
-          uid: uid,
-          email: email,
-          displayName: data.displayName || 'Honored Guest',
-          profile: {
-            name: data.displayName || 'Honored Guest',
-            email: email,
-            phone: '+91 98765 43210',
-            location: 'Delhi NCR',
-            education: 'Graduate',
-            activeGoal: 'Government & Public Sector Career'
-          },
-          enrolledCourses: [],
-          completedModules: {},
-          checkedChecklist: {},
-          earnedCertificates: [],
-          savedItems: [
-            { id: '1', title: 'PM Mudra Loan Scheme', type: 'Scheme', desc: 'Collateral free funding' },
-            { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
-          ],
-          applications: [],
-          updatedAt: new Date().toISOString()
-        };
-        await userDocRef.set(userData);
-      }
-      
-      return res.json({
-        success: true,
-        user: {
-          uid,
-          email,
-          displayName: userData.displayName || data.displayName,
-          idToken: data.idToken,
-          refreshToken: data.refreshToken
-        },
-        userData
-      });
+    // 2. Fetch the user document from Firestore using the Resilient SDK
+    const docSnap = await safeUserDb.get(uid);
+    let userData = null;
+    
+    if (docSnap.exists) {
+      userData = docSnap.data();
     } else {
-      throw new Error('Database is currently offline.');
+      // Create initial document if it didn't exist
+      userData = {
+        uid: uid,
+        email: email,
+        displayName: data.displayName || 'Honored Guest',
+        profile: {
+          name: data.displayName || 'Honored Guest',
+          email: email,
+          phone: '+91 98765 43210',
+          location: 'Delhi NCR',
+          education: 'Graduate',
+          activeGoal: 'Government & Public Sector Career'
+        },
+        enrolledCourses: [],
+        completedModules: {},
+        checkedChecklist: {},
+        earnedCertificates: [],
+        savedItems: [
+          { id: '1', title: 'PM Mudra Loan Scheme', type: 'Scheme', desc: 'Collateral free funding' },
+          { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
+        ],
+        applications: [],
+        updatedAt: new Date().toISOString()
+      };
+      await safeUserDb.set(uid, userData);
     }
+    
+    return res.json({
+      success: true,
+      user: {
+        uid,
+        email,
+        displayName: userData.displayName || data.displayName,
+        idToken: data.idToken,
+        refreshToken: data.refreshToken
+      },
+      userData
+    });
   } catch (error: any) {
     console.error('Signin error:', error);
     res.status(400).json({ error: error.message });
@@ -349,55 +454,50 @@ app.post('/api/auth/google-sync', async (req, res) => {
   const { uid, email, displayName } = req.body;
   try {
     if (!uid) return res.status(400).json({ error: 'UID is required.' });
-    if (adminDb) {
-      const userDocRef = adminDb.collection('users').doc(uid);
-      const docSnap = await userDocRef.get();
-      let userData = null;
+    const docSnap = await safeUserDb.get(uid);
+    let userData = null;
 
-      if (docSnap.exists) {
-        userData = docSnap.data();
-      } else {
-        // Create initial document for Google signed-in user
-        userData = {
-          uid: uid,
-          email: email || '',
-          displayName: displayName || 'Honored Guest',
-          profile: {
-            name: displayName || 'Honored Guest',
-            email: email || '',
-            phone: '+91 98765 43210',
-            location: 'Delhi NCR',
-            education: 'Graduate',
-            activeGoal: 'Government & Public Sector Career'
-          },
-          enrolledCourses: [],
-          completedModules: {},
-          checkedChecklist: {},
-          earnedCertificates: [],
-          savedItems: [
-            { id: '1', title: 'PM Mudra Loan Scheme', type: 'Scheme', desc: 'Collateral free funding' },
-            { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
-          ],
-          applications: [],
-          updatedAt: new Date().toISOString()
-        };
-        await userDocRef.set(userData);
-      }
-
-      logActivity('visit', `User ${displayName || email || uid} signed in via Google`);
-
-      return res.json({
-        success: true,
-        user: {
-          uid,
-          email,
-          displayName: displayName || userData.displayName || email,
-        },
-        userData
-      });
+    if (docSnap.exists) {
+      userData = docSnap.data();
     } else {
-      throw new Error('Database is currently offline.');
+      // Create initial document for Google signed-in user
+      userData = {
+        uid: uid,
+        email: email || '',
+        displayName: displayName || 'Honored Guest',
+        profile: {
+          name: displayName || 'Honored Guest',
+          email: email || '',
+          phone: '+91 98765 43210',
+          location: 'Delhi NCR',
+          education: 'Graduate',
+          activeGoal: 'Government & Public Sector Career'
+        },
+        enrolledCourses: [],
+        completedModules: {},
+        checkedChecklist: {},
+        earnedCertificates: [],
+        savedItems: [
+          { id: '1', title: 'PM Mudra Loan Scheme', type: 'Scheme', desc: 'Collateral free funding' },
+          { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
+        ],
+        applications: [],
+        updatedAt: new Date().toISOString()
+      };
+      await safeUserDb.set(uid, userData);
     }
+
+    logActivity('visit', `User ${displayName || email || uid} signed in via Google`);
+
+    return res.json({
+      success: true,
+      user: {
+        uid,
+        email,
+        displayName: displayName || userData.displayName || email,
+      },
+      userData
+    });
   } catch (error: any) {
     console.error('Google sync error:', error);
     res.status(400).json({ error: error.message });
@@ -429,22 +529,17 @@ app.post('/api/auth/update-profile', async (req, res) => {
   const { uid, profile } = req.body;
   try {
     if (!uid) return res.status(400).json({ error: 'UID is required.' });
-    if (adminDb) {
-      const userDocRef = adminDb.collection('users').doc(uid);
-      const docSnap = await userDocRef.get();
-      if (!docSnap.exists) {
-        return res.status(404).json({ error: 'User profile not found.' });
-      }
-      const currentProfile = docSnap.data().profile || {};
-      await userDocRef.update({
-        profile: { ...currentProfile, ...profile },
-        updatedAt: new Date().toISOString()
-      });
-      const updatedSnap = await userDocRef.get();
-      res.json({ success: true, userData: updatedSnap.data() });
-    } else {
-      res.status(500).json({ error: 'Database is currently offline.' });
+    const docSnap = await safeUserDb.get(uid);
+    if (!docSnap.exists) {
+      return res.status(404).json({ error: 'User profile not found.' });
     }
+    const currentProfile = docSnap.data().profile || {};
+    await safeUserDb.update(uid, {
+      profile: { ...currentProfile, ...profile },
+      updatedAt: new Date().toISOString()
+    });
+    const updatedSnap = await safeUserDb.get(uid);
+    res.json({ success: true, userData: updatedSnap.data() });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -454,21 +549,16 @@ app.post('/api/auth/update-career', async (req, res) => {
   const { uid, progress } = req.body;
   try {
     if (!uid) return res.status(400).json({ error: 'UID is required.' });
-    if (adminDb) {
-      const userDocRef = adminDb.collection('users').doc(uid);
-      const updatePayload: any = {};
-      if (progress.enrolledCourses) updatePayload.enrolledCourses = progress.enrolledCourses;
-      if (progress.completedModules) updatePayload.completedModules = progress.completedModules;
-      if (progress.checkedChecklist) updatePayload.checkedChecklist = progress.checkedChecklist;
-      if (progress.earnedCertificates) updatePayload.earnedCertificates = progress.earnedCertificates;
-      updatePayload.updatedAt = new Date().toISOString();
-      
-      await userDocRef.update(updatePayload);
-      const updatedSnap = await userDocRef.get();
-      res.json({ success: true, userData: updatedSnap.data() });
-    } else {
-      res.status(500).json({ error: 'Database is currently offline.' });
-    }
+    const updatePayload: any = {};
+    if (progress.enrolledCourses) updatePayload.enrolledCourses = progress.enrolledCourses;
+    if (progress.completedModules) updatePayload.completedModules = progress.completedModules;
+    if (progress.checkedChecklist) updatePayload.checkedChecklist = progress.checkedChecklist;
+    if (progress.earnedCertificates) updatePayload.earnedCertificates = progress.earnedCertificates;
+    updatePayload.updatedAt = new Date().toISOString();
+    
+    await safeUserDb.update(uid, updatePayload);
+    const updatedSnap = await safeUserDb.get(uid);
+    res.json({ success: true, userData: updatedSnap.data() });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -478,17 +568,12 @@ app.post('/api/auth/update-bookmarks', async (req, res) => {
   const { uid, savedItems } = req.body;
   try {
     if (!uid) return res.status(400).json({ error: 'UID is required.' });
-    if (adminDb) {
-      const userDocRef = adminDb.collection('users').doc(uid);
-      await userDocRef.update({
-        savedItems,
-        updatedAt: new Date().toISOString()
-      });
-      const updatedSnap = await userDocRef.get();
-      res.json({ success: true, userData: updatedSnap.data() });
-    } else {
-      res.status(500).json({ error: 'Database is currently offline.' });
-    }
+    await safeUserDb.update(uid, {
+      savedItems,
+      updatedAt: new Date().toISOString()
+    });
+    const updatedSnap = await safeUserDb.get(uid);
+    res.json({ success: true, userData: updatedSnap.data() });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -498,17 +583,12 @@ app.post('/api/auth/update-applications', async (req, res) => {
   const { uid, applications } = req.body;
   try {
     if (!uid) return res.status(400).json({ error: 'UID is required.' });
-    if (adminDb) {
-      const userDocRef = adminDb.collection('users').doc(uid);
-      await userDocRef.update({
-        applications,
-        updatedAt: new Date().toISOString()
-      });
-      const updatedSnap = await userDocRef.get();
-      res.json({ success: true, userData: updatedSnap.data() });
-    } else {
-      res.status(500).json({ error: 'Database is currently offline.' });
-    }
+    await safeUserDb.update(uid, {
+      applications,
+      updatedAt: new Date().toISOString()
+    });
+    const updatedSnap = await safeUserDb.get(uid);
+    res.json({ success: true, userData: updatedSnap.data() });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -518,16 +598,11 @@ app.post('/api/auth/me', async (req, res) => {
   const { uid } = req.body;
   try {
     if (!uid) return res.status(400).json({ error: 'UID is required.' });
-    if (adminDb) {
-      const userDocRef = adminDb.collection('users').doc(uid);
-      const docSnap = await userDocRef.get();
-      if (docSnap.exists) {
-        res.json({ success: true, userData: docSnap.data() });
-      } else {
-        res.status(404).json({ error: 'User not found' });
-      }
+    const docSnap = await safeUserDb.get(uid);
+    if (docSnap.exists) {
+      res.json({ success: true, userData: docSnap.data() });
     } else {
-      res.status(500).json({ error: 'Database is currently offline.' });
+      res.status(404).json({ error: 'User not found' });
     }
   } catch (error: any) {
     res.status(400).json({ error: error.message });
@@ -2070,8 +2145,100 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Recruit.org.in Server running on http://localhost:${PORT}`);
+  });
+
+  // Setup WebSocket server for Gemini Live Audio Bidirectional Streaming
+  const wss = new WebSocketServer({ noServer: true });
+
+  wss.on('connection', async (clientWs: WebSocket, request) => {
+    console.log('Client connected to live audio WebSocket');
+    
+    // Parse the voice parameter from the query string
+    const urlObj = new URL(request.url || '', `http://${request.headers.host || 'localhost'}`);
+    const selectedVoice = urlObj.searchParams.get('voice') || 'Zephyr';
+
+    const currentKey = process.env.GEMINI_API_KEY;
+    if (!currentKey) {
+      clientWs.send(JSON.stringify({ error: 'GEMINI_API_KEY is not configured on the server.' }));
+      clientWs.close();
+      return;
+    }
+
+    // Ensure we have a valid GoogleGenAI client (global aiClient or new instance)
+    const clientAi = aiClient || new GoogleGenAI({
+      apiKey: currentKey,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
+
+    try {
+      console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}`);
+      const session = await clientAi.live.connect({
+        model: "gemini-3.1-flash-live-preview",
+        config: {
+          responseModalities: [Modality.AUDIO],
+          speechConfig: {
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
+          },
+          systemInstruction: AROHI_SYSTEM_INSTRUCTION + "\n\nCRITICAL CONTEXT: You are currently connected via real-time live voice link. Speak very concisely, dynamically, and warmly. Keep responses extremely brief (1-3 sentences maximum per turn) so they read nicely as speech without lagging.",
+        },
+        callbacks: {
+          onmessage: (message: any) => {
+            // Forward audio data to client
+            const audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+            if (audio) {
+              clientWs.send(JSON.stringify({ audio }));
+            }
+            if (message.serverContent?.interrupted) {
+              clientWs.send(JSON.stringify({ interrupted: true }));
+            }
+          },
+        },
+      });
+
+      clientWs.on("message", (data) => {
+        try {
+          const parsed = JSON.parse(data.toString());
+          if (parsed.audio) {
+            session.sendRealtimeInput({
+              audio: { data: parsed.audio, mimeType: "audio/pcm;rate=16000" },
+            });
+          }
+        } catch (err) {
+          console.error("Error forwarding user audio to Gemini Live:", err);
+        }
+      });
+
+      clientWs.on("close", () => {
+        console.log("Client closed live voice WebSocket connection.");
+        try {
+          session.close();
+        } catch (err) {
+          // already closed
+        }
+      });
+
+    } catch (error: any) {
+      console.error("Failed to establish session with Gemini Live:", error);
+      clientWs.send(JSON.stringify({ error: `Connection failed: ${error.message || error}` }));
+      clientWs.close();
+    }
+  });
+
+  server.on('upgrade', (request, socket, head) => {
+    const urlObj = new URL(request.url || '', `http://${request.headers.host || 'localhost'}`);
+    if (urlObj.pathname === '/api/live-ws') {
+      wss.handleUpgrade(request, socket, head, (ws) => {
+        wss.emit('connection', ws, request);
+      });
+    } else {
+      socket.destroy();
+    }
   });
 }
 

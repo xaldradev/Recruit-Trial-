@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
+import ArohiAvatar from './ArohiAvatar';
 import { 
   GraduationCap, 
   Briefcase, 
@@ -31,6 +32,22 @@ interface WelcomeLandingProps {
 export default function WelcomeLanding({ onEnter, setActiveTab, language, onLanguageChange }: WelcomeLandingProps) {
   const [isLangOpen, setIsLangOpen] = useState(false);
   const langDropdownRef = useRef<HTMLDivElement>(null);
+  const [activeBubbleIndex, setActiveBubbleIndex] = useState(0);
+
+  const welcomingBubbles = [
+    language === 'hi' ? "नमस्ते! रिक्रूट में आपका स्वागत है! 👋" : language === 'or' ? "ନମସ୍କାର! ରିକ୍ରୁଟ୍‌କୁ ଆପଣଙ୍କୁ ସ୍ୱାଗତ! 👋" : "Hi! Welcome to Recruit! 👋",
+    language === 'hi' ? "मैं आरोही हूँ, आपकी डिजिटल करियर गाइड। 👩‍🎓" : language === 'or' ? "ମୁଁ ଆରୋହୀ, ଆପଣଙ୍କ ସ୍ମାର୍ଟ କ୍ୟାରିୟର ଗାଇଡ୍‌। 👩‍🎓" : "I am Arohi, your smart AI career guide! 👩‍🎓",
+    language === 'hi' ? "नौकरियों, सरकारी योजनाओं और कोर्सेज के बारे में कुछ भी पूछें! 💼" : language === 'or' ? "ଚାକିରି, ଯୋଜନା କିମ୍ବା ପାଠ୍ୟକ୍ରମ ବିଷୟରେ ଯେକୌଣସି ପ୍ରଶ୍ନ ପଚାରନ୍ତୁ! 💼" : "Ask me anything about Jobs, Schemes, or Skills! 💼",
+    language === 'hi' ? "मैं 1 मिनट में आपका वर्ड (.docx) रेज़्यूमे बना सकती हूँ! 📝" : language === 'or' ? "ମୁଁ ୧ ମିନିଟ୍‌ରେ ଆପଣଙ୍କ ରେଜୁମେ ତିଆରି କରିପାରିବି! 📝" : "I can build your professional Resume in 1 minute! 📝",
+    language === 'hi' ? "बोर्ड परीक्षा का सिलेबस और पढ़ाई की सामग्री यहाँ प्राप्त करें! 📚" : language === 'or' ? "ବୋର୍ଡ ପରୀକ୍ଷା ସିଲାବସ୍ ଏବଂ ଅନଲାଇନ୍ ପାଠ୍ୟପୁସ୍ତକ ଏଠାରେ ପାଆନ୍ତୁ! 📚" : "Get your Board Syllabus & NCERT books right here! 📚"
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveBubbleIndex((prev) => (prev + 1) % welcomingBubbles.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [welcomingBubbles.length]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -380,25 +397,69 @@ export default function WelcomeLanding({ onEnter, setActiveTab, language, onLang
 
 
 
-          {/* 3D Circular Pedestal Stage */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.85, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.75, ease: "easeOut" }}
-            className="relative w-48 h-16 sm:w-64 sm:h-20 flex items-center justify-center my-2 sm:my-4 preserve-3d"
-          >
-            {/* Multiple nested glow rings representing 3D platform */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-10 sm:w-48 sm:h-12 bg-[#101438] border-2 border-blue-500/30 rounded-full shadow-[0_0_30px_rgba(59,130,246,0.25)] transform -rotate-x-12 scale-100 flex items-center justify-center">
-              {/* Inner deep spotlight ring */}
-              <div className="w-32 h-6 sm:w-40 sm:h-8 bg-[#070921] border border-blue-400/40 rounded-full shadow-[inset_0_0_15px_rgba(59,130,246,0.5)]"></div>
-            </div>
+          {/* 3D Pedestal Stage with Arohi Avatar Welcoming All */}
+          <div className="relative w-72 h-64 flex flex-col items-center justify-end my-3 sm:my-5">
             
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-12 sm:w-56 sm:h-14 border border-indigo-500/15 rounded-full transform -rotate-x-12 scale-105 pointer-events-none"></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-6 sm:w-36 sm:h-8 border border-blue-400/20 rounded-full transform -rotate-x-12 scale-95 pointer-events-none"></div>
+            {/* 1. Welcoming Floating Chat Bubbles */}
+            <div className="absolute top-0 h-16 flex items-center justify-center z-20">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeBubbleIndex}
+                  initial={{ opacity: 0, scale: 0.8, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: -15 }}
+                  transition={{ type: "spring", stiffness: 220, damping: 16 }}
+                  className="bg-gradient-to-r from-violet-950/95 via-[#18113c]/95 to-violet-950/95 border border-purple-500/40 px-4 py-2.5 rounded-2xl shadow-[0_8px_20px_rgba(124,58,237,0.35)] backdrop-blur-md text-[11px] font-bold text-purple-100 flex items-center gap-2 max-w-[280px] text-center"
+                >
+                  <span className="relative flex h-2 w-2 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span>{welcomingBubbles[activeBubbleIndex]}</span>
+                  {/* Speech Bubble Arrow */}
+                  <div className="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-[#18113c] border-r border-b border-purple-500/40 transform rotate-45" />
+                </motion.div>
+              </AnimatePresence>
+            </div>
 
-            {/* Firing Light Particles up from the podium */}
-            <div className="absolute -top-10 w-12 h-16 bg-gradient-to-t from-blue-500/20 to-transparent blur-md rounded-full animate-pulse"></div>
-          </motion.div>
+            {/* 2. Standing 3D Avatar character */}
+            <div
+              className="relative w-32 h-32 sm:w-36 sm:h-36 z-10 bottom-8 group cursor-pointer animate-float-3d"
+              onClick={onEnter}
+            >
+              {/* Outer glowing halo */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-600/20 to-blue-500/25 blur-lg group-hover:from-purple-600/40 group-hover:to-blue-500/45 transition-all duration-500 animate-pulse"></div>
+              
+              {/* Avatar Frame */}
+              <div className="relative w-full h-full rounded-full border-4 border-indigo-500/35 overflow-hidden shadow-[0_12px_30px_rgba(124,58,237,0.4),inset_0_0_12px_rgba(255,255,255,0.25)] group-hover:border-purple-400 group-hover:scale-105 transition-all duration-300">
+                <ArohiAvatar className="w-full h-full" />
+              </div>
+
+              {/* Online indicator */}
+              <div className="absolute bottom-1 right-1 bg-emerald-400 w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 border-slate-950 flex items-center justify-center shadow-md">
+                <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-emerald-500 rounded-full animate-ping absolute"></span>
+                <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-emerald-400 rounded-full"></span>
+              </div>
+            </div>
+
+            {/* 3. Pedestal stage bottom */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.4 }}
+              className="absolute bottom-0 w-44 h-10 sm:w-52 sm:h-12 flex items-center justify-center preserve-3d"
+            >
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-8 sm:w-44 sm:h-10 bg-[#101438] border-2 border-blue-500/30 rounded-full shadow-[0_0_25px_rgba(59,130,246,0.25)] transform -rotate-x-12 scale-100 flex items-center justify-center">
+                <div className="w-28 h-5 sm:w-36 sm:h-7 bg-[#070921] border border-blue-400/40 rounded-full shadow-[inset_0_0_12px_rgba(59,130,246,0.5)]"></div>
+              </div>
+              
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-44 h-10 sm:w-52 sm:h-12 border border-indigo-500/15 rounded-full transform -rotate-x-12 scale-105 pointer-events-none"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-5 sm:w-32 sm:h-7 border border-blue-400/20 rounded-full transform -rotate-x-12 scale-95 pointer-events-none"></div>
+
+              {/* Spotlight beam */}
+              <div className="absolute bottom-4 w-12 h-24 bg-gradient-to-t from-indigo-500/20 via-purple-500/5 to-transparent blur-xl rounded-full pointer-events-none"></div>
+            </motion.div>
+          </div>
 
           {/* Main CTA Enter Button */}
           <motion.div 

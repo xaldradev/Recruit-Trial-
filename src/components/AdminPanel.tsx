@@ -323,7 +323,7 @@ export default function AdminPanel({
   };
 
   // Toggle user active services with live server sync
-  const toggleUserServices = async (userId: string, key: 'path1' | 'path2' | 'path3') => {
+  const toggleUserServices = async (userId: string, key: 'path1' | 'path2' | 'path3' | 'path4') => {
     const targetUser = adminUsers.find(u => u.id === userId);
     if (!targetUser) return;
 
@@ -1182,7 +1182,8 @@ export default function AdminPanel({
                               {user.services.path1 && <span className="bg-blue-500/10 text-blue-400 text-[8px] font-black px-1.5 py-0.5 rounded border border-blue-500/20">PATH 1</span>}
                               {user.services.path2 && <span className="bg-purple-500/10 text-purple-400 text-[8px] font-black px-1.5 py-0.5 rounded border border-purple-500/20">PATH 2</span>}
                               {user.services.path3 && <span className="bg-emerald-500/10 text-emerald-400 text-[8px] font-black px-1.5 py-0.5 rounded border border-emerald-500/20">PATH 3</span>}
-                              {!user.services.path1 && !user.services.path2 && !user.services.path3 && <span className="text-slate-500 text-[8px]">None</span>}
+                              {user.services.path4 && <span className="bg-indigo-500/10 text-indigo-400 text-[8px] font-black px-1.5 py-0.5 rounded border border-indigo-500/20">PATH 4</span>}
+                              {!user.services.path1 && !user.services.path2 && !user.services.path3 && !user.services.path4 && <span className="text-slate-500 text-[8px]">None</span>}
                             </div>
                           </td>
                           <td className="py-3 px-4 text-center">
@@ -1254,7 +1255,7 @@ export default function AdminPanel({
                   {/* Active Services (Pathways) toggles */}
                   <div className="space-y-1.5 border-t border-[#25174e] pt-3">
                     <label className="block text-[9px] uppercase font-black text-slate-400">Active Service Plans</label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       <button
                         onClick={() => toggleUserServices(selectedUser.id, 'path1')}
                         className={`py-2 px-1 text-center rounded-xl text-[9px] font-black transition-all cursor-pointer border ${
@@ -1284,6 +1285,16 @@ export default function AdminPanel({
                         }`}
                       >
                         Path 3
+                      </button>
+                      <button
+                        onClick={() => toggleUserServices(selectedUser.id, 'path4')}
+                        className={`py-2 px-1 text-center rounded-xl text-[9px] font-black transition-all cursor-pointer border ${
+                          selectedUser.services.path4 
+                            ? 'bg-indigo-900/30 text-indigo-300 border-indigo-500' 
+                            : 'bg-[#100d28]/70 text-slate-400 border-[#23174b] hover:bg-[#151238]'
+                        }`}
+                      >
+                        Path 4
                       </button>
                     </div>
                   </div>

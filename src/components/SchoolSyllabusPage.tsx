@@ -331,90 +331,6 @@ const CHAPTER_TEMPLATES: {
       { name: "Ecosystem & Energy Flow", description: "Food webs, trophic levels, 10% law of energy flow, and ozone layer depletion", topics: ["Trophic levels", "10% Energy law", "Ozone hole issues", "Waste control"] }
     ]
   },
-  physics: {
-    primary: [
-      { name: "Force, Pull and Push", description: "Identifying mechanical forces, magnetic force, gravity and friction", topics: ["What is force", "Pull and push examples", "Magnet attraction", "Friction basics"] }
-    ],
-    elementary: [
-      { name: "Matter: States and Kinetic Properties", description: "Molecular arrangement in solids, liquids, and gases", topics: ["Molecular spacing", "Attraction force", "Kinetic motion", "Change of state"] },
-      { name: "Physical Quantities & Measurement", description: "Measuring volume, area of irregular shapes, density of liquids", topics: ["Density bottle", "Eureka can measure", "Relative density", "Measuring cylinders"] }
-    ],
-    middle: [
-      { name: "Matter & Kinetic Theory (Detailed)", description: "Intermolecular attraction, sublimation, vaporization, boiling physics", topics: ["Kinetic model", "Sublimation camphor", "Vapor pressure", "Boiling points"] },
-      { name: "Force, Turning Effects & Pulleys", description: "Center of gravity, moment of force, single fixed pulley mechanical advantage", topics: ["Moment of a force", "Fixed pulley MA", "CG calculations", "Levers three classes"] }
-    ],
-    high: [
-      { name: "Force, Work, Power and Energy", description: "Turning effect of force, center of gravity, simple machines", topics: ["Moment of a Force", "Pulleys & Levers", "Mechanical Advantage", "Center of gravity"] },
-      { name: "Light (Refraction & Lenses)", description: "Refraction through a prism, critical angle, total internal reflection", topics: ["Prism deviation", "Critical angle values", "Lenses magnification", "Spectrum prism"] },
-      { name: "Electricity and Magnetism", description: "Ohm's law, household circuits, electromagnetic induction", topics: ["Ohm's law verification", "Ring household circuit", "Lenz's induction", "Transformer basics"] },
-      { name: "Modern Physics & Radioactivity", description: "Structure of atom, alpha, beta, gamma radioactive rays", topics: ["Alpha particle loss", "Fission and fusion", "Radioisotopes", "Safety standards"] }
-    ]
-  },
-  chemistry: {
-    primary: [
-      { name: "Air and Water Properties", description: "Discovering composition of air, uses of water, and solid/liquid mixtures", topics: ["Air has weight", "Water states", "Mixing things", "Float or sink"] }
-    ],
-    elementary: [
-      { name: "Introductory Chemistry & Matter", description: "Elements, compounds, physical mixing, and separating methods", topics: ["Pure substances", "Compounds", "Filtration methods", "Winnowing"] }
-    ],
-    middle: [
-      { name: "Atoms, Molecules & Radicals", description: "Symbols, valency, writing chemical formulas of daily salts", topics: ["Symbols elements", "Valency chart", "Formula writing", "Chemical names"] },
-      { name: "Water and Solution Chemistry", description: "Saturated solutions, crystallization, hard and soft water", topics: ["Saturated point", "Hardness of water", "Crystallization", "Distilled water"] }
-    ],
-    high: [
-      { name: "Language of Chemistry", description: "Chemical equations, balancing equations, and radical naming conventions", topics: ["Balancing methods", "Radicals valencies", "State symbols", "Law of conservation"] },
-      { name: "Atomic Structure & Chemical Bonding", description: "Rutherford scattering, Bohr model, electrovalent and covalent bonding", topics: ["Rutherford alpha scat", "Bohr shell model", "Ionic electrovalent", "Covalent sharing"] },
-      { name: "Study of Acid Compounds", description: "Properties of Hydrochloric Acid, Nitric Acid, and Sulphuric Acid", topics: ["HCl preparations", "Nitric acid redox", "Sulphuric dehydrates", "Industrial contact proc"] },
-      { name: "Organic Chemistry Spec", description: "Nomenclature of alkanes, alkenes, alkynes, and key functional groups", topics: ["Alkanes saturation", "IUPAC nomenclature", "Esterification", "Isomerism introduction"] }
-    ]
-  },
-  biology: {
-    primary: [
-      { name: "Nature Studies & Animal Diversity", description: "Exploring plants, pets, crawling insects and birds in our gardens", topics: ["Pet matching", "Garden plants", "Insects identification", "Beaks of birds"] }
-    ],
-    elementary: [
-      { name: "Human Skeletal & Digestive System", description: "Overview of bone counts, joints, and organs of the alimentary canal", topics: ["Joints classification", "Alimentary organs", "Enzyme functions", "Digestion stages"] }
-    ],
-    middle: [
-      { name: "Leaf and Flower Botany", description: "Detailed parts of a flower, cross vs self pollination, seed germination", topics: ["Pistil and stamen", "Self vs cross pollination", "Hypogeal germination", "Seed structure"] },
-      { name: "Circulatory & Nervous System", description: "Human heart structure, blood composition, and central nervous system coordination", topics: ["Heart chambers", "Red white blood cells", "Brain cerebrum", "Nerve impulses"] }
-    ],
-    high: [
-      { name: "Cell: Structural & Functional Unit", description: "Detailed cell biology, chromosomes structure, and mitosis cell division", topics: ["Cell cycle mitosis", "Chromosomes genes", "Meiosis difference", "Karyotype chart"] },
-      { name: "Plant Physiology & Photosynthesis", description: "Absorption of water, transpiration pull, and photosynthesis light-dark reactions", topics: ["Light and Dark reactions", "Transpiration pull", "Osmotic root pressure", "Plasmolysis"] },
-      { name: "Human Digestive & Excretory System", description: "Anatomy of stomach, liver, pancreas, and nephrons function in kidneys", topics: ["Enzyme catalog", "Kidney nephrons", "Urea formation", "Dialysis principles"] },
-      { name: "Endocrine & Nervous System Coordination", description: "Pituitary, thyroid, adrenal hormones and synapse transmission", topics: ["Hormone feedback loops", "Neuron structure", "Synapse chemical transmission", "Brain lobes functions"] }
-    ]
-  },
-  social: {
-    primary: [
-      { name: "Our Beautiful State & Culture", description: "Discovering our rich culture, traditional festivals, dances, and monuments", topics: ["State Festivals", "Folk dances", "Caring neighbors", "National symbols"] },
-      { name: "My Compass Directions & Map", description: "Learning cardinal directions (North, South, East, West) and basic map keys", topics: ["North-South-East-West", "State outline", "Finding places", "Flag coloring"] },
-      { name: "Our Community Helpers", description: "Understanding the roles of doctors, teachers, police officers, and firefighters", topics: ["Emergency numbers", "Police Station", "Farming values", "Post Office"] },
-      { name: "Happy Homes and Family Ties", description: "Caring for parents, grandparents, and maintaining order in the household", topics: ["Helping parents", "Sharing chores", "Family history", "Clean room habits"] }
-    ],
-    elementary: [
-      { name: "Geography: Our Country India", description: "Himalayan ranges, coastal plains, Deccan peninsula, and climate zones of India", topics: ["Himalayas", "Indian peninsula", "Coastal lines", "Sunderban forests"] },
-      { name: "Ancient Empires & Emperors", description: "Harappan town planning, Ashoka's Dhamma, and the rise of early civilizations", topics: ["Indus Valley", "Great Bath", "Emperor Ashoka", "Dhamma rules"] },
-      { name: "Indian Constitution & Democracy", description: "Drafting of the constitution, local government, Gram Panchayat, and rights", topics: ["Dr. B.R. Ambedkar", "Preamble basic", "Gram Panchayat", "Right to Education"] },
-      { name: "Odisha Tourism & Heritage", description: "Konark Sun Temple, Chilika Lake biodiversity, and historic caves", topics: ["Konark Temple", "Chilika Birds", "Udayagiri Caves", "Eco-Tourism"] },
-      { name: "Maps and Globals Interpretation", description: "Understanding scale, meridians of longitude, and parallels of latitude", topics: ["Political vs Physical Map", "Equator", "Latitude & Longitude", "Time calculation"] }
-    ],
-    middle: [
-      { name: "The Delhi Sultanate & Mughals", description: "Political developments from Qutbuddin Aibak up to Aurangzeb's expansion", topics: ["Iqta tax system", "Akbar administration", "Taj Mahal architecture", "Mansabdari system"] },
-      { name: "The Earth's Atmosphere & Water", description: "Layers of atmosphere, ocean currents, tides, and the complete water cycle", topics: ["Troposphere", "Ocean currents", "Tides mechanics", "Water cycle grid"] },
-      { name: "Civics: Parliamentary Democracy", description: "Structure of parliament, bill-passing processes, and role of judiciary", topics: ["Lok Sabha vs Rajya Sabha", "Presidential power", "Supreme Court", "Bill processing"] },
-      { name: "Natural Resources & Industries", description: "Farming types, iron and steel plants, mineral resources and transport", topics: ["Steel Plants", "Commercial farming", "Mineral deposits", "National Highways"] },
-      { name: "Regional Freedom Struggles", description: "History of Paika Bidroha (1817), Satyabadi School, and salt satyagraha", topics: ["Paika Bidroha", "Gopabandhu Das", "Salt Satyagraha", "Baxi Jagabandhu"] }
-    ],
-    high: [
-      { name: "Rise of European Nationalism", description: "French Revolution estates, unification of Italy/Germany, and Balkan crisis", topics: ["French Estates", "Napoleonic Code", "Bismarck Unification", "Bastille fall"] },
-      { name: "Nationalism in India & Movements", description: "Non-cooperation, Civil disobedience, Rowlatt Act, Dandi march, and Netaji", topics: ["Rowlatt Act", "Dandi March", "Non-cooperation", "Netaji Bose"] },
-      { name: "Resource & Mineral Geographics", description: "Alluvial, black, red soils, sustained development, and mineral mapping", topics: ["Soil classification", "Sustained development", "Resource mapping", "Mining zones"] },
-      { name: "Power Sharing & Federalism", description: "Belgian model, decentralization in India, and center-state schedules", topics: ["Federalism principles", "Union & State lists", "Belgian power sharing", "Municipalities"] },
-      { name: "Sectors of the Indian Economy", description: "Primary, secondary, and tertiary sectors, GDP evaluation, and unemployment", topics: ["Three sectors", "Unemployment types", "NREGA 2005", "GDP assessment"] }
-    ]
-  },
   history: {
     primary: [
       { name: "Early Story of Shelter", description: "How ancient humans lived in caves, constructed tree shelters, and gathered foods", topics: ["Cave drawings", "Fruit gatherers", "Invention of Fire", "Simple stone tools"] }
@@ -448,6 +364,152 @@ const CHAPTER_TEMPLATES: {
       { name: "Topographical Sheets Interpretation", description: "Analyzing contour patterns, reading grid coordinates, and identifying human settlements", topics: ["Contour intervals", "Six-figure grid reference", "Drainage patterns (Dendritic)", "Settlement classifications"] }
     ]
   }
+};
+
+const HINDI_TRANSLATIONS: { [key: string]: string } = {
+  "Modal Auxiliaries & Permissions": "सहायक क्रियाएँ और अनुमति (Modals)",
+  "Using can, could, may, might, should, must, and ought to.": "वाक्यों में सामर्थ्य, अनुमति और प्रारंभिक प्रयोग",
+  "Full stops vs question marks": "पूर्ण विराम और प्रश्नवाचक चिह्न",
+  "Tense Mastery: Perfect & Continuous": "काल के भेद: भूत, वर्तमान और भविष्य (Tense)",
+  "Mastering continuous present and perfect tense structures.": "तीनों कालों के भेदों का विस्तृत अध्ययन और प्रयोग।",
+  "Unseen Reading Comprehensions": "अपठित काव्यांश और गद्यांश (Comprehension)",
+  "Answering critical inference questions from challenging text extracts.": "जटिल गद्यांशों को समझकर निष्कर्ष निकालना।",
+  "Formal Request Writing": "औपचारिक प्रार्थना पत्र (Applications)",
+  "Drafting school leave applications and polite feedback letters.": "प्रधनाचार्य को छुट्टी या अन्य सहायता के लिए आवेदन पत्र।",
+  "Active and Passive Voice": "कर्तृवाच्य और कर्मवाच्य (Voice)",
+  "Converting standard active statements into formal passive sentences.": "वाक्यों में कर्ता और कर्म की प्रधानता का अध्ययन।",
+  "Direct and Indirect Speech": "प्रत्यक्ष और अप्रत्यक्ष कथन (Narration)",
+  "Understanding how to quote speakers directly or report them indirectly.": "वक्ता के कथन को ज्यों का त्यों या अपने शब्दों में व्यक्त करना।",
+  "Debate & Public Expression": "वाद-विवाद और मौखिक अभिव्यक्ति (Debate)",
+  "Formulating strong arguments and speaking with proper pacing and volume.": "दिए गए विषय पर तर्कसंगत विचार व्यक्त करना।",
+  "Narrative Essay Composition": "निबंध लेखन (Narrative Essay)",
+  "Drafting multi-paragraph stories describing personal experiences.": "विभिन्न विषयों पर सारगर्भित निबंध लिखना।",
+  "Comma separations": "अल्पविराम का सही प्रयोग",
+  "Correcting broken sentences": "अशुद्ध वाक्यों का शोधन",
+  "Answering 'Who, What, Where'": "कहाँ, कब, कौन के उत्तर",
+  "Context clues vocabulary": "संदर्भ आधारित शब्दार्थ",
+  "Identifying key paragraph ideas": "मुख्य विचार की पहचान",
+  "Drawing character faces": "पात्रों का चित्रण",
+  "Greeting formats": "संबोधन के प्रारूप",
+  "Body text drafting": "पत्र का मुख्य भाग लिखना",
+  "Sign-off expressions": "स्नेहाभिलाषी आदि का प्रयोग",
+  "Thank-you card projects": "धन्यवाद पत्र परियोजना",
+  "Adding -ly to adjectives": "विशेषण से क्रियाविशेषण बनाना",
+  "Adverbs of place (here, there)": "स्थानवाचक क्रियाविशेषण",
+  "Identifying adverbs in stories": "गद्य में क्रियाविशेषण पहचानना",
+  "Adverb fill-in-the-blanks": "क्रियाविशेषण रिक्त स्थान पूर्ति",
+  "Spatial prepositions list": "संबंधबोधक शब्दों की सूची",
+  "Prepositional phrases": "संबंधबोधक वाक्यांश",
+  "Picture matching directions": "दिशानिर्देश आधारित मिलान",
+  "Locational word games": "स्थान सूचक खेल",
+  "Drafting topic sentences": "मुख्य वाक्य का आलेखन",
+  "Supporting sentence ideas": "सहायक वाक्यों के विचार",
+  "Concluding thoughts": "निष्कर्ष वाक्य",
+  "Creative writing paragraphs": "रचनात्मक अनुच्छेद लेखन",
+  "Story planning maps": "कहानी की रूपरेखा बनाना",
+  "Character creation sheets": "पात्रों का चरित्र-चित्रण",
+  "Action scene words": "रोचक घटना शब्द",
+  "Writing funny dialogues": "हास्य संवाद लेखन",
+  "Coordinating conjunctions": "योजक शब्द और उनके भेद",
+  "Making compound sentences": "संयुक्त वाक्य बनाना",
+  "Avoiding run-on sentences": "वाक्य रचना की अशुद्धियाँ",
+  "Conjunction sorting drills": "समुच्चयबोधक शब्द पहचान",
+  "Present perfect (has/have)": "पूर्ण भूत और पूर्ण वर्तमान",
+  "Continuous verbs (ing)": "अपूर्ण क्रिया रूप",
+  "Regular vs irregular past participles": "सकर्मक और अकर्मक क्रिया",
+  "Tense timeline charts": "काल चक्र आलेख",
+  "Making story inferences": "कहानी से निष्कर्ष निकालना",
+  "Finding synonyms in text": "पाठ्य में पर्यायवाची शब्द खोजना",
+  "Analyzing author intentions": "लेखक के मंतव्य का विश्लेषण",
+  "Summarizing text in 2 lines": "दो पंक्तियों में सारांश",
+  "Formal greeting styles": "औपचारिक संबोधन शैलियाँ",
+  "Polite request language": "विनम्र प्रार्थना भाषा",
+  "Formatting formal letters": "प्रार्थना पत्र का प्रारूप",
+  "Leave application checklist": "छुट्टी के आवेदन की सूची",
+  "Subject-object positions": "कर्ता और कर्म का स्थान",
+  "By-agent rules": "कर्मवाच्य के नियम",
+  "Passive verbs structures": "क्रिया पर वाच्य का प्रभाव",
+  "Tense changes in conversion": "वाच्य परिवर्तन में काल नियम",
+  "Reporting verbs (said, told)": "कथन क्रियाएँ (कहा, पूछा)",
+  "Quotation marks rules": "उद्धरण चिह्नों के नियम",
+  "Tense shift in indirect speech": "अप्रत्यक्ष कथन में काल परिवर्तन",
+  "Reporting dialogues correctly": "संवाद रिपोर्टिंग अभ्यास",
+  "Structuring for/against arguments": "पक्ष-विपक्ष में तर्क की संरचना",
+  "Opening hook statements": "प्रभावशाली प्रस्तावना",
+  "Body volume control": "वक्तव्य का प्रभाव",
+  "Debate team rehearsals": "वाद-विवाद पूर्वाभ्यास",
+  "Introductory hooks": "रोचक प्रस्तावना वाक्य",
+  "Sensory descriptions": "इंद्रिय आधारित वर्णन",
+  "Chronological flow words": "क्रमबद्धता सूचक शब्द",
+  "Reflective essay conclusions": "चिंतनशील निबंध का निष्कर्ष",
+  "Modals of ability": "सामर्थ्य सूचक क्रियाएँ",
+  "Modals of obligation/advice": "कर्तव्य और सलाह सूचक",
+  "Polite permission queries": "विनम्र अनुमति प्रश्न",
+  "Modal fill-in practices": "सहायक क्रिया अभ्यास",
+  "Academic synonym matrices": "पर्यायवाची शब्द तालिका",
+  "Antonym pairs matching": "विलोम शब्द मिलान",
+  "Popular idiom interpretations": "प्रसिद्ध मुहावरों का अर्थ",
+  "Using idioms in sentences": "वाक्यों में मुहावरों का प्रयोग",
+  "Similes vs Metaphors": "उपमा बनाम रूपक अलंकार",
+  "Personification examples": "मानवीकरण अलंकार के उदाहरण",
+  "ABBA and AABB rhyme schemes": "तुकबंदी की शैलियाँ",
+  "Analyzing classic short poems": "प्रसिद्ध लघु कविताओं का विश्लेषण",
+  "Informal letter structures": "अनौपचारिक पत्र का प्रारूप",
+  "Adjective-rich description": "विशेषण प्रधान वर्णन",
+  "Personal reflection style": "आत्म-चिंतन शैली",
+  "Drafting review feedback": "समीक्षा प्रारूप",
+  "Main vs Subordinate clauses": "मुख्य बनाम आश्रित उपवाक्य",
+  "Relative pronouns": "संबंधवाचक सर्वनाम",
+  "Combining complex sentences": "मिश्रित वाक्य बनाना",
+  "Clause punctuation rules": "उपवाक्य विराम चिह्न नियम",
+  "Common prefixes (un-, dis-)": "सामान्य उपसर्ग (अ-, प्र-, वि-)",
+  "Common suffixes (-tion, -less)": "सामान्य प्रत्यय (-ता, -पन, -इक)",
+  "Root word origins": "मूल शब्द और धातु रूप",
+  "Dynamic vocabulary matching": "शब्दार्थ मिलान अभ्यास",
+  "Catchy article headlines": "आकर्षक शीर्षक बनाना",
+  "Fact-based body structure": "तथ्यात्मक मुख्य भाग",
+  "Expressing personal opinions": "व्यक्तिगत विचार अभिव्यक्ति",
+  "Concluding recommendations": "सुझाव और निष्कर्ष",
+  "Analyzing theme statements": "मूल कथ्य का विश्लेषण",
+  "Character conflict mapping": "चरित्र द्वंद्व चित्रण",
+  "Setting and tone analysis": "परिवेश और शैली विश्लेषण",
+  "Short essay answers": "लघु निबंधात्मक उत्तर",
+  "Subject-verb agreement drills": "कर्ता-क्रिया संगति अभ्यास",
+  "Dangling modifiers correction": "वाक्य दोष संशोधन",
+  "Punctuation in complex clauses": "मिश्र वाक्यों में विराम चिह्न",
+  "Paragraph editing benchmarks": "अनुच्छेद संपादन मानक",
+  "Rhetorical question hooks": "विचारात्मक प्रश्न शैली",
+  "Rule of three writing": "त्रयी नियम लेखन",
+  "Call to action statements": "अपील वाक्य",
+  "Pacing and pause markings": "भाषण विराम चिन्हन",
+  "Block vs Point-by-Point format": "तुलना प्रारूप",
+  "Transition words (however, similarly)": "संयोजक शब्द (तथापि, उसी प्रकार)",
+  "Thematic comparison matrices": "विषय तुलना तालिका",
+  "Formulating strong thesis lines": "मुख्य प्रतिपाद्य का निर्धारण",
+  "Professional subject lines": "व्यावसायिक विषय पंक्ति",
+  "Formal salutations & closings": "औपचारिक अभिवादन और समापन",
+  "Clear body call-to-actions": "स्पष्ट कार्य निर्देश",
+  "Email etiquette checkpoints": "ईमेल शिष्टाचार नियम",
+  "Time management tactics": "समय प्रबंधन रणनीतियाँ",
+  "Keyword tracing in passage": "मुख्य शब्दों की खोज",
+  "Evaluating tone and mood": "शैली और भाव का मूल्यांकन",
+  "Two-mark concise answers": "दो अंकों के सटीक उत्तर",
+  "Structuring factual reports": "तथ्यात्मक रिपोर्ट की संरचना",
+  "Reporting data and statistics": "आंकड़ों का प्रतिवेदन",
+  "Formal objective register": "औपचारिक भाषा शैली",
+  "Formatting sections/subheadings": "शीर्षक और उपशीर्षक प्रारूप",
+  "Central character summaries": "मुख्य पात्रों का चरित्र चित्रण",
+  "Symbolism and metaphor analysis": "प्रतीक और रूपक विश्लेषण",
+  "Historical context of literature": "साहित्य की ऐतिहासिक पृष्ठभूमि",
+  "Drafting perfect board essays": "बोर्ड परीक्षा हेतु श्रेष्ठ निबंध",
+  "Integrated grammar passages": "एकीकृत व्याकरण अभ्यास",
+  "Error identification grids": "त्रुटि पहचान तालिका",
+  "Sentence reordering tests": "वाक्य पुनर्व्यवस्था परीक्षण",
+  "Active-passive exam questions": "परीक्षा उपयोगी वाच्य प्रश्न"
+};
+
+const translateToHindi = (text: string): string => {
+  return HINDI_TRANSLATIONS[text] || text;
 };
 
 const translateToOdia = (text: string): string => {
@@ -573,6 +635,13 @@ const getChaptersForClass = (catKey: string, classNum: number, board: string): {
         else if (idx === 3) { name = "Trigonometry Ratios & Values"; description = "Learning sine, cosine, tangent ratios and standard values for 0°, 30°, 45°, 60°, and 90°."; topics = ["SOH CAH TOA definitions", "Trig ratios of complementary angles", "Standard trig table values", "Trigonometric ratios of unit circles"]; }
         else if (idx === 4) { name = "Grouped Data Statistics & Mean"; description = "Organizing raw data into grouped frequency distributions and calculating standard arithmetic mean."; topics = ["Grouped frequency tables", "Direct mean calculation method", "Class mark determination", "Frequency polygon drawing"]; }
         else if (idx === 5) { name = "Distance & Section Coordinate Geometry"; description = "Calculating distances between two coordinate points on Cartesian grids."; topics = ["Cartesian coordinate quadrants", "Distance formula proof", "Collinearity of three points", "Midpoint formula layout"]; }
+      } else if (classNum === 10) {
+        if (idx === 0) { name = "Real Numbers & Euclid's Lemma"; description = "Mastering Euclid's division algorithm, the Fundamental Theorem of Arithmetic, and irrationality proofs."; topics = ["Euclid's division lemma", "Fundamental Theorem of Arithmetic", "Irrationality proofs of √2, √3, √5", "Decimal expansion characteristics"]; }
+        else if (idx === 1) { name = "Polynomials & Quadratic Equations"; description = "Relationship between zeroes and coefficients, division algorithm for polynomials, and quadratic formula."; topics = ["Quadratic formula & Discriminant", "Zeroes and coefficients relation", "Division algorithm of polynomials", "Nature of roots analysis"]; }
+        else if (idx === 2) { name = "Arithmetic Progressions Series Sums"; description = "Derivation of the formula for the nth term and sum of first n terms of AP."; topics = ["nth term formula a_n", "AP series sum formula S_n", "Practical daily life AP application", "Advanced progression differences"]; }
+        else if (idx === 3) { name = "Trigonometry Identities & Heights"; description = "Proving standard trigonometric identities and calculating heights and distances using angles of elevation/depression."; topics = ["Trig identity sin²θ + cos²θ = 1", "Angle of elevation and depression", "Multi-point height measurements", "Angle distance trigonometry"]; }
+        else if (idx === 4) { name = "Statistics: Mean, Median, Mode"; description = "Calculating mean, median, and mode for grouped statistical distributions and drawing cumulative frequency ogives."; topics = ["Grouped mean (assumed mean method)", "Grouped median & mode formulas", "Cumulative frequency ogives", "Interpreting distribution shapes"]; }
+        else if (idx === 5) { name = "Coordinate Section & Midpoint Form"; description = "Derivation and application of section formula and finding the areas of triangles."; topics = ["Section ratio formula coordinates", "Midpoint formula calculations", "Triangle area coordinate vertices", "Collinearity condition rules"]; }
       }
     } else if (catKey === 'science') {
       if (classNum === 1) {
@@ -628,6 +697,13 @@ const getChaptersForClass = (catKey: string, classNum: number, board: string): {
         else if (idx === 3) { name = "Lenses Optics & Snell's Refractions"; description = "Applying mirror and lens formulas to calculate magnification and focal centers."; topics = ["Lens formula 1/f = 1/v - 1/u", "Magnification ratios", "Critical angle total reflection", "Prism angle of deviation"]; }
         else if (idx === 4) { name = "Electricity, Series & Parallel Resistors"; description = "Analyzing total resistance inside series and parallel circuit loops."; topics = ["Series resistors R1+R2+R3", "Parallel equations 1/R", "Joule's heating law", "Fuses and circuit breakers"]; }
         else if (idx === 5) { name = "Hormones Coordination & Reflex Arc"; description = "Detailed study of brain hemispheres, spinal reflexes, and hormone loops."; topics = ["Cerebral cortex functions", "Reflex arc synapse speed", "Thyroxine insulin loops", "Plant auxins growth directions"]; }
+      } else if (classNum === 10) {
+        if (idx === 0) { name = "Chemical Reactions & Equations"; description = "Understanding types of chemical reactions, balancing equations, and oxidative rust corrosion."; topics = ["Balancing chemical coefficients", "Decomposition & displacement", "Rancidity and antioxidant roles", "Exothermic and endothermic indicators"]; }
+        else if (idx === 1) { name = "Acids, Bases, Salts & pH Scale"; description = "Investigating acidic properties, hydrogen ions release, pH indicators, and preparation of industrial salts."; topics = ["pH scale definition & importance", "Chlor-alkali manufacturing", "Baking soda & washing soda", "Plaster of Paris synthesis"]; }
+        else if (idx === 2) { name = "Metals, Non-Metals & Metallurgy"; description = "Chemical reactivity series of metals, ionic bond formations, and smelting enrichment processes."; topics = ["Reactivity series benchmarks", "Ionic compound characteristics", "Roasting and calcination", "Electrolytic refining of copper"]; }
+        else if (idx === 3) { name = "Carbon Chain Nomenclature & Compounds"; description = "Exploring covalent bonds, homologous organic series, functional groups, and esterification."; topics = ["Homologous organic series", "Functional groups (alcohol, ketone)", "Esterification chemical reactions", "Saponification & micelles actions"]; }
+        else if (idx === 4) { name = "Life Processes & Energy Conversions"; description = "Human digestive, respiratory, circulatory, and excretory systems working in unison."; topics = ["Alimentary canal enzymes", "Aerobic vs anaerobic glycolysis", "Heart chambers & double cycle", "Nephron urine filtration tubes"]; }
+        else if (idx === 5) { name = "Control, Endocrine Coordination & Tropism"; description = "Nervous systems, chemical hormonal loops in humans, and geotropic plant growth controls."; topics = ["Central nervous system structure", "Reflex arc nerve synapses", "Thyroid, insulin & growth hormones", "Phototropic & geotropic plant auxins"]; }
       }
     } else if (catKey === 'social') {
       if (classNum === 1) {
@@ -682,13 +758,551 @@ const getChaptersForClass = (catKey: string, classNum: number, board: string): {
         else if (idx === 2) { name = "Alluvial, Black and Red Soils Mapping"; description = "Soil classifications across Indian agricultural states and forest soils properties."; topics = ["Alluvial fertile riverbeds", "Black volcanic clay soils", "Red iron-oxide dry soils", "Soil erosion prevention"]; }
         else if (idx === 3) { name = "Belgian vs Sri Lankan Power Sharing"; description = "Comparing community government power sharing with majoritarian crisis."; topics = ["Belgian decentralization model", "Brussels shared council", "Sri Lankan majoritarian crisis", "Schedules of decentralization"]; }
         else if (idx === 4) { name = "GDP evaluation & Economy Sectors"; description = "Analyzing primary, secondary, and tertiary sectors, and NREGA employment guarantees."; topics = ["Primary agriculture sectors", "Secondary factories manufacturing", "Tertiary software services", "GDP estimation formulas"]; }
+      } else if (classNum === 10) {
+        if (idx === 0) { name = "Rise of European Nationalism"; description = "The French Revolution, Napoleonic Civil Codes, and Italian & German unifications."; topics = ["French Estates assembly", "Fall of Bastille 1789", "Napoleonic code 1804", "Garibaldi & Cavour unifications"]; }
+        else if (idx === 1) { name = "Indian Freedom Struggle & Movements"; description = "Mahatma Gandhi's return, Satyagraha marches, Non-Cooperation, Civil Disobedience, and Partition."; topics = ["Rowlatt Act & Jallianwala", "Dandi Salt March 1930", "Quit India Movement 1942", "Swaraj values & Netaji"]; }
+        else if (idx === 2) { name = "Resources, Soil & Mineral Mapping"; description = "Classifying Indian resources, sustainable developmental practices, and forest conservations."; topics = ["Alluvial, black & red soils", "Soil erosion countermeasures", "Chota Nagpur mineral basins", "Joint Forest Management (JFM)"]; }
+        else if (idx === 3) { name = "Power Sharing & Federalism Systems"; description = "Comparing Belgian decentralization with Sri Lankan majoritarian crisis and Indian local self-government."; topics = ["Belgian shared assembly", "Sri Lankan majoritarian crisis", "Panchayati Raj 73rd/74th Acts", "Union, State & Concurrent lists"]; }
+        else if (idx === 4) { name = "Sectors of Economy & GDP Growth"; description = "Primary, secondary, and tertiary sectors, employment generation, and NREGA guarantees."; topics = ["Primary, secondary, tertiary", "GDP estimation methods", "Organized vs unorganized labor", "NREGA 100 days guarantees"]; }
       }
     } else if (catKey === 'language') {
-      name = `${ch.name} (Class ${classNum})`;
-    } else if (['physics', 'chemistry', 'biology', 'history', 'geography'].includes(catKey)) {
-      name = `${ch.name} (Class ${classNum})`;
-      description = `Class ${classNum} graded curriculum focusing on standard ${ch.name.toLowerCase()} syllabus criteria and study blueprints.`;
-      topics = ch.topics.map(t => `${t} (Class ${classNum} Concept)`);
+      const classThemes: Record<number, { name: string; description: string; topics: string[] }[]> = {
+        1: [
+          { name: "Phonetic Alphabet Sounds", description: "Learning basic sounds, pronunciation rules, and alphabet tracing lines.", topics: ["A-Z sound phonics", "Vowels vs Consonants", "Tracing upper and lower cases", "Word-picture matches"] },
+          { name: "Sight Words & Visual Spelling", description: "Reading two and three-letter words with interactive spelling games.", topics: ["Two-letter blends", "Three-letter word blocks", "Sight spellings", "Naming classroom toys"] },
+          { name: "Rhythmic Rhymes & Moral Tales", description: "Reciting standard childhood nursery rhymes with basic lesson morals.", topics: ["Twinkle and Jack/Jill rhymes", "Simple word rhyming pairs", "Moral animal fables", "Happy action terms"] },
+          { name: "First Sentence Writing", description: "Building basic four-word statements to introduce family members and colors.", topics: ["Introducing self/parents", "Primary colors", "Action verbs (run, eat)", "Picture descriptive phrases"] }
+        ],
+        2: [
+          { name: "Vowel Blends & Word Structures", description: "Advanced phonetic vowel blending and syllables identification.", topics: ["Long and short vowels", "Double-vowel sounds", "Syllable separation", "Daily household terms"] },
+          { name: "Nouns & Pronouns Basics", description: "Differentiating people, places, things, and replacing names with pronouns.", topics: ["Common vs Proper Nouns", "Using He, She, It, They", "Singular vs Plural s/es", "Noun matching activities"] },
+          { name: "Story Reading & Retelling", description: "Improving reading speed and answering basic questions from short paragraphs.", topics: ["Finding main characters", "Ordering story events", "Reading short paragraphs", "Moral lesson discussion"] },
+          { name: "Basic Adjectives & Description", description: "Using adjectives to describe size, color, and feelings in everyday objects.", topics: ["Size words (big, small)", "Color descriptions", "Emotion words", "Descriptive word exercises"] }
+        ],
+        3: [
+          { name: "Action Verbs & Tense Intros", description: "Understanding active verbs and simple present/past time frames.", topics: ["Action verbs list", "Adding -ed for past tense", "Present tense triggers", "Verbs matching games"] },
+          { name: "Sentence Structures & Punctuations", description: "Capitalization, full stops, commas, and question marks.", topics: ["Using capital letters", "Full stops vs question marks", "Comma separations", "Correcting broken sentences"] },
+          { name: "Reading Comprehension Skills", description: "Answering specific content questions from descriptive stories.", topics: ["Answering 'Who, What, Where'", "Context clues vocabulary", "Identifying key paragraph ideas", "Drawing character faces"] },
+          { name: "Short Letter Writing", description: "Writing basic friendly cards or greeting letters to friends or teachers.", topics: ["Greeting formats", "Body text drafting", "Sign-off expressions", "Thank-you card projects"] }
+        ],
+        4: [
+          { name: "Adverbs of Manner & Place", description: "Differentiating how and where actions take place using adverbs.", topics: ["Adding -ly to adjectives", "Adverbs of place (here, there)", "Identifying adverbs in stories", "Adverb fill-in-the-blanks"] },
+          { name: "Prepositions & Spatial Relations", description: "Using prepositions like in, on, under, behind, and between.", topics: ["Spatial prepositions list", "Prepositional phrases", "Picture matching directions", "Locational word games"] },
+          { name: "Paragraph Drafting Techniques", description: "Structuring paragraphs with clear main ideas and supporting details.", topics: ["Drafting topic sentences", "Supporting sentence ideas", "Concluding thoughts", "Creative writing paragraphs"] },
+          { name: "Creative Storyboarding", description: "Developing brief stories with beginning, middle, and climax elements.", topics: ["Story planning maps", "Character creation sheets", "Action scene words", "Writing funny dialogues"] }
+        ],
+        5: [
+          { name: "Conjunctions & Compound Sentences", description: "Joining thoughts using and, but, or, so, and because.", topics: ["Coordinating conjunctions", "Making compound sentences", "Avoiding run-on sentences", "Conjunction sorting drills"] },
+          { name: "Tense Mastery: Perfect & Continuous", description: "Mastering continuous present and perfect tense structures.", topics: ["Present perfect (has/have)", "Continuous verbs (ing)", "Regular vs irregular past participles", "Tense timeline charts"] },
+          { name: "Unseen Reading Comprehensions", description: "Answering critical inference questions from challenging text extracts.", topics: ["Making story inferences", "Finding synonyms in text", "Analyzing author intentions", "Summarizing text in 2 lines"] },
+          { name: "Formal Request Writing", description: "Drafting school leave applications and polite feedback letters.", topics: ["Formal greeting styles", "Polite request language", "Formatting formal letters", "Leave application checklist"] }
+        ],
+        6: [
+          { name: "Active and Passive Voice", description: "Converting standard active statements into formal passive sentences.", topics: ["Subject-object positions", "By-agent rules", "Passive verbs structures", "Tense changes in conversion"] },
+          { name: "Direct and Indirect Speech", description: "Understanding how to quote speakers directly or report them indirectly.", topics: ["Reporting verbs (said, told)", "Quotation marks rules", "Tense shift in indirect speech", "Reporting dialogues correctly"] },
+          { name: "Debate & Public Expression", description: "Formulating strong arguments and speaking with proper pacing and volume.", topics: ["Structuring for/against arguments", "Opening hook statements", "Body volume control", "Debate team rehearsals"] },
+          { name: "Narrative Essay Composition", description: "Drafting multi-paragraph stories describing personal experiences.", topics: ["Introductory hooks", "Sensory descriptions", "Chronological flow words", "Reflective essay conclusions"] }
+        ],
+        7: [
+          { name: "Modal Auxiliaries & Permissions", description: "Using can, could, may, might, should, must, and ought to.", topics: ["Modals of ability", "Modals of obligation/advice", "Polite permission queries", "Modal fill-in practices"] },
+          { name: "Synonyms, Antonyms & Idioms", description: "Expanding vocabulary with advanced equivalent terms and cultural idioms.", topics: ["Academic synonym matrices", "Antonym pairs matching", "Popular idiom interpretations", "Using idioms in sentences"] },
+          { name: "Poetic Devices & Lyric Analysis", description: "Analyzing metaphors, similes, personifications, and rhyming schemes.", topics: ["Similes vs Metaphors", "Personification examples", "ABBA and AABB rhyme schemes", "Analyzing classic short poems"] },
+          { name: "Descriptive Letter Composition", description: "Drafting long-form letters describing places visited or books read.", topics: ["Informal letter structures", "Adjective-rich description", "Personal reflection style", "Drafting review feedback"] }
+        ],
+        8: [
+          { name: "Clauses: Independent & Dependent", description: "Identifying noun clauses, adjective clauses, and adverb clauses.", topics: ["Main vs Subordinate clauses", "Relative pronouns", "Combining complex sentences", "Clause punctuation rules"] },
+          { name: "Prefixes, Suffixes & Root Origins", description: "Deconstructing vocabulary using Latin/Sanskrit root structures.", topics: ["Common prefixes (un-, dis-)", "Common suffixes (-tion, -less)", "Root word origins", "Dynamic vocabulary matching"] },
+          { name: "Analytical Article Writing", description: "Drafting newspaper columns or newsletter articles on social issues.", topics: ["Catchy article headlines", "Fact-based body structure", "Expressing personal opinions", "Concluding recommendations"] },
+          { name: "Classic Literature Studies", description: "Deconstructing classic excerpts, character conflicts, and underlying themes.", topics: ["Analyzing theme statements", "Character conflict mapping", "Setting and tone analysis", "Short essay answers"] }
+        ],
+        9: [
+          { name: "Advanced Syntax & Editing", description: "Locating and correcting complex grammatical, punctuation, and style errors.", topics: ["Subject-verb agreement drills", "Dangling modifiers correction", "Punctuation in complex clauses", "Paragraph editing benchmarks"] },
+          { name: "Persuasive Speech Writing", description: "Drafting high-impact speeches using rhetorical questions and structures.", topics: ["Rhetorical question hooks", "Rule of three writing", "Call to action statements", "Pacing and pause markings"] },
+          { name: "Comparative Essay Writing", description: "Drafting comparative essays analyzing two books, stories, or events.", topics: ["Block vs Point-by-Point format", "Transition words (however, similarly)", "Thematic comparison matrices", "Formulating strong thesis lines"] },
+          { name: "Official Email Formats", description: "Drafting professional business emails with correct subject lines and signatures.", topics: ["Professional subject lines", "Formal salutations & closings", "Clear body call-to-actions", "Email etiquette checkpoints"] }
+        ],
+        10: [
+          { name: "Board Exam Comprehension Strategies", description: "Answering complex analytical and direct questions from board level unseen passages.", topics: ["Time management tactics", "Keyword tracing in passage", "Evaluating tone and mood", "Two-mark concise answers"] },
+          { name: "Formal Article & Report Writing", description: "Composing structured, data-driven reports and formal articles.", topics: ["Structuring factual reports", "Reporting data and statistics", "Formal objective register", "Formatting sections/subheadings"] },
+          { name: "Classic Literary Masterpieces", description: "Analyzing standard board-prescribed novels, plays, and poetry themes.", topics: ["Central character summaries", "Symbolism and metaphor analysis", "Historical context of literature", "Drafting perfect board essays"] },
+          { name: "Grammar Summary & Error Diagnosis", description: "Final revision of tenses, speech, voice, and syntax rules for exams.", topics: ["Integrated grammar passages", "Error identification grids", "Sentence reordering tests", "Active-passive exam questions"] }
+        ]
+      };
+      const classChapters = classThemes[classNum] || classThemes[10];
+      const selectedCh = classChapters[idx % classChapters.length];
+      name = `${selectedCh.name}`;
+      description = selectedCh.description;
+      topics = [...selectedCh.topics];
+    } else if (catKey === 'physics') {
+      if (classNum === 1) {
+        if (idx === 0) {
+          name = "Light & Shadows";
+          description = "Understand how light travels and forms shadows of toys.";
+          topics = ["Sources of Light", "Sun as light source", "What is a shadow?", "Day and night light"];
+        }
+      } else if (classNum === 2) {
+        if (idx === 0) {
+          name = "Sound Around Us";
+          description = "How sounds are produced and heard in nature.";
+          topics = ["Loud vs soft sounds", "Animal sound makers", "How we hear sounds", "Musical instruments"];
+        }
+      } else if (classNum === 3) {
+        if (idx === 0) {
+          name = "Measurement of Length";
+          description = "Using rulers and tape measures for standard lengths.";
+          topics = ["Centimeters & Meters", "Ruler measurements", "Estimating lengths", "Zero error basic"];
+        } else if (idx === 1) {
+          name = "Force and Friction";
+          description = "How friction slows down rolling balls on different surfaces.";
+          topics = ["Rough vs smooth floors", "Friction as resistance", "Slowing down toys", "Lubrication basics"];
+        }
+      } else if (classNum === 4) {
+        if (idx === 0) {
+          name = "Mass, Volume & Density";
+          description = "Measuring physical quantities of liquids and solids.";
+          topics = ["Grams & Kilograms", "Measuring cylinders", "Why oil floats on water", "Volume of boxes"];
+        } else if (idx === 1) {
+          name = "Work and Energy";
+          description = "Understanding when work is done and types of energy.";
+          topics = ["Mechanical energy", "Heat and Light energy", "Pushing a wall vs car", "Conservation intro"];
+        }
+      } else if (classNum === 5) {
+        if (idx === 0) {
+          name = "Force & Pressure";
+          description = "Understanding pressure exerted by fluids and air.";
+          topics = ["Force per unit area", "Sucking liquid with straw", "Syringe pressure", "Atmospheric weight"];
+        } else if (idx === 1) {
+          name = "Speed & Motion";
+          description = "Calculating average speed of moving objects.";
+          topics = ["Distance/Time formula", "Uniform vs non-uniform motion", "Odometer & Speedometer", "Graphing simple speed"];
+        }
+      } else if (classNum === 6) {
+        if (idx === 0) {
+          name = "Physical Quantities & Units";
+          description = "Standard SI units and advanced measurements.";
+          topics = ["SI unit system", "Vernier calipers intro", "Parallax error corrections", "Measuring irregular areas"];
+        } else if (idx === 1) {
+          name = "Force, Friction & Drag";
+          description = "Types of friction and reducing fluid resistance.";
+          topics = ["Static vs kinetic friction", "Ball bearings", "Streamlined airplane bodies", "Friction coefficient"];
+        }
+      } else if (classNum === 7) {
+        if (idx === 0) {
+          name = "Motion in One Dimension";
+          description = "Speed, velocity, and basic acceleration.";
+          topics = ["Scalar vs Vector", "Average velocity", "Speed-time graphs", "Equations of motion intro"];
+        } else if (idx === 1) {
+          name = "Heat & Thermodynamics";
+          description = "Conduction, convection, and radiation of heat.";
+          topics = ["Conduction in metals", "Convection currents in water", "Solar radiation", "Thermos flask construction"];
+        }
+      } else if (classNum === 8) {
+        if (idx === 0) {
+          name = "Pressure in Fluids & Buoyancy";
+          description = "Pascal's law, upthrust, and Archimedes' principle.";
+          topics = ["Fluid pressure V=hρg", "Buoyant force upthrust", "Archimedes' floatation law", "Hydrometer applications"];
+        } else if (idx === 1) {
+          name = "Static Electricity";
+          description = "Electric charges, Coulomb's law, and gold leaf electroscope.";
+          topics = ["Positive and negative charges", "Coulomb's attraction law", "Gold leaf electroscope", "Lightning conductors"];
+        }
+      } else if (classNum === 9) {
+        if (idx === 0) {
+          name = "Equations of Motion & Gravity";
+          description = "Deriving three equations of motion and Newton's law of gravitation.";
+          topics = ["Equations of motion proofs", "Universal constant G", "Acceleration due to gravity g", "Mass vs Weight"];
+        } else if (idx === 1) {
+          name = "Work, Power & Energy Formulas";
+          description = "Calculating kinetic and potential energy and power output.";
+          topics = ["Potential Energy mgh", "Kinetic Energy 1/2mv²", "Joule and Watt units", "Power calculations"];
+        } else if (idx === 2) {
+          name = "Current Electricity & Ohm's Law";
+          description = "Verifying Ohm's law and analyzing series resistors.";
+          topics = ["Verification of V=IR", "Ammeter and Voltmeter connection", "Resistivity factors", "Series resistance R1+R2"];
+        } else if (idx === 3) {
+          name = "Modern Physics & Nuclear Structure";
+          description = "Basic structure of the nucleus, isotopes, and radioactive emission basics.";
+          topics = ["Protons and Neutrons", "Isotopes and Isobars", "Alpha Beta Gamma rays", "Radioactivity background"];
+        }
+      } else if (classNum === 10) {
+        if (idx === 0) {
+          name = "Force, Moment & Pulleys";
+          description = "Moment of force, torque, and block & tackle pulley systems.";
+          topics = ["Torque and couple", "Center of gravity theorems", "Block and tackle pulleys", "Mechanical Advantage derivation"];
+        } else if (idx === 1) {
+          name = "Spectrum, Lenses & Electromagnetic Waves";
+          description = "Prism refraction, lens formula, and electromagnetic spectrum.";
+          topics = ["Lens formula 1/f = 1/v - 1/u", "Power of a lens in Dioptres", "Dispersion and spectrum", "Infrared and UV rays"];
+        } else if (idx === 2) {
+          name = "Household Circuits & Safety";
+          description = "Three-wire system, earthing, fuses, and electrical energy billing.";
+          topics = ["Live, Neutral, and Earth wires", "Fuse and MCB installation", "Earthing metal bodies", "Kilowatt-hour billing calculation"];
+        } else if (idx === 3) {
+          name = "Radioactivity & Nuclear Reactions";
+          description = "Exploring natural radioactivity, nuclear fission, fusion, and radioactive hazards.";
+          topics = ["Nuclear structure decay", "Fission and fusion reactions", "Chernobyl & Fukushima basics", "Radiation protective shields"];
+        }
+      }
+    } else if (catKey === 'chemistry') {
+      if (classNum === 1) {
+        if (idx === 0) {
+          name = "Water & Cleaning";
+          description = "Why water is important for bathing, washing, and drinking.";
+          topics = ["Safe drinking water", "Washing away dirt", "Water is liquid", "Ice is cold water"];
+        }
+      } else if (classNum === 2) {
+        if (idx === 0) {
+          name = "Melting & Freezing";
+          description = "How heat changes solid ice to water and melts wax.";
+          topics = ["Melting chocolate", "Freezing water", "Burning candle wax", "Heating vs cooling"];
+        }
+      } else if (classNum === 3) {
+        if (idx === 0) {
+          name = "States of Matter & Liquids";
+          description = "Comparing solids, liquids, and gases.";
+          topics = ["Definite shape solids", "Pouring liquids", "Invisible gases", "Molecular arrangement basic"];
+        }
+      } else if (classNum === 4) {
+        if (idx === 0) {
+          name = "Solubility & Kitchen Solutions";
+          description = "How much salt can dissolve in water and make saturation.";
+          topics = ["Saturated solutions", "Solubility limit", "Effect of hot water", "Crystals introduction"];
+        }
+      } else if (classNum === 5) {
+        if (idx === 0) {
+          name = "Acids & Bases in Food";
+          description = "Lemon juice vs baking soda in everyday life.";
+          topics = ["Sour acids (Lemon)", "Bitter bases (Soap)", "Litmus paper testing", "Neutralizing reactions"];
+        }
+      } else if (classNum === 6) {
+        if (idx === 0) {
+          name = "Introduction to Chemistry";
+          description = "Laboratory apparatus and safety guidelines.";
+          topics = ["Test tubes and beakers", "Bunsen burner use", "Laboratory safety rules", "Alchemists history"];
+        } else if (idx === 1) {
+          name = "Elements, Compounds & Mixtures";
+          description = "Separating mixtures using magnetic extraction and sublimation.";
+          topics = ["Sublimation of camphor", "Centrifugation basics", "Distillation apparatus", "Fractional crystallization"];
+        }
+      } else if (classNum === 7) {
+        if (idx === 0) {
+          name = "Atomic Structure & Symbols";
+          description = "Protons, neutrons, electrons, and writing symbols.";
+          topics = ["Atomic nucleus", "Subatomic particles", "Atomic number Z", "Valency of common metals"];
+        } else if (idx === 1) {
+          name = "Chemical Reactions & Equations";
+          description = "Reactants, products, and balancing simple formulas.";
+          topics = ["Writing reactants & products", "Balancing equation coefficients", "Word equations", "Catalysts introduction"];
+        }
+      } else if (classNum === 8) {
+        if (idx === 0) {
+          name = "Hydrogen & Oxygen Chemistry";
+          description = "Laboratory preparation and properties of hydrogen and oxygen.";
+          topics = ["Preparing oxygen from H2O2", "Combustion reactions", "Hydrogen pop test", "Oxides classifications"];
+        } else if (idx === 1) {
+          name = "Water, Hardness & Hydrates";
+          description = "Anhydrous compounds, efflorescence, and water hardness.";
+          topics = ["Temporary vs permanent hardness", "Efflorescent substances", "Deliquescence and hygroscopy", "Distilled water preparation"];
+        }
+      } else if (classNum === 9) {
+        if (idx === 0) {
+          name = "Atomic Structure & Periodic Table";
+          description = "Rutherford's gold foil experiment, Bohr's model, and periodic classification.";
+          topics = ["Rutherford alpha scattering", "Bohr-Bury electron shells", "Mendeleev vs Modern Periodic law", "Valency periodic trends"];
+        } else if (idx === 1) {
+          name = "Chemical Bonding & Octet Rule";
+          description = "Electrovalent (ionic) and covalent bond formations.";
+          topics = ["Octet rule of stability", "Sodium Chloride ionic bonding", "Water covalent sharing", "Properties of ionic compounds"];
+        } else if (idx === 2) {
+          name = "Periodic Classification Trends";
+          description = "History of periodic tables and fundamental groups.";
+          topics = ["Dovereiner Triads", "Newlands Law of Octaves", "Group vs Period configurations", "Atomic radius trends"];
+        } else if (idx === 3) {
+          name = "Introductory Organic Chemistry";
+          description = "Basic introduction to carbon-based structures and compounds.";
+          topics = ["Tetravalency of Carbon", "Methane and Ethane structures", "Saturated hydrocarbon chains", "Allotropes of carbon"];
+        }
+      } else if (classNum === 10) {
+        if (idx === 0) {
+          name = "Periodic Properties & Variations";
+          description = "Analyzing ionization potential, electron affinity, and atomic radius.";
+          topics = ["Periodic group trends", "Ionization potential factors", "Electronegativity rankings", "Metallic character variations"];
+        } else if (idx === 1) {
+          name = "Chemical Metallurgy & Alloys";
+          description = "Extraction of iron and aluminum from their ores.";
+          topics = ["Hematite & Bauxite ores", "Smelting in blast furnace", "Electrolytic refining", "Composition of brass and bronze"];
+        } else if (idx === 2) {
+          name = "Study of Acids: HCl, HNO3, H2SO4";
+          description = "Industrial manufacture and chemical tests for three mineral acids.";
+          topics = ["Haber process ammonia integration", "Contact process H2SO4", "Ostwald process Nitric acid", "Dehydrating power of sulfuric acid"];
+        } else if (idx === 3) {
+          name = "Organic Chains & Esterification";
+          description = "Functional groups, naming rules, and production of sweet-smelling esters.";
+          topics = ["IUPAC nomenclature", "Alcohols and Carboxylic acids", "Esterification reactions", "Saponification details"];
+        }
+      }
+    } else if (catKey === 'biology') {
+      if (classNum === 1) {
+        if (idx === 0) {
+          name = "My Five Senses & Organs";
+          description = "Understanding eyes, ears, nose, tongue, and skin functions.";
+          topics = ["Sight and eyes", "Hearing and ears", "Smelling flowers", "Healthy skin habits"];
+        }
+      } else if (classNum === 2) {
+        if (idx === 0) {
+          name = "Our Living Garden";
+          description = "How garden plants and friendly animals grow and breathe.";
+          topics = ["Plants grow from seeds", "Animals need food & water", "Bathing pet dogs", "Green leaves need sun"];
+        }
+      } else if (classNum === 3) {
+        if (idx === 0) {
+          name = "Functions of Plant Parts";
+          description = "How roots, stems, leaves, and flowers cooperate.";
+          topics = ["Roots absorb water", "Stem supports branches", "Leaf makes starch", "Flowers produce seeds"];
+        }
+      } else if (classNum === 4) {
+        if (idx === 0) {
+          name = "Balanced Diets & Deficiency";
+          description = "Learning nutrients, proteins, and vitamins to stay healthy.";
+          topics = ["Carbohydrates and proteins", "Vitamin A, B, C, D sources", "Scurvy and weak bones", "Avoiding junk food"];
+        }
+      } else if (classNum === 5) {
+        if (idx === 0) {
+          name = "Brain, Nerves & Coordination";
+          description = "Introduction to brain lobes, spinal cord, and sensory nerves.";
+          topics = ["Cerebrum and cerebellum", "Spinal cord pathways", "Nerve signals basics", "Reflex blinking"];
+        }
+      } else if (classNum === 6) {
+        if (idx === 0) {
+          name = "Introduction to Cell Biology";
+          description = "Comparing animal cells and plant cells under magnifying scopes.";
+          topics = ["Cell walls vs membrane", "Nucleus as brain of cell", "Mitochondria intro", "Robert Hooke discoveries"];
+        } else if (idx === 1) {
+          name = "Human Digestive Path & Enzymes";
+          description = "Journey of food and the major enzymes breaking it down.";
+          topics = ["Amylase, pepsin, trypsin", "Stomach acid functions", "Small intestine absorption", "Liver bile basics"];
+        }
+      } else if (classNum === 7) {
+        if (idx === 0) {
+          name = "Mitochondria & Chloroplasts";
+          description = "Deep dive into energy-releasing and food-manufacturing organelles.";
+          topics = ["Mitochondria cell respiration", "Chloroplast plant cells", "Vacuoles cell storage", "Cytoplasm fluids"];
+        } else if (idx === 1) {
+          name = "Photosynthesis Equation & Stomata";
+          description = "How stomata and chlorophyll combine to create glucose.";
+          topics = ["Photosynthesis equations", "Stomata carbon intake", "Guard cells operations", "Transpiration water loss"];
+        }
+      } else if (classNum === 8) {
+        if (idx === 0) {
+          name = "Water Transport Xylem & Phloem";
+          description = "Osmosis, root pressure, and ascent of sap in plants.";
+          topics = ["Xylem water tubes", "Phloem food transport", "Root osmosis pressure", "Transpiration pull experiment"];
+        } else if (idx === 1) {
+          name = "Hormonal Endocrine Feedback Loops";
+          description = "Anatomy and functions of endocrine glands like thyroid and adrenal.";
+          topics = ["Thyroid and thyroxine", "Adrenaline emergency hormone", "Insulin glucose control", "Growth hormone pituitary"];
+        }
+      } else if (classNum === 9) {
+        if (idx === 0) {
+          name = "Cell Division: Mitosis Stages";
+          description = "Chromosomes, chromatin, and mitotic nuclear division phases.";
+          topics = ["Prophase metaphase phases", "Chromosome duplication", "Meiosis vs mitosis", "DNA double-helix intro"];
+        } else if (idx === 1) {
+          name = "Double Circulatory Heart System";
+          description = "Detailed structure of the human heart chambers and blood flow channels.";
+          topics = ["Atrium and ventricle chambers", "Double circulation system", "Arteries vs Veins", "Red vs White blood cells"];
+        } else if (idx === 2) {
+          name = "Prefixes of Plant Evolution";
+          description = "Classifying plants into Thallophyta, Bryophyta, and Pteridophyta.";
+          topics = ["Thallophyta algae", "Bryophyta mosses", "Pteridophyta ferns", "Gymnosperms basics"];
+        } else if (idx === 3) {
+          name = "Ecology & Biodegradable Waste";
+          description = "Understanding environmental food webs, ecosystems, and plastic degradations.";
+          topics = ["Ecosystem producers & consumers", "Food web relationships", "3R waste reduction", "Composting organic matters"];
+        }
+      } else if (classNum === 10) {
+        if (idx === 0) {
+          name = "Pea Plant Genetics & Mendel's Laws";
+          description = "Monohybrid and dihybrid cross inheritance principles.";
+          topics = ["Mendel's pea experiment", "Monohybrid cross 3:1 ratio", "Dihybrid cross 9:3:3:1", "Sex determination in humans"];
+        } else if (idx === 1) {
+          name = "Brain Lobes & Nerve Synapses";
+          description = "Anatomy of cerebral cortex hemispheres and synaptic impulse transmissions.";
+          topics = ["Central nervous system structure", "Reflex arc nerve synapses", "Thyroid, insulin & growth hormones", "Phototropic & geotropic plant auxins"];
+        } else if (idx === 2) {
+          name = "Excretory Nephrons Ultrafiltration";
+          description = "Detailed look at Bowman's capsule, glomerulus filtration, and urine concentration.";
+          topics = ["Glomerulus ultrafiltration", "Bowman's capsule pressure", "Henle's loop reabsorption", "Dialysis artificial kidneys"];
+        } else if (idx === 3) {
+          name = "Reproduction & Chromosomal Duplications";
+          description = "Sexual reproduction in plants and human endocrine maturation cycles.";
+          topics = ["Double fertilization in flowers", "Sperm and egg cell structures", "Menstrual cycles hormones", "Chromosomal crossovers"];
+        }
+      }
+    } else if (catKey === 'history') {
+      if (classNum === 1) {
+        if (idx === 0) {
+          name = "My Loving Family & Helpers";
+          description = "Understanding family trees and helpful neighborhood workers.";
+          topics = ["Grandparents and parents", "Doctor and teacher roles", "Postal helpers", "Firefighters and safety"];
+        }
+      } else if (classNum === 2) {
+        if (idx === 0) {
+          name = "Early Humans & Cave Dwellers";
+          description = "Discovering stone age human tools, cave art, and the use of fire.";
+          topics = ["Living in dark caves", "Invention of fire", "Stone axes and spears", "Cave paintings of animals"];
+        }
+      } else if (classNum === 3) {
+        if (idx === 0) {
+          name = "Indus Valley Street Grids";
+          description = "Discovering street layouts, drainage channels, and seals in Mohenjo-daro.";
+          topics = ["Brick grid towns", "The Great Bath Mohenjo-daro", "Harappan seals & toys", "Clay terracotta crafts"];
+        }
+      } else if (classNum === 4) {
+        if (idx === 0) {
+          name = "Emperor Ashoka and Kalinga War";
+          description = "How Kalinga war changed Ashoka to spread peaceful Buddhism rules.";
+          topics = ["Kalinga War history", "Buddhist pillars inscriptions", "Ashoka's peaceful edicts", "Spread of Buddhism paths"];
+        }
+      } else if (classNum === 5) {
+        if (idx === 0) {
+          name = "Gupta Golden Age of Metallurgy";
+          description = "Aryabhata's math, Sanskritic arts, and the Delhi Iron Pillar.";
+          topics = ["Samudragupta gold coins", "Iron Pillar of Delhi", "Aryabhata decimal math", "Classical Sanskrit dramas"];
+        }
+      } else if (classNum === 6) {
+        if (idx === 0) {
+          name = "The Slave Dynasty & Razia Sultana";
+          description = "How Qutbuddin and Razia Sultana administered the Delhi sultanate.";
+          topics = ["Slave dynasty Qutbuddin", "Razia Sultana first queen", "Iqta tax land distribution", "Qutb Minar architecture"];
+        }
+      } else if (classNum === 7) {
+        if (idx === 0) {
+          name = "Akbar the Great's Mansabdari Ranks";
+          description = "Mughal expansion, religious tolerance policies, and military ranks.";
+          topics = ["Battle of Panipat", "Mansabdari rank military", "Akbar's religious tolerances", "Taj Mahal monument details"];
+        }
+      } else if (classNum === 8) {
+        if (idx === 0) {
+          name = "British East India Company Expansion";
+          description = "Battle of Plassey, Doctrine of Lapse annexations, and company factories.";
+          topics = ["Battle of Plassey 1757", "Doctrine of Lapse annexations", "Decline of Mughals Aurangzeb", "EIC trading factories"];
+        }
+      } else if (classNum === 9) {
+        if (idx === 0) {
+          name = "The French Revolution & Liberty";
+          description = "Socio-political estates, storming of Bastille, and civil rights.";
+          topics = ["French Estates Assembly", "Fall of Bastille 1789", "Declaration of Rights of Man", "Reign of Terror guillotine"];
+        } else if (idx === 1) {
+          name = "Partition of Bengal & Swadeshi";
+          description = "Early nationalist resistance, boycotts, and British reactions.";
+          topics = ["Lord Curzon partitions 1905", "Swadeshi boycotts of textiles", "Swaraj self-reliance movements", "Formation of Muslim League"];
+        } else if (idx === 2) {
+          name = "Civics: Structure of Lok Sabha";
+          description = "Composition, tenure, election criteria, and rules of Lok Sabha MPs.";
+          topics = ["Speaker of Lok Sabha", "Bill reading processes", "Presidential approvals", "Constitutional amendment rules"];
+        }
+      } else if (classNum === 10) {
+        if (idx === 0) {
+          name = "Sarajevo & First World War Causes";
+          description = "Triple entente alliance, Sarajevo royal murders, and Treaty of Versailles.";
+          topics = ["Sarajevo royal assassination", "Triple Entente alliance", "Treaty of Versailles clauses", "League of Nations failures"];
+        } else if (idx === 1) {
+          name = "Hitler's Rise & World War II";
+          description = "Fascism, Nazism, Pearl Harbor bombings, and UN declarations.";
+          topics = ["Nazism and Hitler's rise", "Fascist March on Rome", "Pearl Harbor attack 1941", "United Nations Charter 1945"];
+        } else if (idx === 2) {
+          name = "Quit India Movement & Partition 1947";
+          description = "Gandhi's final marches, Azad Hind Fauj, and Mountbatten partitioning plans.";
+          topics = ["Quit India Movement 1942", "Netaji Azad Hind Fauj", "Mountbatten Partition plan", "Indian Independence Act 1947"];
+        }
+      }
+    } else if (catKey === 'geography') {
+      if (classNum === 1) {
+        if (idx === 0) {
+          name = "School Layouts & Weather";
+          description = "Understanding sunny or rainy days and simple school maps.";
+          topics = ["Finding classrooms", "Library vs playground directions", "Sunny weather shadows", "Rainy day clouds"];
+        }
+      } else if (classNum === 2) {
+        if (idx === 0) {
+          name = "Compass Directions & Landforms";
+          description = "Understanding cardinal directions, high mountains, and blue oceans.";
+          topics = ["Where the Sun rises (East)", "Finding North direction", "Tall mountain peaks", "Flowing water rivers"];
+        }
+      } else if (classNum === 3) {
+        if (idx === 0) {
+          name = "Himalayas and Indian Riverbeds";
+          description = "Physical geography of Himalayan snow peaks and coastal plains.";
+          topics = ["Himalayas snow peaks", "Ganges and Yamuna paths", "Deccan plateau", "Sunderban tiger deltas"];
+        }
+      } else if (classNum === 4) {
+        if (idx === 0) {
+          name = "Types of Indian Forest Reserves";
+          description = "Understanding alpine pine, evergreen, and deciduous forests.";
+          topics = ["Alpine trees conifers", "Evergreen vs deciduous trees", "Monsoon cloud pathways", "Rain shadow desert dry zones"];
+        }
+      } else if (classNum === 5) {
+        if (idx === 0) {
+          name = "Deccan Coal Mines & Soil Mapping";
+          description = "Chota Nagpur iron mines, volcanic black soil, and conserving resources.";
+          topics = ["Deccan volcanic rocks", "Black cotton soils", "Chota Nagpur iron mines", "Conserving rich minerals"];
+        }
+      } else if (classNum === 6) {
+        if (idx === 0) {
+          name = "Atmosphere Troposphere & Wind Belts";
+          description = "Troposphere properties, global heat circulation, and wind pathways.";
+          topics = ["Atmospheric gas composition", "Troposphere weather changes", "High-low pressure winds", "Global temperature convection"];
+        }
+      } else if (classNum === 7) {
+        if (idx === 0) {
+          name = "Ocean Currents & Marine Gravitational Tides";
+          description = "Gulf Stream warm currents, ocean salinity charts, and moon gravitational tides.";
+          topics = ["Warm vs cold ocean currents", "Gravitational lunar tides", "Salinity ocean water graphs", "Marine shipping routes"];
+        }
+      } else if (classNum === 8) {
+        if (idx === 0) {
+          name = "Earth's Mantle & Core Seismology";
+          description = "Tectonic boundaries, Sial vs Sima, and seismograph Richter readings.";
+          topics = ["Sial and Sima rock compositions", "Tectonic continental plates", "Seismograph Richter scale ratings", "Volcanic magma vent pipes"];
+        }
+      } else if (classNum === 9) {
+        if (idx === 0) {
+          name = "Indian Longitudes & McMahon Border Lines";
+          description = "Standard meridians, neighboring countries boundaries, and soils classification.";
+          topics = ["82.5 degrees East meridian", "McMahon line Indian borders", "Soil classifications across states", "Indian neighbors (Nepal, Bhutan)"];
+        } else if (idx === 1) {
+          name = "Alluvial, Black, Red Soils Properties";
+          description = "Soil textures, nutrient contents, and erosion prevention methods.";
+          topics = ["Alluvial fertile riverbeds", "Black volcanic clay soils", "Red iron-oxide dry soils", "Soil erosion prevention"];
+        } else if (idx === 2) {
+          name = "Civics: Local Decentralization";
+          description = "Panchayati Raj 73rd and 74th amendments and power distribution.";
+          topics = ["Belgian decentralization model", "Brussels shared council", "Sri Lankan majoritarian crisis", "Schedules of decentralization"];
+        } else if (idx === 3) {
+          name = "Primary and Secondary Sectors";
+          description = "Sectors of economy, GDP estimation formulas, and NREGA guarantees.";
+          topics = ["Primary agriculture sectors", "Secondary factories manufacturing", "Tertiary software services", "GDP estimation formulas"];
+        }
+      } else if (classNum === 10) {
+        if (idx === 0) {
+          name = "South-West Monsoon Wind Pathways";
+          description = "Arabian Sea and Bay of Bengal branches of monsoon, jet streams.";
+          topics = ["South-West Monsoon branches", "Arabian sea wind paths", "Bay of Bengal rainfall", "Jet stream weather triggers"];
+        } else if (idx === 1) {
+          name = "Rainwater Roof Harvesting & Dams";
+          description = "Exploring Hirakud dam, Bhakra Nangal turbines, and water table restorations.";
+          topics = ["Hirakud dam reservoir (Odisha)", "Bhakra Nangal hydro turbines", "Rainwater roof harvesting systems", "Water table conservation steps"];
+        } else if (idx === 2) {
+          name = "Topographical Sheet Contour Intervals";
+          description = "Reading contour heights, map colors, and drainage structures.";
+          topics = ["Contour interval elevations", "Six-figure grid mapping", "Dendritic drainage paths", "Settlement classifications"];
+        } else if (idx === 3) {
+          name = "NREGA Employment and GDP Estimations";
+          description = "Sectors of the Indian economy, employment generation, and NREGA 100 days guidelines.";
+          topics = ["Primary, secondary, tertiary", "GDP estimation methods", "Organized vs unorganized labor", "NREGA 100 days guarantees"];
+        }
+      }
     }
 
     return {
@@ -756,15 +1370,28 @@ const buildSyllabusData = (): SyllabusData => {
       else if (subTemplate.id === 'science') catKey = 'science';
       else if (subTemplate.id === 'social') catKey = 'social';
 
-      const chapters = getChaptersForClass(catKey, c, 'cbse');
+      let chapters = getChaptersForClass(catKey, c, 'cbse');
+
+      if (subTemplate.id === 'hindi') {
+        chapters = chapters.map((ch) => {
+          return {
+            name: translateToHindi(ch.name),
+            weightage: ch.weightage,
+            description: translateToHindi(ch.description),
+            topics: ch.topics.map(t => translateToHindi(t))
+          };
+        });
+      }
+
+      const finalName = subTemplate.id === 'hindi' ? `Hindi Reader (Class ${c})` : `${subTemplate.name} (Class ${c})`;
 
       return {
         id: `${subTemplate.id}-cbse-${c}`,
-        name: `${subTemplate.name} (Class ${c})`,
+        name: finalName,
         icon: subTemplate.icon,
         chapters: chapters,
         resources: [
-          `NCERT Class ${c} ${subTemplate.name} Book PDF`,
+          subTemplate.id === 'hindi' ? `NCERT Class ${c} Hindi Durva/Vasant Textbook PDF` : `NCERT Class ${c} ${subTemplate.name} Book PDF`,
           `CBSE Blueprints & Marking Scheme`,
           `Arohi Smart Online Study Packet`
         ]

@@ -13,6 +13,7 @@ export interface AdminUser {
     path1: boolean; // Career, Jobs & Resume Plan
     path2: boolean; // Economical Skill Upgrade Plan
     path3: boolean; // Udyam Business Plan
+    path4: boolean; // Student Support Plan
   };
   takenCourses: string[];
   usage: {
@@ -65,7 +66,8 @@ export const INITIAL_ADMIN_USERS: AdminUser[] = [
     services: {
       path1: true,
       path2: true,
-      path3: true
+      path3: true,
+      path4: true
     },
     takenCourses: ['MSME Business Fundamentals', 'Drone Piloting & Agri-Spraying'],
     usage: {
@@ -93,7 +95,8 @@ export const INITIAL_ADMIN_USERS: AdminUser[] = [
     services: {
       path1: true,
       path2: false,
-      path3: false
+      path3: false,
+      path4: false
     },
     takenCourses: ['Drone Piloting & Agri-Spraying'],
     usage: {
@@ -121,7 +124,8 @@ export const INITIAL_ADMIN_USERS: AdminUser[] = [
     services: {
       path1: false,
       path2: false,
-      path3: false
+      path3: false,
+      path4: false
     },
     takenCourses: [],
     usage: {
@@ -149,7 +153,8 @@ export const INITIAL_ADMIN_USERS: AdminUser[] = [
     services: {
       path1: false,
       path2: false,
-      path3: true
+      path3: true,
+      path4: false
     },
     takenCourses: ['MSME Business Fundamentals'],
     usage: {
@@ -177,7 +182,8 @@ export const INITIAL_ADMIN_USERS: AdminUser[] = [
     services: {
       path1: true,
       path2: true,
-      path3: false
+      path3: false,
+      path4: false
     },
     takenCourses: ['Drone Piloting & Agri-Spraying'],
     usage: {

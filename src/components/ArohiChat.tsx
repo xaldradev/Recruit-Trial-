@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User, Sparkles, Plus, RefreshCw, Trash2, Mic, Paperclip, CheckCircle, ArrowRight, Lightbulb, MapPin, Briefcase, Landmark, Award, Minus, X, Globe } from 'lucide-react';
+import { Send, Bot, User, Sparkles, Plus, RefreshCw, Trash2, Mic, Paperclip, CheckCircle, ArrowRight, Lightbulb, MapPin, Briefcase, Landmark, Award, Minus, X, Globe, Phone } from 'lucide-react';
 import ArohiAvatar from './ArohiAvatar';
 import { Language, getTranslation, getWelcomeContent, getSuggestedPrompts } from '../translations';
+import ArohiVoiceCall from './ArohiVoiceCall';
 
 interface Message {
   id: string;
@@ -171,6 +172,7 @@ function parseMessageResume(content: string) {
 
 export default function ArohiChat({ initialPrompt, onNavigateTab, onMinimize, onClose, language = 'en' }: ArohiChatProps) {
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isVoiceCallOpen, setIsVoiceCallOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
@@ -613,6 +615,14 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
 
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             <button
+              onClick={() => setIsVoiceCallOpen(true)}
+              title="Live Voice Call"
+              className="p-1.5 sm:p-2 rounded-xl bg-[#7c3aed]/10 hover:bg-[#7c3aed]/20 text-[#c084fc] hover:text-[#d8b4fe] transition-all cursor-pointer flex items-center gap-1.5 border border-[#7c3aed]/20 mr-1"
+            >
+              <Phone className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+              <span className="text-[10px] font-extrabold uppercase tracking-wide hidden xs:inline">Live Call</span>
+            </button>
+            <button
               onClick={() => {
                 setMessages((prev) => [prev[0]]);
               }}
@@ -922,6 +932,10 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
           </div>
         </div>
       </aside>
+
+      {isVoiceCallOpen && (
+        <ArohiVoiceCall onClose={() => setIsVoiceCallOpen(false)} language={language} />
+      )}
 
     </div>
   );
