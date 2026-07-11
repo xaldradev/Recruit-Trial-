@@ -9,10 +9,16 @@ const app = initializeApp({
 });
 export const auth = getAuth(app);
 
-// Initialize Firestore using initializeFirestore with experimentalForceLongPolling to prevent iframe connection issues
+// Initialize Firestore with auto-detect long polling and ignoreUndefinedProperties for maximum resilience in sandboxed iframe environments
 export const db = firebaseConfig.firestoreDatabaseId
-  ? initializeFirestore(app, { experimentalForceLongPolling: true }, firebaseConfig.firestoreDatabaseId)
-  : initializeFirestore(app, { experimentalForceLongPolling: true });
+  ? initializeFirestore(app, { 
+      experimentalAutoDetectLongPolling: true,
+      ignoreUndefinedProperties: true
+    }, firebaseConfig.firestoreDatabaseId)
+  : initializeFirestore(app, { 
+      experimentalAutoDetectLongPolling: true,
+      ignoreUndefinedProperties: true
+    });
 
 // Validate Connection to Firestore as per SKILL.md rules
 async function testConnection() {
