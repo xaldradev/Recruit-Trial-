@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PhoneOff, Mic, MicOff, Volume2, VolumeX, Sparkles, Radio, Settings, AlertCircle, X, ChevronDown } from 'lucide-react';
+import ArohiAvatar from './ArohiAvatar';
 
 interface ArohiVoiceCallProps {
   onClose: () => void;
@@ -356,8 +357,7 @@ export default function ArohiVoiceCall({ onClose, language = 'en' }: ArohiVoiceC
         <div className="relative flex justify-center items-center w-56 h-56">
           {/* Inner Avatar Bubble */}
           <div className="w-32 h-32 rounded-full bg-gradient-to-tr from-[#120e2a] via-[#7c3aed] to-[#a855f7] border-4 border-[#3b218d] shadow-[0_0_50px_rgba(124,58,237,0.4)] flex flex-col items-center justify-center z-10 relative overflow-hidden transition-all duration-300">
-            <span className="text-4xl select-none animate-bounce duration-1000">👩</span>
-            <span className="text-[10px] font-black tracking-widest uppercase mt-2 text-white/95">AROHI</span>
+            <ArohiAvatar className="w-full h-full" />
           </div>
 
           {/* Speaking rings (visible when speaking) */}

@@ -2129,6 +2129,43 @@ app.get('/sitemap.xml', (req, res) => {
 </urlset>`);
 });
 
+// Dynamic route to serve any uploaded Arohi image from the project root with any extension (png, jpg, jpeg, webp)
+app.get('/arohi.png', (req, res) => {
+  const rootDir = process.cwd();
+  try {
+    const files = fs.readdirSync(rootDir);
+    // Find any file that starts with "arohi" or contains "arohi" (case-insensitive) and has an image extension
+    const imageFile = files.find(file => {
+      const lower = file.toLowerCase();
+      return (lower.startsWith('arohi') || lower.includes('arohi')) && 
+             (lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.webp'));
+    });
+
+    if (imageFile) {
+      return res.sendFile(path.join(rootDir, imageFile));
+    }
+    
+    // Also check the assets folder if it has any such files
+    const assetsDir = path.join(rootDir, 'assets');
+    if (fs.existsSync(assetsDir)) {
+      const assetsFiles = fs.readdirSync(assetsDir);
+      const assetsImageFile = assetsFiles.find(file => {
+        const lower = file.toLowerCase();
+        return (lower.startsWith('arohi') || lower.includes('arohi')) && 
+               (lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.webp'));
+      });
+      if (assetsImageFile) {
+        return res.sendFile(path.join(assetsDir, assetsImageFile));
+      }
+    }
+  } catch (err) {
+    console.error('Error finding Arohi image:', err);
+  }
+
+  // Fallback if not found: Send 404
+  return res.status(404).json({ error: 'Arohi image not found. Please upload your image to the workspace.' });
+});
+
 // Vite middleware and asset delivery setup
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {

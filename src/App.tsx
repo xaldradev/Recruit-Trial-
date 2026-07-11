@@ -26,6 +26,7 @@ import Smooth3DShowcase from './components/Smooth3DShowcase';
 import Interactive3DOrbit from './components/Interactive3DOrbit';
 import NotificationToast from './components/NotificationToast';
 import WelcomeLanding from './components/WelcomeLanding';
+import ArohiAvatar from './components/ArohiAvatar';
 
 import { initialPostings } from './data/initialData';
 import { Posting, Application, CategoryType } from './types';
@@ -986,8 +987,8 @@ export default function App() {
                 
                 {/* Header Info */}
                 <div className="flex items-center gap-4">
-                  <div className="bg-[#7c3aed] rounded-full w-14 h-14 flex items-center justify-center border border-[#9b7df5]/30 shadow-md shrink-0 relative overflow-hidden">
-                    <span className="text-3xl select-none">👩</span>
+                  <div className="rounded-full w-14 h-14 flex items-center justify-center border border-[#9b7df5]/30 shadow-md shrink-0 relative overflow-hidden">
+                    <ArohiAvatar className="w-full h-full" />
                   </div>
                   <div className="text-left">
                     <h3 className="text-lg font-extrabold text-white flex items-center gap-1.5">
@@ -2895,7 +2896,9 @@ export default function App() {
           className="fixed bottom-6 right-6 bg-[#7c3aed] hover:bg-[#6d28d9] active:scale-95 text-white p-3 sm:p-3.5 rounded-full shadow-[0_4px_20px_rgba(124,58,237,0.45)] border border-[#a78bfa]/40 z-50 flex items-center justify-center gap-2 group transition-all duration-300"
           title="Talk to AROHI"
         >
-          <span className="text-2xl select-none">👩</span>
+          <div className="w-7 h-7 rounded-full overflow-hidden shrink-0">
+            <ArohiAvatar className="w-full h-full" />
+          </div>
           <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-out text-xs font-black uppercase tracking-wider whitespace-nowrap">
             {isChatOpen && !isChatMinimized ? 'Close AROHI' : 'Ask AROHI'}
           </span>

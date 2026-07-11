@@ -583,7 +583,7 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
           ))}
         </div>
 
-        <div className="pt-4 border-t border-[#231a4f]">
+        <div className="pt-4 border-t border-[#231a4f] space-y-3.5">
           <div className="bg-gradient-to-tr from-[#7c3aed] to-[#3b218d] text-white p-3 rounded-xl shadow-inner text-center">
             <span className="text-[10px] uppercase tracking-wider font-extrabold opacity-75">AROHI Status</span>
             <div className="flex items-center justify-center gap-1.5 mt-1 font-bold text-xs text-emerald-300">
