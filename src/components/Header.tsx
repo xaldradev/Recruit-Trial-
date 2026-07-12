@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bot, Sparkles, Award, Menu, X, Landmark, Briefcase, Settings, User, BookOpen, FileText, ChevronDown, LogOut, LogIn, ShieldCheck, Globe } from 'lucide-react';
+import { Bot, Sparkles, Award, Menu, X, Landmark, Briefcase, Settings, User, BookOpen, FileText, ChevronDown, LogOut, LogIn, ShieldCheck, Globe, Share2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { Language, getTranslation } from '../translations';
@@ -13,6 +13,7 @@ interface HeaderProps {
   onRevisitWelcome?: () => void;
   language: Language;
   onLanguageChange: (lang: Language) => void;
+  onShare?: () => void;
 }
 
 export const LANGUAGES_LIST = [
@@ -31,12 +32,13 @@ export const LANGUAGES_LIST = [
   { code: 'as', native: 'অসমীয়া', english: 'Assamese', symbol: 'অ' }
 ] as const;
 
-export default function Header({ activeTab, onTabChange, onSearchChange, searchQuery, onOpenAuth, onRevisitWelcome, language, onLanguageChange }: HeaderProps) {
+export default function Header({ activeTab, onTabChange, onSearchChange, searchQuery, onOpenAuth, onRevisitWelcome, language, onLanguageChange, onShare }: HeaderProps) {
   const { user, userData, signOutUser } = useAuth();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [countdown, setCountdown] = useState({ hours: 23, minutes: 45, seconds: 20 });
   const [isHeaderLangOpen, setIsHeaderLangOpen] = useState(false);
+  const [isMobileLangOpen, setIsMobileLangOpen] = useState(false);
   const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
   const headerLangRef = useRef<HTMLDivElement>(null);
   const moreDropdownRef = useRef<HTMLDivElement>(null);
@@ -102,6 +104,7 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
 
   const navLinks = [
     { id: 'home', label: getTranslation('home', language), hasDropdown: false },
+    { id: 'dashboard', label: getTranslation('dashboard', language), hasDropdown: false },
     { id: 'jobs', label: getTranslation('jobs', language), hasDropdown: true },
     { id: 'courses', label: getTranslation('skills', language), hasDropdown: true },
     { id: 'syllabus', label: getTranslation('syllabus', language), hasBadge: true, badgeText: 'Odia/CBSE' },
@@ -291,12 +294,24 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
             </button>
           )}
 
+          {onShare && (
+            <button
+              onClick={onShare}
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-500/10 via-[#00e676]/10 to-teal-500/10 border border-[#00e676]/30 hover:border-[#00e676]/70 rounded-full cursor-pointer text-emerald-300 hover:text-white transition-all text-[11px] font-bold shadow-[0_0_15px_rgba(0,230,118,0.1)]"
+              title="Share Recruit.org.in with friends"
+            >
+              <Share2 className="w-3 h-3 text-[#00e676]" />
+              <span>Share App</span>
+            </button>
+          )}
+
           {user ? (
             <div className="hidden sm:flex items-center gap-3">
               {/* Account details badge */}
               <div 
-                onClick={() => onTabChange('arohi')}
+                onClick={() => onTabChange('dashboard')}
                 className="flex items-center gap-2 px-3.5 py-1.5 bg-[#17113a] border border-[#3b289c] rounded-full cursor-pointer hover:bg-[#251b5c] transition-all"
+                title="Go to User Dashboard"
               >
                 <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#7c3aed] to-[#a855f7] flex items-center justify-center text-white text-[10px] font-black uppercase">
                   {userData?.profile?.name?.slice(0, 2) || user.displayName?.slice(0, 2) || 'IN'}
@@ -438,6 +453,7 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
                     const getLinkIcon = (id: string) => {
                       switch (id) {
                         case 'home': return <Landmark className="w-4 h-4 text-purple-400" />;
+                        case 'dashboard': return <User className="w-4 h-4 text-[#00e676]" />;
                         case 'jobs': return <Briefcase className="w-4 h-4 text-blue-400" />;
                         case 'courses': return <BookOpen className="w-4 h-4 text-emerald-400" />;
                         case 'syllabus': return <FileText className="w-4 h-4 text-amber-400" />;
@@ -503,27 +519,43 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
                   style={{ transform: 'translateZ(40px)' }}
                 >
                   {/* Mobile Language Selector */}
-                  <div className="mb-4 px-3 py-2.5 bg-[#120a28]/60 border border-purple-950/40 rounded-2xl flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-purple-400" />
-                      <span className="text-xs text-slate-300 font-bold">{getTranslation('selectLang', language)}:</span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-1.5 max-h-36 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-purple-900/60 scrollbar-track-transparent">
-                      {LANGUAGES_LIST.map((lang) => (
-                        <button
-                          key={lang.code}
-                          onClick={() => onLanguageChange(lang.code as Language)}
-                          className={`px-2 py-1.5 rounded-xl text-[10px] font-black cursor-pointer transition-all text-center truncate ${
-                            language === lang.code
-                              ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white border border-purple-400/45 shadow-md'
-                              : 'bg-purple-950/35 hover:bg-purple-900/30 text-slate-300 border border-purple-950/40'
-                          }`}
-                          title={`${lang.native} ${lang.english ? `(${lang.english})` : ''}`}
-                        >
-                          {lang.native}
-                        </button>
-                      ))}
-                    </div>
+                  <div className="mb-3 px-3 py-2 bg-[#120a28]/60 border border-purple-950/40 rounded-2xl flex flex-col gap-1.5 transition-all">
+                    <button
+                      onClick={() => setIsMobileLangOpen(!isMobileLangOpen)}
+                      className="flex items-center justify-between w-full text-left cursor-pointer py-1"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-purple-400" />
+                        <span className="text-xs text-slate-300 font-bold">
+                          {getTranslation('selectLang', language)}: <span className="text-emerald-400 font-extrabold ml-1">
+                            {LANGUAGES_LIST.find(l => l.code === language)?.native || 'English'}
+                          </span>
+                        </span>
+                      </div>
+                      <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-300 ${isMobileLangOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {isMobileLangOpen && (
+                      <div className="grid grid-cols-3 gap-1 mt-1 max-h-32 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-purple-900/60 scrollbar-track-transparent animate-in fade-in slide-in-from-top-1.5 duration-200">
+                        {LANGUAGES_LIST.map((lang) => (
+                          <button
+                            key={lang.code}
+                            onClick={() => {
+                              onLanguageChange(lang.code as Language);
+                              setIsMobileLangOpen(false);
+                            }}
+                            className={`px-1.5 py-1 rounded-lg text-[9px] font-black cursor-pointer transition-all text-center truncate ${
+                              language === lang.code
+                                ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white border border-purple-400/45 shadow-md'
+                                : 'bg-purple-950/35 hover:bg-purple-900/30 text-slate-300 border border-purple-950/40'
+                            }`}
+                            title={`${lang.native} ${lang.english ? `(${lang.english})` : ''}`}
+                          >
+                            {lang.native}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {onRevisitWelcome && (
@@ -541,9 +573,16 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
                     </motion.button>
                   )}
 
-                  {user ? (
+                   {user ? (
                     <div className="flex flex-col gap-3">
-                      <div className="flex items-center gap-3 px-4 py-3 bg-[#130b2c]/80 border border-purple-950/40 rounded-2xl shadow-inner">
+                      <div 
+                        onClick={() => {
+                          onTabChange('dashboard');
+                          setMobileMenuOpen(false);
+                        }}
+                        className="flex items-center gap-3 px-4 py-3 bg-[#130b2c]/80 hover:bg-[#1a0f3d]/80 border border-purple-950/40 rounded-2xl shadow-inner cursor-pointer transition-all"
+                        title="Go to User Dashboard"
+                      >
                         <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#7c3aed] to-[#a855f7] flex items-center justify-center text-white text-xs font-black uppercase shadow-md border border-purple-400/30">
                           {userData?.profile?.name?.slice(0, 2) || user.displayName?.slice(0, 2) || 'IN'}
                         </div>
@@ -601,6 +640,21 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
                         </motion.button>
                       </div>
                     </div>
+                  )}
+
+                  {onShare && (
+                    <motion.button
+                      whileHover={{ scale: 1.02, backgroundColor: 'rgba(0, 230, 118, 0.15)' }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        onShare();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full text-center bg-gradient-to-r from-emerald-500/10 via-[#00e676]/10 to-teal-500/10 border border-[#00e676]/30 text-[#00e676] py-3 rounded-2xl text-xs font-black uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2 mt-4 shadow-sm"
+                    >
+                      <Share2 className="w-4 h-4 text-[#00e676]" />
+                      <span>Share Platform with Friends</span>
+                    </motion.button>
                   )}
                 </div>
 

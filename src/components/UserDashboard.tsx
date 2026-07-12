@@ -3,7 +3,7 @@ import {
   User, Mail, Phone, MapPin, Award, CheckCircle2, Bookmark, FileText, 
   Bot, Briefcase, Landmark, ExternalLink, Sparkles, AlertCircle, 
   ShieldCheck, Edit3, Save, LogIn, Trash2, X, ChevronRight, 
-  Download, RefreshCw, Trophy, Calendar, Check, Play, GraduationCap, Map, Clock
+  Download, RefreshCw, Trophy, Calendar, Check, Play, GraduationCap, Map, Clock, Share2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { initialCourses } from '../data/coursesData';
@@ -13,13 +13,15 @@ interface UserDashboardProps {
   onSubscribe?: (pathId: string) => void;
   onNavigateTab?: (tab: string) => void;
   onOpenAuth?: () => void;
+  onShare?: () => void;
 }
 
 export default function UserDashboard({ 
   subscriptions = { path1: false, path2: false, path3: false }, 
   onSubscribe, 
   onNavigateTab, 
-  onOpenAuth 
+  onOpenAuth,
+  onShare
 }: UserDashboardProps) {
   
   const { user, userData, updateUserProfile, updateBookmarks } = useAuth();
@@ -734,12 +736,22 @@ export default function UserDashboard({
             </p>
 
             {!isEditingProfile && (
-              <button 
-                onClick={() => setIsEditingProfile(true)}
-                className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#1a143a] hover:bg-[#251e54] border border-slate-800 rounded-xl text-[11px] font-black uppercase tracking-wider text-slate-300 hover:text-white transition-all cursor-pointer shadow-sm"
-              >
-                <Edit3 className="w-3.5 h-3.5 text-purple-400" /> Complete Registry Profile
-              </button>
+              <div className="flex flex-col gap-2 w-full">
+                <button 
+                  onClick={() => setIsEditingProfile(true)}
+                  className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#1a143a] hover:bg-[#251e54] border border-slate-800 rounded-xl text-[11px] font-black uppercase tracking-wider text-slate-300 hover:text-white transition-all cursor-pointer shadow-sm"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-purple-400" /> Complete Registry Profile
+                </button>
+                {onShare && (
+                  <button 
+                    onClick={onShare}
+                    className="w-full flex items-center justify-center gap-1.5 px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-500/30 rounded-xl text-[11px] font-black uppercase tracking-wider text-emerald-400 hover:text-white transition-all cursor-pointer shadow-sm"
+                  >
+                    <Share2 className="w-3.5 h-3.5 text-emerald-400" /> Share Platform
+                  </button>
+                )}
+              </div>
             )}
           </div>
 

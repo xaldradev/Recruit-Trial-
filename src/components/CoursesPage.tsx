@@ -425,7 +425,7 @@ function renderMarkdown(content: string) {
   return <div className="space-y-1">{elements}</div>;
 }
 
-export default function CoursesPage({ onOpenAuth }: { onOpenAuth?: () => void }) {
+export default function CoursesPage({ onOpenAuth, onNavigateTab }: { onOpenAuth?: () => void, onNavigateTab?: (tab: string) => void }) {
   const { user, userData, updateCareerProgress } = useAuth();
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -1781,6 +1781,26 @@ Keep in mind:
             className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md shrink-0 active:scale-95 hover:scale-[1.02]"
           >
             Create Free Account
+          </button>
+        </div>
+      )}
+
+      {user && (
+        <div className="bg-gradient-to-r from-emerald-950/15 via-[#1a2e3b]/30 to-purple-950/15 border border-emerald-500/25 rounded-3xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 text-left">
+          <div className="space-y-1">
+            <span className="text-[9px] font-black uppercase text-emerald-400 font-mono tracking-widest block">✓ INTEGRATED CLASSROOM ACTIVE</span>
+            <h4 className="text-xs font-black text-white">
+              Track Your Courses & Earned Certificates
+            </h4>
+            <p className="text-[11px] text-slate-300 font-medium max-w-2xl">
+              All your study progress, lesson scores, module completions, and verified digital certificates are securely synced. Open your main User Dashboard to review your course progression, download high-resolution certificates, and access your subscriptions.
+            </p>
+          </div>
+          <button 
+            onClick={() => onNavigateTab?.('dashboard')}
+            className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md shrink-0 active:scale-95 hover:scale-[1.02] flex items-center gap-1.5"
+          >
+            <User className="w-3.5 h-3.5" /> Go to User Dashboard
           </button>
         </div>
       )}
