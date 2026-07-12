@@ -9,14 +9,14 @@ const app = initializeApp({
 });
 export const auth = getAuth(app);
 
-// Initialize Firestore with auto-detect long polling and ignoreUndefinedProperties for maximum resilience in sandboxed iframe environments
+// Initialize Firestore with forced long polling and ignoreUndefinedProperties for maximum resilience in sandboxed iframe environments
 export const db = firebaseConfig.firestoreDatabaseId
   ? initializeFirestore(app, { 
-      experimentalAutoDetectLongPolling: true,
+      experimentalForceLongPolling: true,
       ignoreUndefinedProperties: true
     }, firebaseConfig.firestoreDatabaseId)
   : initializeFirestore(app, { 
-      experimentalAutoDetectLongPolling: true,
+      experimentalForceLongPolling: true,
       ignoreUndefinedProperties: true
     });
 
