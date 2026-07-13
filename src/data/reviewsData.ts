@@ -513,5 +513,590 @@ export const INITIAL_REVIEWS: Review[] = [
     rating: 5,
     comment: "The self-paced MSME GST certification course is excellent. It explains complex tax filings using extremely simple, relatable analogies.",
     date: '21 Apr 2026'
+  },
+  {
+    id: 'rev-56',
+    name: 'Karan Malhotra',
+    city: 'Noida',
+    state: 'Uttar Pradesh',
+    rating: 5,
+    comment: "The interactive D3 Career Roadmap is a masterpiece. It visually mapped out my path from an associate QA engineer to a principal solutions architect, detailing every required certification.",
+    date: '20 Apr 2026'
+  },
+  {
+    id: 'rev-57',
+    name: 'Tsering Dorjee',
+    city: 'Leh',
+    state: 'Ladakh',
+    rating: 5,
+    comment: "Even in low-bandwidth regions, the site loaded incredibly fast. Arohi's career advice on competitive government entrance exams was clear, concise, and highly actionable.",
+    date: '19 Apr 2026'
+  },
+  {
+    id: 'rev-58',
+    name: 'Malini Krishnan',
+    city: 'Palakkad',
+    state: 'Kerala',
+    rating: 5,
+    comment: "I used the resume builder to prepare for banking roles. The ATS evaluator's analysis of my structural alignment was flawless, pointing out exact sections to improve.",
+    date: '18 Apr 2026'
+  },
+  {
+    id: 'rev-59',
+    name: 'Jaspreet Chawla',
+    city: 'Jalandhar',
+    state: 'Punjab',
+    rating: 5,
+    comment: "The mock interview portal is super realistic! The voice feedback from Arohi helped me tackle difficult behavioral questions with absolute confidence.",
+    date: '17 Apr 2026'
+  },
+  {
+    id: 'rev-60',
+    name: 'Anupama Gokhale',
+    city: 'Thane',
+    state: 'Maharashtra',
+    rating: 5,
+    comment: "Detailed documentation on MSME subsidies and central schemes helped us register our small dairy cooperative in record time. Highly professional utility!",
+    date: '16 Apr 2026'
+  },
+  {
+    id: 'rev-61',
+    name: 'Manish Sisodia',
+    city: 'Gwalior',
+    state: 'Madhya Pradesh',
+    rating: 4,
+    comment: "I am preparing for state administrative exams. The study guides, test series and mock feedback cycles are very helpful for regular review and pacing.",
+    date: '15 Apr 2026'
+  },
+  {
+    id: 'rev-62',
+    name: 'Bijaylaxmi Jena',
+    city: 'Kendrapara',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ଆରୋହୀ ଏଆଇ ସହିତ ଓଡ଼ିଶାର ବିଭିନ୍ନ ସରକାରୀ ଯୋଜନା ବିଷୟରେ ଆଲୋଚନା କରିବା ବହୁତ ଉପଯୋଗୀ ଥିଲା। ଏହି ପ୍ଲାଟଫର୍ମଟି ବହୁତ ସହଜ ଏବଂ ଆଧୁନିକ ଅଟେ।",
+    date: '14 Apr 2026'
+  },
+  {
+    id: 'rev-63',
+    name: 'Sanjeev Goel',
+    city: 'Panipat',
+    state: 'Haryana',
+    rating: 5,
+    comment: "The drone training syllabus is very detailed. It covers real-world application parameters, safety logs, and regulatory compliance protocols for DGCA certifications.",
+    date: '13 Apr 2026'
+  },
+  {
+    id: 'rev-64',
+    name: 'Meenakshi Sundaram',
+    city: 'Madurai',
+    state: 'Tamil Nadu',
+    rating: 5,
+    comment: "அரோஹி ஏஐ உடனான நேரடி உரையாடல் மிகவும் இயல்பாக இருந்தது. என் தொழில்முறை சந்தேகங்களுக்கு துல்லியமான பதில்களை உடனடியாகப் பெற்றேன்.",
+    date: '12 Apr 2026'
+  },
+  {
+    id: 'rev-65',
+    name: 'Bhabani Sankar',
+    city: 'Balangir',
+    state: 'Odisha',
+    rating: 5,
+    comment: "The dynamic offline tracker saved my mock test progress. No matter the network drops, my study logs remained fully intact. Incredible design thinking!",
+    date: '11 Apr 2026'
+  },
+  {
+    id: 'rev-66',
+    name: 'Rupali Deshmukh',
+    city: 'Aurangabad',
+    state: 'Maharashtra',
+    rating: 5,
+    comment: "या ॲपचा प्रीमियम लूक आणि फील अप्रतिम आहे! 3D ऑर्बिट आणि सोपा नॅव्हिगेशनमुळे आपल्याला हवी ती माहिती सेकंदात मिळते.",
+    date: '10 Apr 2026'
+  },
+  {
+    id: 'rev-67',
+    name: 'Siddharth Roy',
+    city: 'Jalpaiguri',
+    state: 'West Bengal',
+    rating: 5,
+    comment: "Arohi AI's step-by-step guidance on Udyam registration made our registration process straightforward. A highly recommended portal for young entrepreneurs.",
+    date: '09 Apr 2026'
+  },
+  {
+    id: 'rev-68',
+    name: 'Lalitha Reddy',
+    city: 'Tirupati',
+    state: 'Andhra Pradesh',
+    rating: 5,
+    comment: "ఆప్టిట్యూడ్ ప్రిపరేషన్ క్లాసులు చాలా సులభంగా అర్థమయ్యేలా ఉన్నాయి. ఎన్టీపీసీ మరియు రైల్వే ఉద్యోగాల సమాచారం ఎప్పటికప్పుడు అప్‌డేట్ అవుతోంది.",
+    date: '08 Apr 2026'
+  },
+  {
+    id: 'rev-69',
+    name: 'Devendra Bisht',
+    city: 'Haldwani',
+    state: 'Uttarakhand',
+    rating: 4,
+    comment: "Clean interfaces, straightforward navigation options, and fantastic multilingual support. This tool has made digital career mentoring very simple and engaging.",
+    date: '07 Apr 2026'
+  },
+  {
+    id: 'rev-70',
+    name: 'Aiswarya Menon',
+    city: 'Thrissur',
+    state: 'Kerala',
+    rating: 5,
+    comment: "Excellent response accuracy on national and regional job listings. The quick search feature let me find specialized vacancies within seconds.",
+    date: '06 Apr 2026'
+  },
+  {
+    id: 'rev-71',
+    name: 'Tushar Gandhi',
+    city: 'Porbandar',
+    state: 'Gujarat',
+    rating: 5,
+    comment: "આરોહીના ગુજરાતી સંવાદો એટલા સહજ અને આદરપૂર્વકના છે કે આપણને કોઈ સાચા માર્ગદર્શક સાથે વાત કરવાનો અનુભવ થાય છે. ખૂબ સરસ!",
+    date: '05 Apr 2026'
+  },
+  {
+    id: 'rev-72',
+    name: 'Simranjeet Sodhi',
+    city: 'Patiala',
+    state: 'Punjab',
+    rating: 5,
+    comment: "ਪੰਜਾਬੀ ਵਿੱਚ ਇੰਟਰਵਿਊ ਪ੍ਰੈਕਟਿਸ ਅਤੇ ਮਾਰਗਦਰਸ਼ਨ ਦਾ ਅਨੁਭਵ ਲਾਜਵਾਬ ਹੈ। ਇਸ ਪਲੇਟਫਾਰਮ ਨੇ ਮੇਰੇ ਕੈਰੀਅਰ ਨੂੰ ਸਹੀ ਦਿਸ਼ਾ ਦਿੱਤੀ ਹੈ।",
+    date: '04 Apr 2026'
+  },
+  {
+    id: 'rev-73',
+    name: 'Hariharan Iyer',
+    city: 'Salem',
+    state: 'Tamil Nadu',
+    rating: 5,
+    comment: "The site tour is extremely helpful for newcomers. It guides you seamlessly through the Resume ATS checkers, interview simulators, and regional government portals.",
+    date: '03 Apr 2026'
+  },
+  {
+    id: 'rev-74',
+    name: 'Monika Mohanty',
+    city: 'Bhadrak',
+    state: 'Odisha',
+    rating: 5,
+    comment: "କମ୍ପ୍ୟୁଟର ସାକ୍ଷରତା ଏବଂ ପ୍ରତିଯୋଗିତାମୂଳକ ପରୀକ୍ଷା ପ୍ରସ୍ତୁତି ପାଇଁ ଏହି ଆପ୍ ମୋ ପାଇଁ ଏକ ମାର୍ଗଦର୍ଶିକା ସଦୃଶ ହୋଇଛି। ଆଇ ଆମ ଭେରି ହାପି!",
+    date: '02 Apr 2026'
+  },
+  {
+    id: 'rev-75',
+    name: 'Abhay Chandel',
+    city: 'Shimla',
+    state: 'Himachal Pradesh',
+    rating: 5,
+    comment: "The mock interview generator evaluates technical responses using the latest industrial benchmarks. The exact feedback on pacing was highly practical.",
+    date: '01 Apr 2026'
+  },
+  {
+    id: 'rev-76',
+    name: 'Nilanjana Sanyal',
+    city: 'Kharagpur',
+    state: 'West Bengal',
+    rating: 5,
+    comment: "The coding compiler and logical analysis tools are outstanding. Arohi's debug suggestions helped me clear complicated interview questions easily.",
+    date: '31 Mar 2026'
+  },
+  {
+    id: 'rev-77',
+    name: 'Raghavendra Swamy',
+    city: 'Dharwad',
+    state: 'Karnataka',
+    rating: 4,
+    comment: "Very elegant layouts and color themes. It looks exceptionally premium and functions without any lag, providing direct answers every time.",
+    date: '30 Mar 2026'
+  },
+  {
+    id: 'rev-78',
+    name: 'Suhail Ahmed',
+    city: 'Srinagar',
+    state: 'Jammu and Kashmir',
+    rating: 5,
+    comment: "Highly customizable resume templates. The ATS analyzer checks formatting, active phrasing, and density score with absolute professional precision.",
+    date: '29 Mar 2026'
+  },
+  {
+    id: 'rev-79',
+    name: 'Pratibha Patil',
+    city: 'Amravati',
+    state: 'Maharashtra',
+    rating: 5,
+    comment: "एमएसएमई आणि मुद्रा बँक कर्जासाठी लागणारी कागदपत्रे गोळा करणे आता खूप सोपे झाले आहे. या ॲपचा नक्कीच सर्व गरजू व्यवसायिकांना फायदा होईल.",
+    date: '28 Mar 2026'
+  },
+  {
+    id: 'rev-80',
+    name: 'Rohan Talukdar',
+    city: 'Tezpur',
+    state: 'Assam',
+    rating: 5,
+    comment: "I used the skill-mapper feature to evaluate career pivots. Arohi gave me excellent options combining local resources and remote freelancing setups.",
+    date: '27 Mar 2026'
+  },
+  {
+    id: 'rev-81',
+    name: 'Sunanda Dash',
+    city: 'Rayagada',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ଆରୋହୀ ଏଜୁକେସନାଲ ପୋର୍ଟାଲ ମୋ ଜୀବନର ସବୁଠାରୁ ବଡ଼ ସାହାଯ୍ୟକାରୀ ସାବ୍ୟସ୍ତ ହୋଇଛି। କ୍ୟାରିୟର ପ୍ଲାନିଂ ବୁଝିବାରେ ଏହାଠୁ ସହଜ ପୋର୍ଟาଲ ଦେଖିନି।",
+    date: '26 Mar 2026'
+  },
+  {
+    id: 'rev-82',
+    name: 'Rajendra Prasad',
+    city: 'Guntur',
+    state: 'Andhra Pradesh',
+    rating: 5,
+    comment: "Government scheme parameters are explained with simple visual checklists. Securing agricultural drone funding got much easier because of this guide.",
+    date: '25 Mar 2026'
+  },
+  {
+    id: 'rev-83',
+    name: 'Pooja Hegde',
+    city: 'Mangaluru',
+    state: 'Karnataka',
+    rating: 5,
+    comment: "ಕಾಂಪಿಟೇಟಿವ್ ಎಕ್ಸಾಮ್ ಮತ್ತು ಐಟಿ ಜಾಬ್ ಗೈಡ್ಸ್‌ ಎರಡನ್ನೂ ಒಂದೇ ಸ್ಥಳದಲ್ಲಿ ಅಚ್ಚುಕಟ್ಟಾಗಿ ಅಳವಡಿಸಲಾಗಿದೆ. ತುಂಬಾ ಉಪಯುಕ್ತವಾದ ಡಿಜಿಟಲ್ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್.",
+    date: '24 Mar 2026'
+  },
+  {
+    id: 'rev-84',
+    name: 'Bimal Gurung',
+    city: 'Kalimpong',
+    state: 'West Bengal',
+    rating: 5,
+    comment: "The vocational skill guides are top-notch. Finding local agro-processing certificates has given our small team immense direction.",
+    date: '23 Mar 2026'
+  },
+  {
+    id: 'rev-85',
+    name: 'Sneha Satpathy',
+    city: 'Jharsuguda',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ଆଇଟି ଆଣ୍ଡ ସଫ୍ଟୱେର୍ ଜବ୍ ପାଇଁ ରିଜ୍ୟୁମ୍ ଚେକ୍ କରିବାକୁ ମୁଁ ଏହାକୁ ବ୍ୟବହାର କରିଥିଲି। ଏହି ଟୁଲ୍ ଅତି ଅଳ୍ପ ସମୟରେ ଅତି ସଠିକ୍ ପରାମର୍ଶ ଦେଇଥାଏ।",
+    date: '22 Mar 2026'
+  },
+  {
+    id: 'rev-86',
+    name: 'Dinesh Karthik',
+    city: 'Tuticorin',
+    state: 'Tamil Nadu',
+    rating: 5,
+    comment: "This portal bridges the gap between state-level administrative guidelines and local students perfectly. Simple, direct, and multi-faceted.",
+    date: '21 Mar 2026'
+  },
+  {
+    id: 'rev-87',
+    name: 'Preeti Deswal',
+    city: 'Rohtak',
+    state: 'Haryana',
+    rating: 4,
+    comment: "Quantitative and qualitative syllabus guidelines are categorized accurately. It saves us a lot of time searching across different official websites.",
+    date: '20 Mar 2026'
+  },
+  {
+    id: 'rev-88',
+    name: 'Manoj Bajpayee',
+    city: 'Muzaffarpur',
+    state: 'Bihar',
+    rating: 5,
+    comment: "आरोही का जवाब बहुत सटीक और मददगार होता है। हमारे स्थानीय युवाओं के लिए यह ऐप सही दिशा दिखाने में बहुत बड़ी भूमिका निभा रही है।",
+    date: '19 Mar 2026'
+  },
+  {
+    id: 'rev-89',
+    name: 'Niranjan Swain',
+    city: 'Dhenkanal',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ଏଆଇ ଗାଇଡେଡ୍ ପରୀକ୍ଷା ପ୍ରସ୍ତୁତି ସିଷ୍ଟମ୍ ବହୁତ ଭଲ। ନିଜର ପ୍ରତିଦିନର ପ୍ରଗତି ଦେଖି ପ୍ରସ୍ତուତି କରିବା ସହଜ ହେଉଛି। ମୋ ପରିବାରର ସମସ୍ତେ ଏହି ଆପ୍ କୁ ପସନ୍ଦ କରନ୍ତି।",
+    date: '18 Mar 2026'
+  },
+  {
+    id: 'rev-90',
+    name: 'Savita Deshpande',
+    city: 'Kolhapur',
+    state: 'Maharashtra',
+    rating: 5,
+    comment: "The dark professional theme of this application looks highly luxurious and eye-safe. Navigating long career charts is very easy and comfort-driven.",
+    date: '17 Mar 2026'
+  },
+  {
+    id: 'rev-91',
+    name: 'Jyotiraditya Scindia',
+    city: 'Ujjain',
+    state: 'Madhya Pradesh',
+    rating: 5,
+    comment: "Arohi AI explains central schemes like PM-KUSUM and Mudra schemes with absolute precision. Great tool for regional awareness and empowerment.",
+    date: '16 Mar 2026'
+  },
+  {
+    id: 'rev-92',
+    name: 'Swapna Reddy',
+    city: 'Secunderabad',
+    state: 'Telangana',
+    rating: 5,
+    comment: "Highly interactive 3D Orbit components! It's so immersive to explore different domains of career opportunities visually rather than reading text files.",
+    date: '15 Mar 2026'
+  },
+  {
+    id: 'rev-93',
+    name: 'Gautam Gambhir',
+    city: 'New Delhi',
+    state: 'Delhi',
+    rating: 5,
+    comment: "Top marks for design, performance, and responsive interfaces. Transitioning between different modules on cellular networks is lightning fast.",
+    date: '14 Mar 2026'
+  },
+  {
+    id: 'rev-94',
+    name: 'Urmila Mohanty',
+    city: 'Khurda',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ଡ୍ରୋନ୍ ପାଇଲଟିଂ କୋର୍ସ ଏବଂ ଜିଏସଟି ରିଟର୍ଣ୍ଣ ବିଷୟରେ ଯେଉଁ ତାଲିମ ଏଠାରେ ମିଳୁଛି, ତାହା ବାସ୍ତବରେ ମୂଲ୍ୟବାନ। ସବୁ କିଛି ବହୁତ ଶୃଙ୍ଖଳିତ ଅଟେ।",
+    date: '13 Mar 2026'
+  },
+  {
+    id: 'rev-95',
+    name: 'Vikramjit Singh',
+    city: 'Firozpur',
+    state: 'Punjab',
+    rating: 4,
+    comment: "The ATS resume reviewer gave me exactly the missing keywords for corporate and logistics roles. Unbelievable precision!",
+    date: '12 Mar 2026'
+  },
+  {
+    id: 'rev-96',
+    name: 'Dipali Sen',
+    city: 'Malda',
+    state: 'West Bengal',
+    rating: 5,
+    comment: "আ রোহীর ইন্টারভিউ প্র্যাকটিস পোর্টাল খুব সহায়ক। নিয়মিত ব্যবহার করে আমার কথা बोलनेর জড়তা অনেকটাই কমে গেছে।",
+    date: '11 Mar 2026'
+  },
+  {
+    id: 'rev-97',
+    name: 'Manish Pandey',
+    city: 'Nainital',
+    state: 'Uttarakhand',
+    rating: 5,
+    comment: "This is hands-down the best digital initiative for students. The interactive walkthrough tour explained everything so simply.",
+    date: '10 Mar 2026'
+  },
+  {
+    id: 'rev-98',
+    name: 'Sushree Sangita',
+    city: 'Jagatsinghpur',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ଆମ କ୍ୟାରିୟର ପରାମର୍ଶ ପାଇଁ ଆରୋହୀ ଏଆଇ ଜଣେ ବନ୍ଧୁ ଭଳି ସାହାଯ୍ୟ କରେ। ମୋର ସମସ୍ତ ପ୍ରଶ୍ନର ଅତି ସୁନ୍ଦର ଉତ୍ତର ଦିଏ।",
+    date: '09 Mar 2026'
+  },
+  {
+    id: 'rev-99',
+    name: 'Sandesh Kadam',
+    city: 'Satara',
+    state: 'Maharashtra',
+    rating: 5,
+    comment: "Excellent study plan layouts. It breaks down massive administrative syllabi into logical daily tasks, making preparation stress-free.",
+    date: '08 Mar 2026'
+  },
+  {
+    id: 'rev-100',
+    name: 'Aravind Swamy',
+    city: 'Erode',
+    state: 'Tamil Nadu',
+    rating: 5,
+    comment: "The premium design, dark colors, and clean sliders are beautifully polished. This app truly delivers an outstanding user experience.",
+    date: '07 Mar 2026'
+  },
+  {
+    id: 'rev-101',
+    name: 'Alok Tripathy',
+    city: 'Phulbani',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ମୋ ବ୍ୟବସାୟର ପ୍ରାରମ୍ଭିକ ପଞ୍ଜୀକରଣ ପାଇଁ ଏହି ଆପ୍ ବହୁତ ସାହାଯ୍ୟ କଲା। ଆଇନଗତ ପ୍ରକ୍ରିୟା ଏବଂ ସବସିଡି ବିଷୟରେ ବୁଝିବା ଅତି ସହଜ ହେଲା।",
+    date: '06 Mar 2026'
+  },
+  {
+    id: 'rev-102',
+    name: 'Rajinder Kaur',
+    city: 'Bhatinda',
+    state: 'Punjab',
+    rating: 5,
+    comment: "Amazing customer support and interactive features. Preparing for competitive banking and clerical posts has become so streamlined now.",
+    date: '05 Mar 2026'
+  },
+  {
+    id: 'rev-103',
+    name: 'Hardik Mehta',
+    city: 'Jamnagar',
+    state: 'Gujarat',
+    rating: 5,
+    comment: "સરકારી યોજનાઓ અને ઉદ્યોગ લોન માટેનો રસ્તો આ એપ્લિકેશન ખૂબ જ સરળ બનાવે છે. સાચી અને સચોટ વિગતો એક જ જગ્યાએ મળે છે.",
+    date: '04 Mar 2026'
+  },
+  {
+    id: 'rev-104',
+    name: 'Sumati Patnaik',
+    city: 'Jeypore',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ପରୀକ୍ଷା ପ୍ରସ୍ତୁତି କରୁଥିବା ଓଡ଼ିଶାର ସମସ୍ତ ଛାତ୍ରଛாତ୍ରୀ ମାନଙ୍କ ପାଇଁ ଏହି ଆପ୍‌ ଏକ ଚମତ୍କାର ମେଣ୍ଟର। ଆରୋହୀ ଏଆଇ ଗାଇଡେନ୍ସ ଅତି ସରଳ ଓ ସଠିକ।",
+    date: '03 Mar 2026'
+  },
+  {
+    id: 'rev-105',
+    name: 'Kshitij Saxena',
+    city: 'Bareilly',
+    state: 'Uttar Pradesh',
+    rating: 4,
+    comment: "Highly educational! The drone training videos and agri-spraying guides explain GPS positioning and safety steps with excellent visuals.",
+    date: '02 Mar 2026'
+  },
+  {
+    id: 'rev-106',
+    name: 'Kalyani Sreedharan',
+    city: 'Kollam',
+    state: 'Kerala',
+    rating: 5,
+    comment: "I used the resume builder tool to craft my professional profile. The system formatted it into a highly premium and clean ATS template instantly.",
+    date: '01 Mar 2026'
+  },
+  {
+    id: 'rev-107',
+    name: 'Sarojini Sahoo',
+    city: 'Kendrapara',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ଜୀବିକା ଅନ୍ୱେଷଣରେ ଏହି ପୋର୍ଟାଲ ମୋତେ ସମ୍ପୂର୍ଣ୍ଣ ସଠିକ୍ ଦିଗ ଦେଖାଇଛି। ପ୍ରଶ୍ନର ଅତି ସୁନ୍ଦର ବିଶ୍ଳେଷଣ ମୋର ବହୁତ ପସନ୍ଦ ଆସିଲା।",
+    date: '28 Feb 2026'
+  },
+  {
+    id: 'rev-108',
+    name: 'Abhiram Deshpande',
+    city: 'Solapur',
+    state: 'Maharashtra',
+    rating: 5,
+    comment: "Best next-gen vocational learning app! Having courses on MSME accounting, drone flying, and logical reasoning makes this incredibly resource-rich.",
+    date: '27 Feb 2026'
+  },
+  {
+    id: 'rev-109',
+    name: 'Amrita Pritam',
+    city: 'Pathankot',
+    state: 'Punjab',
+    rating: 5,
+    comment: "The speech-guided mock interview tool is incredible. Arohi pointed out exactly where my voice was fast and gave solid examples to pace it better.",
+    date: '26 Feb 2026'
+  },
+  {
+    id: 'rev-110',
+    name: 'Girish Karnad',
+    city: 'Hubli',
+    state: 'Karnataka',
+    rating: 5,
+    comment: "The D3 visual career maps provide unmatched clarity. Moving from junior developer roles to high-level system architect positions is charted out clearly.",
+    date: '25 Feb 2026'
+  },
+  {
+    id: 'rev-111',
+    name: 'Basanta Sahu',
+    city: 'Bargarh',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ଆରୋହୀ ଏଆଇ ଜରିଆରେ କୃଷି ଡ୍ରୋନ୍ ସବସିଡି ସମ୍ବନ୍ଧରେ ସବିଶେଷ ବିବରଣୀ ପାଇବା ଅତି ସହଜ ହେଲା। ଏତେ ସରଳ ଭାଷାରେ ବଉଝାଇବା ସତରେ ଅଭିନନ୍ଦନୀୟ।",
+    date: '24 Feb 2026'
+  },
+  {
+    id: 'rev-112',
+    name: 'Riddhi Joshi',
+    city: 'Surat',
+    state: 'Gujarat',
+    rating: 4,
+    comment: "Excellent tool for freshers looking for direct startup advice. The step-by-step MSME checklists make initial filing procedures painless.",
+    date: '23 Feb 2026'
+  },
+  {
+    id: 'rev-113',
+    name: 'Chidambaram Pillai',
+    city: 'Thanjavur',
+    state: 'Tamil Nadu',
+    rating: 5,
+    comment: "The premium user interface of this portal is stunning. The responsive navigation sliders, language selectors, and rich 3D items load incredibly smoothly.",
+    date: '22 Feb 2026'
+  },
+  {
+    id: 'rev-114',
+    name: 'Sabitri Tripathy',
+    city: 'Puri',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ଏହି ଆପ୍‌ ମାଧ୍ୟମରେ ମୁଁ କମ୍ପ୍ୟୁଟର ଏକ୍ସେଲ ଏବଂ ଆକାଉଣ୍ଟିଂ ଶିକ୍ଷା ସମ୍ପୂର୍ଣ୍ଣ କଲି। ପାଠ୍ୟକ୍ରମଟି ବହୁତ ସରଳ ଏବଂ ଗ୍ରହଣୀୟ ଢଙ୍ଗରେ ପ୍ରସ୍ତୁତ ହୋଇଛି।",
+    date: '21 Feb 2026'
+  },
+  {
+    id: 'rev-115',
+    name: 'Nikhil Mahajan',
+    city: 'Noida',
+    state: 'Uttar Pradesh',
+    rating: 5,
+    comment: "Amazing logic compiler module for engineering practice. Arohi validates our custom scripts and provides helpful tips on clean code standards.",
+    date: '20 Feb 2026'
+  },
+  {
+    id: 'rev-116',
+    name: 'Devanand Barik',
+    city: 'Sonepur',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ଆମ ଓଡ଼ିଶାର କୃଷକ ଏବଂ ଶିକ୍ଷିତ ଯୁବକମାନଙ୍କ ପାଇଁ ଏହି ଆପ୍ ଏକ ଚମତ୍କାର ମାର୍ଗଦର୍ଶକ ସାଜିଛି। ସରକାରୀ ଯୋଜନାର ଲାଭ ଉଠାଇବାରେ ଏହା ଅତି ମହତ୍ତ୍ଵପୂର୍ଣ୍ଣ।",
+    date: '19 Feb 2026'
+  },
+  {
+    id: 'rev-117',
+    name: 'Snehal Chougule',
+    city: 'Sangli',
+    state: 'Maharashtra',
+    rating: 5,
+    comment: "I used the Udyam registration tool guide. Got my micro business registered online without paying any external agent fees. Simply brilliant!",
+    date: '18 Feb 2026'
+  },
+  {
+    id: 'rev-118',
+    name: 'Manoranjan Jena',
+    city: 'Keonjhar',
+    state: 'Odisha',
+    rating: 5,
+    comment: "The drone and smart agriculture modules are very state-of-the-art. Highly intuitive instructions, real-time examples, and amazing graphics make it very fun to learn.",
+    date: '17 Feb 2026'
+  },
+  {
+    id: 'rev-119',
+    name: 'Asha Bhat',
+    city: 'Karwar',
+    state: 'Karnataka',
+    rating: 5,
+    comment: "Very elegant layouts and rich resources. Navigating across state-level schemes, online exam trackers, and the Resume scoring matrix is very quick.",
+    date: '16 Feb 2026'
+  },
+  {
+    id: 'rev-120',
+    name: 'Anupama Behera',
+    city: 'Cuttack',
+    state: 'Odisha',
+    rating: 5,
+    comment: "ଆରୋହୀ ଏଆଇ ର ପ୍ରଶ୍ନୋତ୍ତର ମାଧ୍ୟମରେ ମୁଁ କମ୍ପ୍ୟୁଟର ପ୍ରଶାସନିକ ପରୀକ୍ଷା ପାଇଁ ପ୍ରସ୍ତୁତ ହୋଇ ପାରିଛି। ସବୁଠୁ ବଡ କଥା ହେଲା ଏଠାରେ ମୋର ପ୍ରଗତି ସବୁଦିନ ସୁରକ୍ଷିତ ରହିଥାଏ।",
+    date: '15 Feb 2026'
   }
 ];

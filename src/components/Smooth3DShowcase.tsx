@@ -137,16 +137,16 @@ export default function Smooth3DShowcase({ setActiveTab, setSelectedPosting }: S
   };
 
   return (
-    <section className="bg-gradient-to-r from-[#110d2d] via-[#0b0821] to-[#160f38] border border-[#231a52] rounded-[2.5rem] p-6 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative overflow-hidden select-none font-sans mt-8">
+    <section className="bg-gradient-to-r from-[#06040d] via-[#0b0816] to-[#040307] border border-slate-800 rounded-[3rem] p-8 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.85)] relative overflow-hidden select-none font-sans mt-8">
       
       {/* Dynamic Background Effects */}
       <div className="absolute top-0 left-0 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-0 right-0 w-80 h-80 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
       {/* Header Info */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8 relative z-10">
         <div className="text-left space-y-1.5">
-          <div className="inline-flex items-center gap-2 bg-[#7c3aed]/15 text-[#c084fc] border border-[#7c3aed]/30 px-3.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+          <div className="inline-flex items-center gap-2 bg-amber-500/10 text-amber-300 border border-amber-500/30 px-3.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
             <Zap className="w-3.5 h-3.5 text-yellow-300 animate-bounce" /> 
             <span>Ecosystem Corridor Showcase</span>
           </div>
@@ -154,12 +154,12 @@ export default function Smooth3DShowcase({ setActiveTab, setSelectedPosting }: S
             Navigate Our Unified Recruitment Ecosystem
           </h3>
           <p className="text-xs text-slate-300 max-w-2xl font-semibold leading-relaxed">
-            Explore our endless sliding directory of central recruitment portals, skills classes, government calculators, and resume utilities. <span className="text-[#a78bfa]">Click any card directly to navigate there!</span>
+            Explore our endless sliding directory of central recruitment portals, skills classes, government calculators, and resume utilities. <span className="text-amber-300">Click any card directly to navigate there!</span>
           </p>
         </div>
 
         {/* 3D Showcase Live Control HUD */}
-        <div className="bg-[#120d2a]/90 border border-[#302373] p-3 rounded-2xl flex flex-wrap items-center gap-3 shrink-0 shadow-lg">
+        <div className="bg-slate-950/90 border border-slate-850 p-3 rounded-2xl flex flex-wrap items-center gap-3 shrink-0 shadow-lg">
           
           {/* Play/Pause */}
           <button
@@ -167,7 +167,7 @@ export default function Smooth3DShowcase({ setActiveTab, setSelectedPosting }: S
             className={`p-2 rounded-xl border transition-all cursor-pointer ${
               isPaused 
                 ? 'bg-[#00e676]/20 text-[#00e676] border-[#00e676]/30' 
-                : 'bg-[#1b1540] hover:bg-[#251e56] border-[#2d2163] text-slate-300'
+                : 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300'
             }`}
             title={isPaused ? 'Resume Scroll' : 'Pause Scroll'}
           >
@@ -175,11 +175,11 @@ export default function Smooth3DShowcase({ setActiveTab, setSelectedPosting }: S
           </button>
 
           {/* Direction */}
-          <div className="flex rounded-xl bg-[#1b1540] p-0.5 border border-[#2d2163]">
+          <div className="flex rounded-xl bg-slate-900 p-0.5 border border-slate-800">
             <button
               onClick={() => setDirection('left')}
               className={`p-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                direction === 'left' ? 'bg-[#7c3aed] text-white shadow-md' : 'text-slate-400 hover:text-white'
+                direction === 'left' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'
               }`}
               title="Scroll Left"
             >
@@ -188,7 +188,7 @@ export default function Smooth3DShowcase({ setActiveTab, setSelectedPosting }: S
             <button
               onClick={() => setDirection('right')}
               className={`p-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                direction === 'right' ? 'bg-[#7c3aed] text-white shadow-md' : 'text-slate-400 hover:text-white'
+                direction === 'right' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'
               }`}
               title="Scroll Right"
             >
@@ -197,14 +197,14 @@ export default function Smooth3DShowcase({ setActiveTab, setSelectedPosting }: S
           </div>
 
           {/* Speed Indicator */}
-          <div className="flex rounded-xl bg-[#1b1540] p-0.5 border border-[#2d2163] items-center">
+          <div className="flex rounded-xl bg-slate-900 p-0.5 border border-slate-800 items-center">
             <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold px-2 hidden sm:inline">Speed:</span>
             {(['slow', 'normal', 'fast'] as const).map((s) => (
               <button
                 key={s}
                 onClick={() => setSpeed(s)}
                 className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer ${
-                  speed === s ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+                  speed === s ? 'bg-amber-500 text-slate-950 font-extrabold' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {s}
@@ -213,14 +213,14 @@ export default function Smooth3DShowcase({ setActiveTab, setSelectedPosting }: S
           </div>
 
           {/* Perspective Depth */}
-          <div className="flex rounded-xl bg-[#1b1540] p-0.5 border border-[#2d2163] items-center">
+          <div className="flex rounded-xl bg-slate-900 p-0.5 border border-slate-800 items-center">
             <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold px-2 hidden sm:inline">Depth:</span>
             {(['flat', 'medium', 'deep'] as const).map((d) => (
               <button
                 key={d}
                 onClick={() => setDepth(d)}
                 className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer ${
-                  depth === d ? 'bg-[#7c3aed] text-white' : 'text-slate-400 hover:text-white'
+                  depth === d ? 'bg-amber-500 text-slate-950 font-extrabold' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {d}
@@ -233,12 +233,12 @@ export default function Smooth3DShowcase({ setActiveTab, setSelectedPosting }: S
 
       {/* Real 3D Endless Viewport */}
       <div 
-        className="w-full relative py-10 overflow-hidden bg-[#070514]/60 border border-[#1b143c] rounded-[2rem] preserve-3d"
+        className="w-full relative py-10 overflow-hidden bg-slate-950/60 border border-slate-850 rounded-[2rem] preserve-3d"
         style={getPerspectiveStyle()}
       >
         {/* Soft Left and Right Ambient Overlays for depth fade */}
-        <div className="absolute top-0 left-0 w-16 sm:w-32 h-full bg-gradient-to-r from-[#070514] to-transparent z-20 pointer-events-none"></div>
-        <div className="absolute top-0 right-0 w-16 sm:w-32 h-full bg-gradient-to-l from-[#070514] to-transparent z-20 pointer-events-none"></div>
+        <div className="absolute top-0 left-0 w-16 sm:w-32 h-full bg-gradient-to-r from-[#030208] to-transparent z-20 pointer-events-none"></div>
+        <div className="absolute top-0 right-0 w-16 sm:w-32 h-full bg-gradient-to-l from-[#030208] to-transparent z-20 pointer-events-none"></div>
 
         {/* 3D Transform Track */}
         <div className="w-max flex gap-6 items-center preserve-3d">

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, MessageSquare, Video, Mic, Award, ChevronRight, CheckCircle2, ShieldAlert, Play, RotateCcw } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 interface Question {
   id: number;
@@ -16,6 +17,7 @@ interface Evaluation {
 }
 
 export default function InterviewPage() {
+  const { user, updateDiagnostics } = useAuth();
   const [domain, setDomain] = useState<'developer' | 'banking' | 'civil' | 'msme'>('developer');
   const [activeQuestionIdx, setActiveQuestionIdx] = useState(0);
   const [userAnswer, setUserAnswer] = useState('');
@@ -72,6 +74,14 @@ Excellent effort! Your answer displays strong conceptual understanding and addre
 "I bring a balanced combination of technical proficiency and structured problem-solving. In my past work, I focused on high-performance frameworks, ensuring database optimizations reduced page latencies by 30% while collaborating effectively with design stakeholders."`
       });
       setIsEvaluating(false);
+
+      // Save to localStorage
+      localStorage.setItem('recruit_interview_score', score.toString());
+
+      // Save to Firestore if logged in
+      if (user) {
+        updateDiagnostics({ interviewScore: score }).catch(err => console.error("Error updating interview diagnostics:", err));
+      }
     }, 2000);
   };
 

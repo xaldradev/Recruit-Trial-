@@ -11,6 +11,7 @@ interface HeaderProps {
   searchQuery?: string;
   onOpenAuth: () => void;
   onRevisitWelcome?: () => void;
+  onStartTour?: () => void;
   language: Language;
   onLanguageChange: (lang: Language) => void;
   onShare?: () => void;
@@ -32,7 +33,7 @@ export const LANGUAGES_LIST = [
   { code: 'as', native: 'অসমীয়া', english: 'Assamese', symbol: 'অ' }
 ] as const;
 
-export default function Header({ activeTab, onTabChange, onSearchChange, searchQuery, onOpenAuth, onRevisitWelcome, language, onLanguageChange, onShare }: HeaderProps) {
+export default function Header({ activeTab, onTabChange, onSearchChange, searchQuery, onOpenAuth, onRevisitWelcome, onStartTour, language, onLanguageChange, onShare }: HeaderProps) {
   const { user, userData, signOutUser } = useAuth();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -110,6 +111,7 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
     { id: 'syllabus', label: getTranslation('syllabus', language), hasBadge: true, badgeText: 'Odia/CBSE' },
     { id: 'business', label: getTranslation('business', language), hasBadge: true, badgeText: 'New' },
     { id: 'arohi', label: getTranslation('arohiChat', language), hasDropdown: false },
+    { id: 'employer', label: 'Recruiters', hasBadge: true, badgeText: 'Free' },
     { id: 'privacy', label: 'Privacy', hasDropdown: false },
     { id: 'terms', label: 'Terms', hasDropdown: false },
     { id: 'refunds', label: 'Refund', hasDropdown: false },
@@ -121,7 +123,7 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
   const secondaryLinks = navLinks.filter(l => ['privacy', 'terms', 'refunds', 'payments', 'contact'].includes(l.id));
 
   return (
-    <header className="sticky top-0 z-50 bg-[#090714] border-b border-[#211b3d] text-white shadow-xl">
+    <header className="sticky top-0 z-50 bg-[#06040b] border-b border-[#171329] text-white shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
       
       {/* Top micro promo banner - Replaced with premium Apple-style status announcement */}
       <div className="bg-gradient-to-r from-[#070510] via-[#100a29] to-[#070510] text-slate-300 text-xs py-2 px-4 flex justify-center items-center gap-3 overflow-hidden border-b border-[#1b1535] text-center shadow-md">
@@ -240,7 +242,7 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
           <div className="relative" ref={headerLangRef}>
             <button
               onClick={() => setIsHeaderLangOpen(!isHeaderLangOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#17113a]/80 border border-[#3b289c]/60 rounded-xl hover:bg-[#251b5c]/80 hover:border-purple-500/50 transition-all shadow-sm cursor-pointer min-w-[70px] justify-between"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#0f0e1a]/80 border border-slate-800 rounded-xl hover:bg-[#161427]/80 hover:border-purple-500/40 transition-all shadow-sm cursor-pointer min-w-[70px] justify-between"
               title="Change Language / ਭାଷା ବଦଳାନ୍ତୁ"
             >
               <div className="flex items-center gap-1">
@@ -253,13 +255,13 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
             </button>
 
             <div
-              className={`absolute right-0 mt-2 w-52 max-h-80 overflow-y-auto bg-[#0d091e]/95 border border-[#3e2b85]/70 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all duration-300 scrollbar-thin scrollbar-thumb-purple-900/50 scrollbar-track-transparent ${
+              className={`absolute right-0 mt-2 w-52 max-h-80 overflow-y-auto bg-[#07060f]/95 border border-slate-800 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all duration-300 scrollbar-thin scrollbar-thumb-purple-900/50 scrollbar-track-transparent ${
                 isHeaderLangOpen
                   ? 'opacity-100 scale-100 pointer-events-auto'
                   : 'opacity-0 scale-95 pointer-events-none'
               } z-[60]`}
             >
-              <div className="px-3.5 py-2 border-b border-[#2b1f5c]/40 text-[10px] text-slate-400 font-bold uppercase tracking-wider sticky top-0 bg-[#0d091e] z-10">
+              <div className="px-3.5 py-2 border-b border-slate-800/40 text-[10px] text-slate-400 font-bold uppercase tracking-wider sticky top-0 bg-[#07060f] z-10">
                 {getTranslation('selectLang', language)}
               </div>
               {LANGUAGES_LIST.map((lang) => (
@@ -291,6 +293,16 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
             >
               <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
               <span>3D Welcome Intro</span>
+            </button>
+          )}
+
+          {onStartTour && (
+            <button
+              onClick={onStartTour}
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-indigo-950/45 border border-indigo-500/40 hover:border-indigo-400/80 rounded-full cursor-pointer hover:bg-indigo-900/40 text-[#aec4ff] hover:text-white transition-all text-[11px] font-bold shadow-md"
+              title="Launch Interactive Site Walkthrough Tour"
+            >
+              <span>🗺️ Site Tour</span>
             </button>
           )}
 
@@ -459,6 +471,7 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
                         case 'syllabus': return <FileText className="w-4 h-4 text-amber-400" />;
                         case 'business': return <Sparkles className="w-4 h-4 text-pink-400" />;
                         case 'arohi': return <Bot className="w-4 h-4 text-fuchsia-400" />;
+                        case 'employer': return <Briefcase className="w-4 h-4 text-rose-400" />;
                         case 'privacy': return <ShieldCheck className="w-4 h-4 text-teal-400" />;
                         case 'terms': return <FileText className="w-4 h-4 text-indigo-400" />;
                         case 'refunds': return <Landmark className="w-4 h-4 text-red-400" />;

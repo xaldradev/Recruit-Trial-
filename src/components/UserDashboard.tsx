@@ -24,7 +24,7 @@ export default function UserDashboard({
   onShare
 }: UserDashboardProps) {
   
-  const { user, userData, updateUserProfile, updateBookmarks } = useAuth();
+  const { user, userData, updateUserProfile, updateBookmarks, updateDiagnostics, updateActivities } = useAuth();
 
   // Basic profile state
   const [profile, setProfile] = useState({
@@ -76,11 +76,16 @@ export default function UserDashboard({
       description,
       timestamp: new Date().toISOString()
     };
-    setActivities(prev => {
-      const updated = [newAct, ...prev].slice(0, 15);
-      localStorage.setItem('recruit_activities', JSON.stringify(updated));
-      return updated;
-    });
+    if (user) {
+      const updated = [newAct, ...(userData?.activities || [])].slice(0, 15);
+      updateActivities(updated).catch(err => console.error("Firebase activities sync error:", err));
+    } else {
+      setActivities(prev => {
+        const updated = [newAct, ...prev].slice(0, 15);
+        localStorage.setItem('recruit_activities', JSON.stringify(updated));
+        return updated;
+      });
+    }
   };
 
   // Modal details
@@ -89,19 +94,27 @@ export default function UserDashboard({
 
   // Sync profile & other lists in real time from context or localStorage fallbacks
   useEffect(() => {
-    // 1. Fetch Diagnostics Score from LocalStorage
-    const savedAtsScore = localStorage.getItem('recruit_ats_score');
-    const savedInterviewScore = localStorage.getItem('recruit_interview_score');
-    const savedBusinessScore = localStorage.getItem('recruit_business_score');
-    
-    setDiagnostics({
-      atsScore: savedAtsScore ? parseInt(savedAtsScore, 10) : 74,
-      interviewScore: savedInterviewScore ? parseInt(savedInterviewScore, 10) : 0,
-      businessScore: savedBusinessScore ? parseInt(savedBusinessScore, 10) : 84
-    });
-
     if (user && userData) {
       // LOGGED-IN FIREBASE STATE
+      if (userData.diagnostics) {
+        setDiagnostics({
+          atsScore: userData.diagnostics.atsScore ?? 74,
+          interviewScore: userData.diagnostics.interviewScore ?? 0,
+          businessScore: userData.diagnostics.businessScore ?? 84
+        });
+      } else {
+        const savedAtsScore = localStorage.getItem('recruit_ats_score');
+        const savedInterviewScore = localStorage.getItem('recruit_interview_score');
+        const savedBusinessScore = localStorage.getItem('recruit_business_score');
+        const defaultDiagnostics = {
+          atsScore: savedAtsScore ? parseInt(savedAtsScore, 10) : 74,
+          interviewScore: savedInterviewScore ? parseInt(savedInterviewScore, 10) : 0,
+          businessScore: savedBusinessScore ? parseInt(savedBusinessScore, 10) : 84
+        };
+        setDiagnostics(defaultDiagnostics);
+        updateDiagnostics(defaultDiagnostics).catch(err => console.error("Error setting default diagnostics:", err));
+      }
+
       if (userData.profile) {
         setProfile({
           name: userData.profile.name || user.displayName || 'Honored Guest',
@@ -191,6 +204,16 @@ export default function UserDashboard({
 
     } else {
       // GUEST MODE FALLBACKS (Pulling from LocalStorage)
+      const savedAtsScore = localStorage.getItem('recruit_ats_score');
+      const savedInterviewScore = localStorage.getItem('recruit_interview_score');
+      const savedBusinessScore = localStorage.getItem('recruit_business_score');
+      
+      setDiagnostics({
+        atsScore: savedAtsScore ? parseInt(savedAtsScore, 10) : 74,
+        interviewScore: savedInterviewScore ? parseInt(savedInterviewScore, 10) : 0,
+        businessScore: savedBusinessScore ? parseInt(savedBusinessScore, 10) : 84
+      });
+
       const guestName = localStorage.getItem('recruit_user_name') || 'Honored Guest';
       setProfile({
         name: guestName,
@@ -345,6 +368,26 @@ export default function UserDashboard({
       }
     }
   }, [user, userData]);
+
+  // Synchronize activities in real time on storage/custom updates
+  useEffect(() => {
+    const handleSync = () => {
+      const stored = localStorage.getItem('recruit_activities');
+      if (stored) {
+        try {
+          setActivities(JSON.parse(stored));
+        } catch (e) {
+          console.error("Error parsing recruit_activities inside storage listener:", e);
+        }
+      }
+    };
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('recruit_activities_update', handleSync);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('recruit_activities_update', handleSync);
+    };
+  }, []);
 
   // Load or dynamically generate initial/recent activities
   useEffect(() => {

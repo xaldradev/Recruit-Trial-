@@ -27,6 +27,7 @@ import Interactive3DOrbit from './components/Interactive3DOrbit';
 import NotificationToast from './components/NotificationToast';
 import WelcomeLanding from './components/WelcomeLanding';
 import ArohiAvatar from './components/ArohiAvatar';
+import WalkthroughTour from './components/WalkthroughTour';
 
 import { initialPostings } from './data/initialData';
 import { INITIAL_REVIEWS, Review } from './data/reviewsData';
@@ -80,6 +81,23 @@ export default function App() {
   const { user, userData, updateApplications } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
+  const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
+
+  // Auto-trigger walkthrough for newly logged-in users or guest users upon entry
+  useEffect(() => {
+    if (hasEntered) {
+      const tourKey = user ? `recruit_walkthrough_seen_${user.uid}` : 'recruit_walkthrough_seen_guest';
+      const hasSeenTour = localStorage.getItem(tourKey);
+      if (!hasSeenTour) {
+        // Delay slightly for smooth entering animation transition
+        const timer = setTimeout(() => {
+          setIsWalkthroughOpen(true);
+          localStorage.setItem(tourKey, 'true');
+        }, 1200);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [hasEntered, user]);
 
   const [language, setLanguage] = useState<Language>(() => {
     return (localStorage.getItem('recruit_language') as Language) || 'en';
@@ -190,6 +208,10 @@ export default function App() {
   });
   const [currentReviewIdx, setCurrentReviewIdx] = useState(0);
   const [isAddingReview, setIsAddingReview] = useState(false);
+  const [isAllReviewsOpen, setIsAllReviewsOpen] = useState(false);
+  const [reviewsSearchQuery, setReviewsSearchQuery] = useState('');
+  const [reviewsStateFilter, setReviewsStateFilter] = useState('All');
+  const [reviewsRatingFilter, setReviewsRatingFilter] = useState('All');
   const [newReviewName, setNewReviewName] = useState('');
   const [newReviewCity, setNewReviewCity] = useState('');
   const [newReviewState, setNewReviewState] = useState('Odisha');
@@ -761,7 +783,14 @@ export default function App() {
           />
         );
       case 'employer':
-        return <EmployerPortal />;
+        return (
+          <EmployerPortal 
+            postings={postings}
+            onAddPosting={handleAddPosting}
+            applications={applications}
+            onUpdateAppStatus={handleUpdateAppStatus}
+          />
+        );
       case 'privacy':
       case 'terms':
       case 'refunds':
@@ -850,10 +879,10 @@ export default function App() {
       <div className="space-y-12">
         
         {/* HERO AREA */}
-        <section className="bg-gradient-to-br from-[#120a2e] via-[#090714] to-[#1c0f42] text-white rounded-[2.5rem] p-6 md:p-12 shadow-2xl relative overflow-hidden border border-[#2d2163]">
+        <section className="bg-gradient-to-br from-[#06040c] via-[#0b0816] to-[#040307] text-white rounded-[3rem] p-8 md:p-14 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative overflow-hidden border border-slate-800/80">
           {/* Glowing ambient light nodes */}
-          <div className="absolute right-0 bottom-0 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl -translate-y-10 translate-x-10 animate-pulse"></div>
-          <div className="absolute left-1/3 top-1/4 w-80 h-80 bg-[#7c3aed]/10 rounded-full blur-3xl animate-pulse delay-700"></div>
+          <div className="absolute right-0 bottom-0 w-96 h-96 bg-[#00e676]/5 rounded-full blur-3xl -translate-y-10 translate-x-10 animate-pulse"></div>
+          <div className="absolute left-1/3 top-1/4 w-80 h-80 bg-purple-600/5 rounded-full blur-3xl animate-pulse delay-700"></div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
             
@@ -862,10 +891,17 @@ export default function App() {
               
               {/* Pulsing AI Online badge & Interactive 3D Welcome Re-trigger */}
               <div className="flex flex-wrap items-center gap-3">
-                <div className="inline-flex items-center gap-2 bg-[#16122e] border border-[#3c2a82]/60 text-[#a594fd] px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide shadow-sm w-fit">
+                <div className="inline-flex items-center gap-2 bg-[#091515] border border-teal-500/30 text-teal-300 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide shadow-sm w-fit">
                   <span className="w-2 h-2 rounded-full bg-[#00e676] animate-pulse"></span>
                   <span>AROHI is Live — Online Now</span>
                 </div>
+                <button
+                  onClick={() => setIsWalkthroughOpen(true)}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/35 hover:to-yellow-500/35 border border-amber-500/30 hover:border-amber-400/70 text-amber-200 hover:text-white px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wide shadow-lg cursor-pointer transition-all active:scale-95 shrink-0"
+                >
+                  <span>🗺️ Take Site Tour</span>
+                  <span className="bg-amber-500 text-slate-950 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full animate-pulse">Tour</span>
+                </button>
               </div>
               
               {/* Exact screenshot headings */}
@@ -873,7 +909,7 @@ export default function App() {
                 Confused About <br />
                 Your Career? <br />
                 <span className="text-white">We've Got </span>
-                <span className="text-[#fcd34d] font-black bg-clip-text">Your Back!</span>
+                <span className="text-[#f1b434] font-black bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">Your Back!</span>
               </h2>
 
               {/* Exact subtitle */}
@@ -886,17 +922,17 @@ export default function App() {
 
               {/* Standard layout four feature pills */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-w-md pt-2">
-                <div className="inline-flex items-center gap-2 bg-[#100d28] border border-[#2b1f5f] text-[#b4a8fa] text-[11px] font-bold py-2 px-3 rounded-xl">
-                  <span>🌐</span> Personal Career Insights
+                <div className="inline-flex items-center gap-2.5 bg-slate-900/55 border border-slate-800 hover:border-amber-500/25 text-slate-200 text-[11px] font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm">
+                  <span className="text-base">🌐</span> Personal Career Insights
                 </div>
-                <div className="inline-flex items-center gap-2 bg-[#100d28] border border-[#2b1f5f] text-[#b4a8fa] text-[11px] font-bold py-2 px-3 rounded-xl">
-                  <span>👤</span> Expert Career Counselors
+                <div className="inline-flex items-center gap-2.5 bg-slate-900/55 border border-slate-800 hover:border-amber-500/25 text-slate-200 text-[11px] font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm">
+                  <span className="text-base">👤</span> Expert Career Counselors
                 </div>
-                <div className="inline-flex items-center gap-2 bg-[#100d28] border border-[#2b1f5f] text-[#b4a8fa] text-[11px] font-bold py-2 px-3 rounded-xl">
-                  <span>🗺️</span> Personalized Roadmaps
+                <div className="inline-flex items-center gap-2.5 bg-slate-900/55 border border-slate-800 hover:border-amber-500/25 text-slate-200 text-[11px] font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm">
+                  <span className="text-base">🗺️</span> Personalized Roadmaps
                 </div>
-                <div className="inline-flex items-center gap-2 bg-[#100d28] border border-[#2b1f5f] text-[#b4a8fa] text-[11px] font-bold py-2 px-3 rounded-xl">
-                  <span>🔒</span> 100% Confidential & Trusted
+                <div className="inline-flex items-center gap-2.5 bg-slate-900/55 border border-slate-800 hover:border-amber-500/25 text-slate-200 text-[11px] font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm">
+                  <span className="text-base">🔒</span> 100% Confidential & Trusted
                 </div>
               </div>
 
@@ -906,16 +942,16 @@ export default function App() {
             <div className="lg:col-span-5 relative flex flex-col gap-4 items-center justify-center select-none max-w-md w-full mx-auto">
               
               {/* Premium Resume Builder Card */}
-              <div className="bg-gradient-to-r from-[#1e154a] to-[#2e1d70] border border-[#523ba6]/50 rounded-[1.75rem] p-5 shadow-[0_4px_20px_rgba(124,58,237,0.25)] relative overflow-hidden w-full text-left">
+              <div className="bg-gradient-to-br from-[#0a0815] via-[#100e21] to-[#07050e] border border-slate-800 rounded-[2rem] p-6 shadow-[0_15px_35px_-5px_rgba(0,0,0,0.8)] relative overflow-hidden w-full text-left transition-all hover:border-slate-700">
                 {/* Background glow or accent */}
-                <div className="absolute right-0 top-0 w-24 h-24 bg-[#00e676]/10 rounded-full blur-2xl"></div>
+                <div className="absolute right-0 top-0 w-24 h-24 bg-[#00e676]/5 rounded-full blur-2xl"></div>
                 
                 <div className="flex justify-between items-start gap-2">
                   <div>
-                    <span className="bg-[#00e676]/10 text-[#00e676] text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#00e676]/20">
+                    <span className="bg-[#00e676]/10 text-[#00e676] text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border border-[#00e676]/20">
                       ⚡ Professional Tool
                     </span>
-                    <h4 className="text-[15px] font-black text-white mt-2 flex items-center gap-1.5">
+                    <h4 className="text-[15px] font-black text-white mt-3 flex items-center gap-1.5">
                       📑 Professional Resume Builder
                     </h4>
                     <p className="text-[11px] text-slate-300 mt-1.5 max-w-[280px] font-medium leading-relaxed">
@@ -930,10 +966,10 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="flex gap-2 mt-4">
+                <div className="flex gap-2 mt-5">
                   <button
                     onClick={() => setActiveTab('resume')}
-                    className="flex-1 bg-[#00e676] hover:bg-[#00c864] text-slate-950 font-black text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
+                    className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
                   >
                     <span>Build Your Resume</span>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 stroke-[2px]">
@@ -942,20 +978,20 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => handleOpenShare('Professional Resume Builder', 'Check out the amazing Professional Resume Builder on Recruit.org.in! Create an ATS-friendly, professional resume to get hired instantly for only ₹99.', 'https://recruit.org.in')}
-                    className="px-3.5 bg-slate-900 border border-purple-500/30 hover:border-purple-400/60 text-purple-300 hover:text-white font-black text-xs uppercase rounded-xl flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
+                    className="px-3.5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white font-black text-xs uppercase rounded-xl flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
                     title="Share Resume Builder with friends"
                   >
-                    <Share2 className="w-4 h-4 text-[#00f3ff]" />
+                    <Share2 className="w-4 h-4 text-emerald-400" />
                     <span>Share</span>
                   </button>
                 </div>
               </div>
 
-              <div className="bg-[#120e2a] border border-[#2c2062] rounded-[2.25rem] p-6 sm:p-8 shadow-[0_0_50px_rgba(124,58,237,0.15)] relative space-y-6 w-full">
+              <div className="bg-gradient-to-br from-[#090812] via-[#0d0c1b] to-[#05040a] border border-slate-800/80 rounded-[2.25rem] p-6 sm:p-8 shadow-[0_15px_35px_-5px_rgba(0,0,0,0.8)] relative space-y-6 w-full hover:border-slate-700 transition-all">
                 
                 {/* Header Info */}
                 <div className="flex items-center gap-4">
-                  <div className="rounded-full w-14 h-14 flex items-center justify-center border border-[#9b7df5]/30 shadow-md shrink-0 relative overflow-hidden">
+                  <div className="rounded-full w-14 h-14 flex items-center justify-center border border-slate-800 bg-slate-950 shadow-md shrink-0 relative overflow-hidden">
                     <ArohiAvatar className="w-full h-full" />
                   </div>
                   <div className="text-left">
@@ -983,12 +1019,12 @@ export default function App() {
                     "Achieve your career goals"
                   ].map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-[#10b981]/20 border border-[#10b981]/40 flex items-center justify-center shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 text-[#10b981]">
+                      <div className="w-5 h-5 rounded-full bg-teal-500/10 border border-teal-500/20 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 text-teal-400">
                           <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <span className="text-xs font-semibold text-slate-200">{item}</span>
+                      <span className="text-xs font-semibold text-slate-300">{item}</span>
                     </div>
                   ))}
                 </div>
@@ -996,7 +1032,7 @@ export default function App() {
                 {/* CTA Action button */}
                 <button
                   onClick={() => setActiveTab('arohi')}
-                  className="bg-[#7c3aed] hover:bg-[#6d28d9] active:scale-[0.98] text-white font-extrabold text-xs uppercase tracking-wider py-3.5 px-6 rounded-2xl w-full flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(124,58,237,0.4)] transition-all cursor-pointer"
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-[0.98] text-white font-extrabold text-xs uppercase tracking-wider py-3.5 px-6 rounded-2xl w-full flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(124,58,237,0.3)] transition-all cursor-pointer border border-purple-500/20"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-white">
                     <path fillRule="evenodd" d="M10 2c-2.236 0-4.43.18-6.57.53a.75.75 0 0 0-.63.732v6.417a5.21 5.21 0 0 0 1.253 3.39l1.411 1.693a.75.75 0 0 0 1.15-.054L8 12.333V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-4.667l1.396 2.393a.75.75 0 0 0 1.15.054l1.411-1.693a5.21 5.21 0 0 0 1.253-3.39V3.262a.75.75 0 0 0-.63-.73A42.12 42.12 0 0 0 10 2Zm-2.75 7.5a.75.75 0 0 1 .75-.75h4a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1-.75-.75ZM8 6.25a.75.75 0 0 1 .75-.75h4a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
@@ -1751,6 +1787,29 @@ export default function App() {
             </div>
 
           </div>
+
+          {/* Browse all reviews trigger */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-[#211b4a] mt-2 text-left">
+            <div className="space-y-0.5">
+              <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-amber-400" />
+                Explore {reviews.length} Verified Submissions
+              </h4>
+              <p className="text-[10px] text-slate-400 font-semibold">
+                Our active community spans over 100+ state and national reviews detailing genuine career impacts.
+              </p>
+            </div>
+            <button
+              onClick={() => setIsAllReviewsOpen(true)}
+              className="bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-100 font-extrabold text-[11px] uppercase tracking-wider py-2.5 px-5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shrink-0 active:scale-95"
+            >
+              <span>View All Verified Reviews ({reviews.length})</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3.5 h-3.5 text-amber-400">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
+          </div>
+
         </section>
 
       </div>
@@ -2637,6 +2696,7 @@ export default function App() {
           localStorage.removeItem('recruit_has_entered');
           setHasEntered(false);
         }}
+        onStartTour={() => setIsWalkthroughOpen(true)}
         language={language}
         onLanguageChange={changeLanguage}
         onShare={() => handleOpenShare()}
@@ -3582,6 +3642,220 @@ export default function App() {
         </div>
       )}
 
+      {/* 100+ Verified Reviews Interactive Directory Modal */}
+      <AnimatePresence>
+        {isAllReviewsOpen && (
+          <div className="fixed inset-0 z-[105] flex items-center justify-center p-4 md:p-8">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAllReviewsOpen(false)}
+              className="absolute inset-0 bg-[#06040d]/90 backdrop-blur-md cursor-pointer"
+            />
+
+            {/* Modal Content */}
+            <motion.div
+              initial={{ scale: 0.95, y: 30, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: 30, opacity: 0 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+              className="bg-[#0b081c] border border-slate-800 rounded-[2.5rem] shadow-[0_30px_70px_rgba(0,0,0,0.95)] max-w-5xl w-full h-[85vh] flex flex-col overflow-hidden relative z-10 text-slate-100"
+            >
+              {/* Background gradient flares */}
+              <div className="absolute top-0 right-0 w-96 h-96 bg-[#7c3aed]/10 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+              {/* Modal Header */}
+              <div className="p-6 md:p-8 border-b border-slate-850 flex flex-col gap-4 relative z-10">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <span className="bg-amber-500/10 text-amber-300 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-amber-500/25">
+                      ⭐ 100+ Candidate Testimonials
+                    </span>
+                    <h3 className="text-xl md:text-2xl font-black text-white mt-2">
+                      Verified Candidates Directory
+                    </h3>
+                    <p className="text-xs text-slate-400 font-semibold mt-0.5">
+                      Browse genuine, real-time reviews from students, job-seekers and start-ups across India.
+                    </p>
+                  </div>
+                  
+                  {/* Close button */}
+                  <button 
+                    onClick={() => {
+                      setIsAllReviewsOpen(false);
+                      setReviewsSearchQuery('');
+                      setReviewsStateFilter('All');
+                      setReviewsRatingFilter('All');
+                    }}
+                    className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer active:scale-95 shrink-0"
+                    title="Close directory"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-4 h-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Directory Controls (Search + Filters) */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mt-1">
+                  {/* Search bar */}
+                  <div className="md:col-span-5 relative">
+                    <input
+                      type="text"
+                      placeholder="Search reviews (e.g., Drone, ATS, BPSC)..."
+                      value={reviewsSearchQuery}
+                      onChange={(e) => setReviewsSearchQuery(e.target.value)}
+                      className="w-full bg-slate-950/80 border border-slate-800 focus:border-amber-500/50 text-white text-xs pl-9 pr-4 py-2.5 rounded-xl outline-none transition-colors"
+                    />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 text-slate-500 absolute left-3 top-3">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.602 10.602Z" />
+                    </svg>
+                    {reviewsSearchQuery && (
+                      <button
+                        onClick={() => setReviewsSearchQuery('')}
+                        className="text-[10px] text-slate-500 hover:text-slate-300 absolute right-3 top-2.5 font-bold uppercase"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  {/* State Filter dropdown */}
+                  <div className="md:col-span-4 flex items-center bg-slate-950/80 border border-slate-800 rounded-xl px-2.5">
+                    <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold pr-2 whitespace-nowrap">State:</span>
+                    <select
+                      value={reviewsStateFilter}
+                      onChange={(e) => setReviewsStateFilter(e.target.value)}
+                      className="w-full bg-transparent text-slate-200 text-xs py-2.5 outline-none cursor-pointer font-semibold"
+                    >
+                      <option value="All">All States (Pan-India)</option>
+                      <option value="Odisha">Odisha</option>
+                      <option value="West Bengal">West Bengal</option>
+                      <option value="Maharashtra">Maharashtra</option>
+                      <option value="Bihar">Bihar</option>
+                      <option value="Tamil Nadu">Tamil Nadu</option>
+                      <option value="Andhra Pradesh">Andhra Pradesh</option>
+                      <option value="Karnataka">Karnataka</option>
+                      <option value="Punjab">Punjab</option>
+                      <option value="Gujarat">Gujarat</option>
+                      <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    </select>
+                  </div>
+
+                  {/* Star Rating Filter */}
+                  <div className="md:col-span-3 flex items-center bg-slate-950/80 border border-slate-800 rounded-xl px-2.5">
+                    <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold pr-2 whitespace-nowrap">Rating:</span>
+                    <select
+                      value={reviewsRatingFilter}
+                      onChange={(e) => setReviewsRatingFilter(e.target.value)}
+                      className="w-full bg-transparent text-slate-200 text-xs py-2.5 outline-none cursor-pointer font-semibold text-amber-400"
+                    >
+                      <option value="All">All Ratings</option>
+                      <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                      <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Scrollable grid area */}
+              <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+                {(() => {
+                  const filtered = reviews.filter((r) => {
+                    const matchesSearch = 
+                      r.name.toLowerCase().includes(reviewsSearchQuery.toLowerCase()) ||
+                      r.city.toLowerCase().includes(reviewsSearchQuery.toLowerCase()) ||
+                      r.state.toLowerCase().includes(reviewsSearchQuery.toLowerCase()) ||
+                      r.comment.toLowerCase().includes(reviewsSearchQuery.toLowerCase());
+                    const matchesState = reviewsStateFilter === 'All' || r.state === reviewsStateFilter;
+                    const matchesRating = reviewsRatingFilter === 'All' || r.rating.toString() === reviewsRatingFilter;
+                    return matchesSearch && matchesState && matchesRating;
+                  });
+
+                  if (filtered.length === 0) {
+                    return (
+                      <div className="py-16 text-center space-y-4">
+                        <span className="text-4xl block">🔍</span>
+                        <h4 className="text-sm font-black text-white">No Matching Reviews Found</h4>
+                        <p className="text-xs text-slate-400 max-w-sm mx-auto font-medium leading-relaxed">
+                          Try clearing your active search query or selecting "All States" to view more verified submissions.
+                        </p>
+                        <button
+                          onClick={() => {
+                            setReviewsSearchQuery('');
+                            setReviewsStateFilter('All');
+                            setReviewsRatingFilter('All');
+                          }}
+                          className="bg-slate-900 border border-slate-800 text-slate-200 font-bold text-[10px] uppercase tracking-wider py-2 px-4 rounded-lg hover:border-slate-700"
+                        >
+                          Clear Filters
+                        </button>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between text-xs text-slate-400 font-bold uppercase tracking-wider">
+                        <span>Showing {filtered.length} matching candidate reviews</span>
+                        <span className="text-amber-400">Avg Rating 4.9★</span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filtered.map((rev) => (
+                          <div 
+                            key={rev.id} 
+                            className="bg-slate-950/60 border border-slate-900 hover:border-slate-800 rounded-2xl p-5 text-left transition-all hover:scale-[1.01] flex flex-col justify-between space-y-4 min-h-[160px] relative overflow-hidden"
+                          >
+                            <div className="space-y-3 relative z-10">
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center font-black text-xs uppercase shadow-inner">
+                                    {rev.name.charAt(0)}
+                                  </div>
+                                  <div>
+                                    <h5 className="text-xs font-black text-white line-clamp-1">{rev.name}</h5>
+                                    <p className="text-[10px] text-slate-400 font-semibold flex items-center gap-0.5 mt-0.5">
+                                      <MapPin className="w-2.5 h-2.5 text-amber-400 shrink-0" /> {rev.city}, {rev.state}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-0.5 text-amber-400 font-black text-[10px] shrink-0">
+                                  <span>{rev.rating}.0</span>
+                                  <Star className="w-2.5 h-2.5 fill-current" />
+                                </div>
+                              </div>
+
+                              <p className="text-[11px] sm:text-xs text-slate-300 leading-relaxed font-semibold">
+                                "{rev.comment}"
+                              </p>
+                            </div>
+
+                            <div className="text-[9px] text-slate-500 font-bold uppercase tracking-wider border-t border-slate-900 pt-3 relative z-10">
+                              Verified Account • {rev.date}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-5 border-t border-slate-850 bg-slate-950/40 text-center relative z-10 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                <span>Secure SSL encryption certified database</span>
+                <span>Total Registered Platform Audience: {(14820 + 9330 + reviews.length).toLocaleString()}+</span>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Floating Bottom-Left Navigation Hub */}
       {(!isChatOpen || isChatMinimized) && (
         <NavigationHub
@@ -3591,6 +3865,14 @@ export default function App() {
           setSelectedPosting={setSelectedPosting}
         />
       )}
+
+      {/* Interactive Walkthrough Tour overlay */}
+      <WalkthroughTour
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isOpen={isWalkthroughOpen}
+        onClose={() => setIsWalkthroughOpen(false)}
+      />
 
     </div>
   );

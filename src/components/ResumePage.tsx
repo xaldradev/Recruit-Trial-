@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { 
   Upload, 
   Sparkles, 
@@ -50,6 +51,7 @@ interface Education {
 }
 
 export default function ResumePage() {
+  const { user, updateDiagnostics } = useAuth();
   // Main page navigation
   const [pageMode, setPageMode] = useState<'evaluator' | 'builder'>('builder');
 
@@ -160,6 +162,14 @@ Your resume lists solid software experience, particularly with **React**, **Node
       });
     } finally {
       setIsAnalyzing(false);
+
+      // Save to localStorage always
+      localStorage.setItem('recruit_ats_score', finalScore.toString());
+
+      // If logged in, update diagnostics in Firebase
+      if (user) {
+        updateDiagnostics({ atsScore: finalScore }).catch(err => console.error("Error updating diagnostics:", err));
+      }
 
       // Log resume analysis activity
       try {

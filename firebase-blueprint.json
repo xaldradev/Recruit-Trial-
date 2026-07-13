@@ -44,6 +44,14 @@
         "applications": {
           "type": "array",
           "description": "User's mock application history"
+        },
+        "arohiChats": {
+          "type": "array",
+          "description": "User's past chat sessions with Arohi AI"
+        },
+        "arohiCalls": {
+          "type": "array",
+          "description": "User's past voice call summaries with Arohi AI"
         }
       },
       "required": ["uid", "email", "displayName"]

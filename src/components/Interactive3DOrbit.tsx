@@ -135,7 +135,7 @@ export default function Interactive3DOrbit({ setActiveTab, setSelectedPosting }:
   };
 
   return (
-    <div className="bg-gradient-to-br from-[#120a32] via-[#08051a] to-[#1a0e3a] border border-[#2b1f63] rounded-[2.5rem] p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.7),0_0_25px_rgba(124,58,237,0.15)] relative overflow-hidden select-none font-sans min-h-[580px] flex flex-col justify-between preserve-3d">
+    <div className="bg-gradient-to-br from-[#06040d] via-[#0c0a1b] to-[#040308] border border-slate-800/80 rounded-[3rem] p-8 sm:p-10 shadow-[0_30px_70px_rgba(0,0,0,0.95)] relative overflow-hidden select-none font-sans min-h-[580px] flex flex-col justify-between preserve-3d">
       
       {/* Background Radial Light Orbs */}
       <div className="absolute top-0 left-0 w-80 h-80 bg-[#7c3aed]/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -157,7 +157,7 @@ export default function Interactive3DOrbit({ setActiveTab, setSelectedPosting }:
         </div>
 
         {/* Depth Adjuster HUD */}
-        <div className="bg-[#0b081e] border border-[#271d5b] p-2.5 rounded-2xl flex flex-wrap items-center gap-3 self-start lg:self-center shadow-md">
+        <div className="bg-slate-950/80 border border-slate-800 p-2.5 rounded-2xl flex flex-wrap items-center gap-3 self-start lg:self-center shadow-md">
           <div className="flex items-center gap-1">
             <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold px-1">Tilt Angle:</span>
             <input 
@@ -166,7 +166,7 @@ export default function Interactive3DOrbit({ setActiveTab, setSelectedPosting }:
               max="15" 
               value={tilt} 
               onChange={(e) => setTilt(Number(e.target.value))}
-              className="w-16 h-1 bg-[#221c4b] rounded-lg appearance-none cursor-pointer accent-[#7c3aed]"
+              className="w-16 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500"
             />
           </div>
           
@@ -178,14 +178,14 @@ export default function Interactive3DOrbit({ setActiveTab, setSelectedPosting }:
               max="350" 
               value={depthOffset} 
               onChange={(e) => setDepthOffset(Number(e.target.value))}
-              className="w-16 h-1 bg-[#221c4b] rounded-lg appearance-none cursor-pointer accent-[#7c3aed]"
+              className="w-16 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500"
             />
           </div>
 
           <button
             onClick={() => setAutoRotate(!autoRotate)}
             className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-              autoRotate ? 'bg-[#7c3aed]/20 text-[#a78bfa] border border-[#7c3aed]/40' : 'bg-slate-800 text-slate-400 border border-slate-700'
+              autoRotate ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700'
             }`}
           >
             {autoRotate ? 'Auto Rotation ON' : 'Rotation Paused'}

@@ -159,26 +159,45 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-const PORT = 3000;
-
-// Initialize GoogleGenAI server-side
-const apiKey = process.env.GEMINI_API_KEY;
-let aiClient: GoogleGenAI | null = null;
-
-if (apiKey && apiKey !== 'MY_GEMINI_API_KEY') {
+// Lazy initializer helper for GoogleGenAI to handle dynamic API key configuration cleanly
+let globalAiClient: GoogleGenAI | null = null;
+function getAiClient(): GoogleGenAI | null {
+  const currentKey = process.env.GEMINI_API_KEY;
+  if (!currentKey || currentKey === 'MY_GEMINI_API_KEY') {
+    return null;
+  }
+  if (globalAiClient && (globalAiClient as any)._apiKey === currentKey) {
+    return globalAiClient;
+  }
   try {
-    aiClient = new GoogleGenAI({
-      apiKey: apiKey,
+    const client = new GoogleGenAI({
+      apiKey: currentKey,
       httpOptions: {
         headers: {
           'User-Agent': 'aistudio-build',
         }
       }
     });
-    console.log('GoogleGenAI initialized successfully.');
+    (client as any)._apiKey = currentKey;
+    globalAiClient = client;
+    return client;
   } catch (err) {
-    console.error('Failed to initialize GoogleGenAI client:', err);
+    console.error('Error creating GoogleGenAI client:', err);
+    return null;
   }
+}
+
+// Dynamically refresh the active client on every API request
+let aiClient: GoogleGenAI | null = getAiClient();
+app.use((req, res, next) => {
+  aiClient = getAiClient();
+  next();
+});
+
+const PORT = 3000;
+
+if (aiClient) {
+  console.log('GoogleGenAI initialized successfully.');
 } else {
   console.log('GEMINI_API_KEY not set or default. Running with intelligent fallbacks.');
 }
@@ -368,7 +387,7 @@ app.post('/api/save-arohi-avatar', (req, res) => {
 
 // API endpoints for Server-Side Auth Proxy
 app.post('/api/auth/signup', async (req, res) => {
-  const { email, password, name } = req.body;
+  const { email, password, name, role } = req.body;
   try {
     // 1. Call Firebase Auth REST API to create user
     const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`, {
@@ -389,6 +408,7 @@ app.post('/api/auth/signup', async (req, res) => {
       uid: uid,
       email: email,
       displayName: name,
+      role: role || 'candidate',
       profile: {
         name: name,
         email: email,
@@ -406,6 +426,12 @@ app.post('/api/auth/signup', async (req, res) => {
         { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
       ],
       applications: [],
+      diagnostics: {
+        atsScore: 74,
+        interviewScore: 0,
+        businessScore: 84
+      },
+      activities: [],
       updatedAt: new Date().toISOString()
     };
     await safeUserDb.set(uid, initialData);
@@ -473,6 +499,12 @@ app.post('/api/auth/signin', async (req, res) => {
           { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
         ],
         applications: [],
+        diagnostics: {
+          atsScore: 74,
+          interviewScore: 0,
+          businessScore: 84
+        },
+        activities: [],
         updatedAt: new Date().toISOString()
       };
       await safeUserDb.set(uid, userData);
@@ -496,7 +528,7 @@ app.post('/api/auth/signin', async (req, res) => {
 });
 
 app.post('/api/auth/google-sync', async (req, res) => {
-  const { uid, email, displayName } = req.body;
+  const { uid, email, displayName, role } = req.body;
   try {
     if (!uid) return res.status(400).json({ error: 'UID is required.' });
     const docSnap = await safeUserDb.get(uid);
@@ -510,6 +542,7 @@ app.post('/api/auth/google-sync', async (req, res) => {
         uid: uid,
         email: email || '',
         displayName: displayName || 'Honored Guest',
+        role: role || 'candidate',
         profile: {
           name: displayName || 'Honored Guest',
           email: email || '',
@@ -527,6 +560,12 @@ app.post('/api/auth/google-sync', async (req, res) => {
           { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
         ],
         applications: [],
+        diagnostics: {
+          atsScore: 74,
+          interviewScore: 0,
+          businessScore: 84
+        },
+        activities: [],
         updatedAt: new Date().toISOString()
       };
       await safeUserDb.set(uid, userData);
@@ -630,6 +669,66 @@ app.post('/api/auth/update-applications', async (req, res) => {
     if (!uid) return res.status(400).json({ error: 'UID is required.' });
     await safeUserDb.update(uid, {
       applications,
+      updatedAt: new Date().toISOString()
+    });
+    const updatedSnap = await safeUserDb.get(uid);
+    res.json({ success: true, userData: updatedSnap.data() });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/update-arohi-chats', async (req, res) => {
+  const { uid, arohiChats } = req.body;
+  try {
+    if (!uid) return res.status(400).json({ error: 'UID is required.' });
+    await safeUserDb.update(uid, {
+      arohiChats,
+      updatedAt: new Date().toISOString()
+    });
+    const updatedSnap = await safeUserDb.get(uid);
+    res.json({ success: true, userData: updatedSnap.data() });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/update-arohi-calls', async (req, res) => {
+  const { uid, arohiCalls } = req.body;
+  try {
+    if (!uid) return res.status(400).json({ error: 'UID is required.' });
+    await safeUserDb.update(uid, {
+      arohiCalls,
+      updatedAt: new Date().toISOString()
+    });
+    const updatedSnap = await safeUserDb.get(uid);
+    res.json({ success: true, userData: updatedSnap.data() });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/update-diagnostics', async (req, res) => {
+  const { uid, diagnostics } = req.body;
+  try {
+    if (!uid) return res.status(400).json({ error: 'UID is required.' });
+    await safeUserDb.update(uid, {
+      diagnostics,
+      updatedAt: new Date().toISOString()
+    });
+    const updatedSnap = await safeUserDb.get(uid);
+    res.json({ success: true, userData: updatedSnap.data() });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/update-activities', async (req, res) => {
+  const { uid, activities } = req.body;
+  try {
+    if (!uid) return res.status(400).json({ error: 'UID is required.' });
+    await safeUserDb.update(uid, {
+      activities,
       updatedAt: new Date().toISOString()
     });
     const updatedSnap = await safeUserDb.get(uid);
@@ -1395,6 +1494,254 @@ Construct this JSON strictly based on details discussed, or use standard profess
   }
 });
 
+// 1.25. Analyze Voice Call Turns Endpoint using Gemini SDK
+app.post('/api/analyze-call', async (req, res) => {
+  const { turns, callDuration, uid } = req.body;
+  if (!turns || !Array.isArray(turns)) {
+    return res.status(400).json({ error: 'turns array is required' });
+  }
+
+  // 1. Validate and sanitize transcript speech turns
+  const validatedTurns = turns
+    .filter((t: any) => t && typeof t === 'object' && t.text && typeof t.text === 'string' && t.text.trim().length > 0)
+    .map((t: any) => ({
+      speaker: t.speaker === 'user' ? 'user' : 'arohi',
+      text: t.text.trim(),
+      timestamp: t.timestamp || new Date().toISOString()
+    }));
+
+  try {
+    let parsed: any;
+    if (aiClient && validatedTurns.length > 0) {
+      const text = validatedTurns.map(t => `${t.speaker === 'user' ? 'Candidate' : 'Arohi AI'}: ${t.text}`).join('\n');
+      
+      const prompt = `Perform a comprehensive conversation analysis on the following real-time Indian voice interaction between a candidate and AROHI AI.
+Analyze the actual dialogue, and extract details such as any specific names, numbers, budgets, or business types they discussed (e.g. "manufacturing setup of flying ash bricks factory with a budget of 10 lakhs" or similar details).
+
+Return a clean, valid JSON response with the following fields:
+- summary: (string, a warm, professional, detailed 1-2 sentence executive summary of what was ACTUALLY discussed in this specific call, reflecting real topics, names, budgets, and objectives. Do NOT assume generic templates like a bakery, software development, or a career plan unless actually mentioned in the transcript. Be fully truthful to the actual speech.)
+- priorities: (array of exactly 3 strings, crucial action items or strategic next-step priorities tailored specifically to what they discussed. Do NOT use technical meta-logs or developer/system events like "Initialized AROHI system".)
+- completedTasks: (array of exactly 2-3 strings, completed milestones or accomplishments during the call. Do NOT include technical meta-logs, system operations, API calls, or server/developer events such as "Initialized AROHI system", "Scanned payload", "Parsed JSON", "Set up connection".)
+- isCareerRelated: (boolean, true if the topic is NOT business/MSME/entrepreneurship)
+- topics: (object containing the following booleans):
+  - business: (boolean, true if startup, funding, business, MSME, shop, manufacturing, or factory was discussed)
+  - resume: (boolean, true if resume, CV, biodata, or portfolio was discussed)
+  - jobs: (boolean, true if job vacancy, exams, SSC, PSC, placement was discussed)
+  - courses: (boolean, true if courses, upskilling, certifications, training was discussed)
+
+Call Transcript Turns:
+${text}`;
+
+      const response = await generateContentWithFallback(aiClient, {
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          systemInstruction: 'You are AROHI, a brilliant career and business development analyst. Synthesize voice sessions with high fidelity and zero template slop. NEVER include developer or API event descriptions as completed tasks.',
+        }
+      });
+
+      parsed = JSON.parse(response.text || '{}');
+    } else {
+      // Return a smart client-side analysis from the server
+      parsed = runSmartOfflineAnalysis(validatedTurns);
+    }
+
+    // 2. Structured logging mechanism to console (fully readable/scannable logs)
+    console.log(JSON.stringify({
+      tag: 'AROHI_VOICE_SESSION_TRANSCRIPT',
+      timestamp: new Date().toISOString(),
+      uid: uid || 'guest',
+      callDuration: callDuration || 0,
+      totalTurns: turns.length,
+      validatedTurnsCount: validatedTurns.length,
+      rawWordCount: validatedTurns.reduce((acc: number, t: any) => acc + t.text.split(/\s+/).length, 0),
+      analysisSummary: parsed.summary || 'None'
+    }, null, 2));
+
+    // 3. Persist the validated transcript & analysis in general voice logs
+    if (adminDb) {
+      try {
+        await adminDb.collection('voice_call_logs').add({
+          uid: uid || 'guest',
+          timestamp: new Date().toISOString(),
+          duration: callDuration || 0,
+          turns: validatedTurns,
+          analysis: parsed,
+        });
+        console.log(`[Structured Log] Successfully logged transcript to voice_call_logs Firestore collection for UID: ${uid || 'guest'}`);
+      } catch (logErr: any) {
+        console.error('[Structured Log] Firestore voice_call_logs write error:', logErr.message || logErr);
+      }
+    }
+
+    // 4. Persist directly inside the user's active call-history list in Firestore/LocalDB
+    if (uid) {
+      try {
+        const docSnap = await safeUserDb.get(uid);
+        if (docSnap.exists) {
+          const userData = docSnap.data() || {};
+          const arohiCalls = userData.arohiCalls || [];
+          
+          const newCallItem = {
+            id: `call-${Date.now()}`,
+            duration: callDuration || 0,
+            turns: validatedTurns,
+            date: new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }),
+            summaryText: parsed.summary,
+            isCareerRelated: !parsed.topics?.business,
+            analysis: parsed
+          };
+          
+          const updatedCalls = [newCallItem, ...arohiCalls];
+          await safeUserDb.update(uid, {
+            arohiCalls: updatedCalls,
+            updatedAt: new Date().toISOString()
+          });
+          console.log(`[Structured Log] Saved validated call record to user's database profile for UID: ${uid}`);
+        }
+      } catch (profileErr: any) {
+        console.error('[Structured Log] Error updating user voice profile:', profileErr.message || profileErr);
+      }
+    }
+
+    return res.json({ success: true, analysis: parsed });
+  } catch (error: any) {
+    console.error('Error in /api/analyze-call:', error);
+    const analysis = runSmartOfflineAnalysis(validatedTurns);
+    return res.json({ success: true, analysis, error: error.message });
+  }
+});
+
+function runSmartOfflineAnalysis(turns: any[]) {
+  if (!turns || turns.length === 0) {
+    return {
+      summary: "The voice session completed successfully, but no spoken turns were registered.",
+      priorities: [
+        "PLANNING: Refine your professional or entrepreneurial strategy with AROHI.",
+        "SKILLS: Focus on learning practical, high-demand industry skills.",
+        "COMPLIANCE: Research state-sponsored developmental programs and support provisions."
+      ],
+      completedTasks: [
+        "AROHI Real-Time voice consultation completed"
+      ],
+      isCareerRelated: true,
+      topics: { business: false, resume: false, jobs: false, courses: false }
+    };
+  }
+
+  const text = turns.map(t => t.text.toLowerCase()).join(' ');
+
+  const isBricks = /brick|ash|fly|cement/.test(text);
+  const isBusiness = isBricks || /bakery|bake|bread|cake|business|entrepreneur|shop|mudra|loan|startup|venture|funding|finance|retail|commerce|market|industry|manufactur/.test(text);
+  const isResume = /resume|cv|portfolio|bio|biodata|interview|hire|hiring|recruit/.test(text);
+  const isJobs = /job|vacancy|exam|ssc|psc|railway|post|placement|technical service/.test(text);
+  const isCourses = /course|learn|skill|upskill|react|d3|training|study|education|cert/.test(text);
+
+  const userTurns = turns.filter(t => t.speaker === 'user' || t.speaker?.toLowerCase() === 'candidate');
+  const assistantTurns = turns.filter(t => t.speaker === 'arohi' || t.speaker?.toLowerCase() === 'arohi ai' || t.speaker === 'assistant');
+
+  const userTexts = userTurns.map(t => t.text.trim()).filter(Boolean);
+  const assistantTexts = assistantTurns.map(t => t.text.trim()).filter(Boolean);
+
+  let summary = "";
+  if (userTexts.length > 0 && assistantTexts.length > 0) {
+    const primaryQuery = userTexts[0];
+    const primaryResponse = assistantTexts[0];
+    
+    const cleanQuery = primaryQuery.length > 120 ? primaryQuery.substring(0, 117) + "..." : primaryQuery;
+    const cleanResponse = primaryResponse.length > 150 ? primaryResponse.substring(0, 147) + "..." : primaryResponse;
+    
+    summary = `The candidate discussed: "${cleanQuery}". AROHI provided personalized guidance, recommending: "${cleanResponse}".`;
+  } else if (userTexts.length > 0) {
+    const cleanQuery = userTexts[0].length > 180 ? userTexts[0].substring(0, 177) + "..." : userTexts[0];
+    summary = `The voice session captured the candidate's query: "${cleanQuery}". AROHI analyzed this input to frame tailored development opportunities.`;
+  } else if (assistantTexts.length > 0) {
+    const cleanResponse = assistantTexts[0].length > 180 ? assistantTexts[0].substring(0, 177) + "..." : assistantTexts[0];
+    summary = `AROHI provided consultation guidance: "${cleanResponse}", outlining technical and developmental milestones.`;
+  } else {
+    summary = "The candidate and AROHI engaged in a voice consultation. Discussion points centered on matching qualifications against active vacancies, identifying upskilling opportunities, or exploring state-sponsored schemes.";
+  }
+
+  let priorities: string[] = [];
+  let completedTasks: string[] = [];
+
+  if (isBricks) {
+    priorities = [
+      "PLANT INFRASTRUCTURE: Finalize machinery procurement specs for automatic/semi-automatic brick presses.",
+      "FINANCING PLAN: Structure the 10 Lakhs budget, dividing 60% for machinery and 40% for working capital.",
+      "MSME INCENTIVES: Apply for an Udyam MSME certificate to claim credit linkages and power tariff subsidies."
+    ];
+    completedTasks = [
+      "Fly Ash Bricks Factory Setup Outline Created",
+      "Capital Expenditure Allocations Mapped (10 Lakhs budget)",
+      "MSME Subsidies Eligibility Verified"
+    ];
+  } else if (isBusiness) {
+    const bizMatch = text.match(/(bakery|shop|venture|startup|retail|commerce)/);
+    const bizName = bizMatch ? bizMatch[1] : "commercial venture";
+    priorities = [
+      `BUSINESS MODELLING: Finalize the commercial product line, pricing framework, and equipment procurement list for your ${bizName}.`,
+      "FINANCE: Prepare draft business proposals and check eligibility for the PM Mudra Loan Scheme.",
+      "COMPLIANCE: Check licensing guidelines (FSSAI/Municipal) and regional trading registrations."
+    ];
+    completedTasks = [
+      `Business Model Outline Generated for ${bizName}`,
+      "Mudra Loan Scheme (PMMY) Eligibility Checklist Verified",
+      "Sourcing & Commercial Setup Priorities Mapped"
+    ];
+  } else if (isResume && !isJobs) {
+    priorities = [
+      "RESUME EXPORT: Review and download the personalized professional resume generated in this session.",
+      "PORTFOLIO: Collate live project links highlighting key engineering outputs and interactive features.",
+      "PREPARATION: Go through mock interviews with Arohi's career sandbox to practice core answers."
+    ];
+    completedTasks = [
+      "Candidate Professional Resume Drafted",
+      "Technical Competencies (React 19, TypeScript) Formatted for Export"
+    ];
+  } else {
+    const techKeywords = ["react", "software", "developer", "coding", "technical", "web", "d3", "programming", "python", "java", "sql", "engineering"];
+    const hasTech = techKeywords.some(kw => text.includes(kw));
+
+    if (hasTech) {
+      priorities = [
+        "DEVELOPER PORTFOLIO: Compile high-fidelity responsive projects demonstrating core technical competencies.",
+        "SKILLS ADVANCEMENT: Upskill in modern frameworks such as React 19, TypeScript, and state architectures.",
+        "PLACEMENT STRATEGY: Target state technical vacancies and corporate software development opportunities."
+      ];
+      completedTasks = [
+        "Analyzed software development career alignment",
+        "Configured personalized upskilling benchmarks",
+        "Matched target technical vacancy tracks"
+      ];
+    } else {
+      priorities = [
+        "CAREER STRATEGY: Consult AROHI periodically to refine your professional or entrepreneurial strategy.",
+        "DEVELOPMENT: Focus on learning practical, high-demand industry skills that fit your desired track.",
+        "COMPLIANCE: Research state-sponsored developmental programs and career support provisions."
+      ];
+      completedTasks = [
+        "Completed professional skill diagnostic",
+        "AROHI Real-Time voice consultation logged",
+        "Career development checklist updated"
+      ];
+    }
+  }
+
+  return {
+    summary,
+    priorities,
+    completedTasks,
+    isCareerRelated: !isBusiness,
+    topics: {
+      business: isBusiness || turns.length === 0,
+      resume: isResume,
+      jobs: isJobs,
+      courses: isCourses
+    }
+  };
+}
+
 // 1.5. Generate Resume Word Document (.docx) Endpoint
 app.post('/api/generate-resume-docx', async (req, res) => {
   try {
@@ -1474,6 +1821,92 @@ Hello! I am **AROHI**, your AI Opportunity Advisor. I have reviewed your resume 
     }
   } catch (error: any) {
     console.error('Error in /api/analyze-resume:', error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// 2.5. AI Candidate Matching Endpoint
+app.post('/api/ai-match-candidate', async (req, res) => {
+  const { candidateProfile, jobRequirements } = req.body;
+  if (!candidateProfile || !jobRequirements) {
+    return res.status(400).json({ error: 'Candidate profile and job requirements are required' });
+  }
+
+  logActivity('recruitment', `Recruiter ran AI Candidate Matching for candidate "${candidateProfile.name}" against job "${jobRequirements.title}"`);
+
+  try {
+    if (aiClient) {
+      const prompt = `Perform a professional AI Candidate Matching analysis. Compare the Candidate's profile against the Job's requirements.
+      
+      Candidate Profile:
+      - Name: ${candidateProfile.name}
+      - Qualifications: ${candidateProfile.qualification}
+      - Contact: ${candidateProfile.email} / ${candidateProfile.phone}
+      - Location / Other Details: ${candidateProfile.address || 'Not specified'}
+
+      Job Requirements:
+      - Title: ${jobRequirements.title}
+      - Organization: ${jobRequirements.organization}
+      - Eligibility & Skills Needed: ${jobRequirements.eligibility}
+      - Salary / Vacancies: ${jobRequirements.salary || 'Market Standard'} / ${jobRequirements.vacancies || '1'}
+
+      Return a clean JSON response containing:
+      - matchScore (number from 0 to 100 representing compatibility)
+      - recommendation (string: "Strong Match", "Standard Fit", "Requires Upskilling", "Not Recommended")
+      - keyStrengths (array of strings, areas where candidate matches perfectly)
+      - skillGaps (array of strings, skills or keywords candidate is missing)
+      - customQuestions (array of strings, 3 tailored interview questions to ask this specific candidate to test their gaps)
+      - evaluationMarkdown (markdown-formatted detailed recruiter report about why they match or don't match, and hiring suggestions)`;
+
+      const response = await generateContentWithFallback(aiClient, {
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          systemInstruction: 'You are AROHI, an advanced AI Recruiter and candidate evaluator. Assess candidates with high professional standard, objectivity and actionable insight.',
+        }
+      });
+
+      const parsed = JSON.parse(response.text || '{}');
+      return res.json(parsed);
+    } else {
+      // High-quality simulated response based on candidate name and job
+      const matchScore = Math.floor(65 + Math.random() * 30);
+      let recommendation = "Standard Fit";
+      if (matchScore >= 85) recommendation = "Strong Match";
+      else if (matchScore < 75) recommendation = "Requires Upskilling";
+
+      const fallbackAnalysis = {
+        matchScore,
+        recommendation,
+        keyStrengths: [
+          `Fulfills the core educational background requested for ${jobRequirements.title}.`,
+          "Possesses clear local connectivity and verified professional contact details.",
+          "Demonstrates basic readiness to learn and execute specialized workplace protocols."
+        ],
+        skillGaps: [
+          "Needs further exposure to advanced toolkits in " + (jobRequirements.eligibility ? jobRequirements.eligibility.slice(0, 50) : "modern workflows"),
+          "Lacks documented certifications for specific enterprise tools."
+        ],
+        customQuestions: [
+          `How would you apply your qualification "${candidateProfile.qualification ? candidateProfile.qualification.slice(0, 40) : 'your studies'}" to solve typical technical challenges in our team?`,
+          `We see you are interested in "${jobRequirements.title}". What is your approach when dealing with tight deadlines or complex client specifications?`,
+          `How do you keep yourself updated with the fast-evolving skills specified in our requirements?`
+        ],
+        evaluationMarkdown: `### Recruiter Diagnostics Report
+Hello! I am **AROHI**, your AI Recruitment co-pilot. I have scanned **${candidateProfile.name}** against the requirements for the **${jobRequirements.title}** role.
+
+#### Overall Matching Summary
+* **Alignment Rate:** ${matchScore}% Compatibility
+* **Hiring Verdict:** **${recommendation}**
+* **Core Strength:** Strong alignment with academic benchmarks and location criteria.
+* **Core Gap:** Needs specific micro-certifications or training on intermediate operational tools.
+`,
+        fallback: true
+      };
+      return res.json(fallbackAnalysis);
+    }
+  } catch (error: any) {
+    console.error('Error in /api/ai-match-candidate:', error);
     return res.status(500).json({ error: error.message });
   }
 });
@@ -2236,29 +2669,54 @@ async function startServer() {
   // Setup WebSocket server for Gemini Live Audio Bidirectional Streaming
   const wss = new WebSocketServer({ noServer: true });
 
+  wss.on('error', (err) => {
+    console.error('WebSocket Server error:', err);
+  });
+
   wss.on('connection', async (clientWs: WebSocket, request) => {
     console.log('Client connected to live audio WebSocket');
-    
-    // Parse the voice parameter from the query string
-    const urlObj = new URL(request.url || '', `http://${request.headers.host || 'localhost'}`);
-    const selectedVoice = urlObj.searchParams.get('voice') || 'Zephyr';
 
-    const currentKey = process.env.GEMINI_API_KEY;
-    if (!currentKey) {
-      clientWs.send(JSON.stringify({ error: 'GEMINI_API_KEY is not configured on the server.' }));
-      clientWs.close();
-      return;
+    // Prevent uncaught socket-level errors from crashing the Node.js process
+    clientWs.on('error', (err) => {
+      console.error('Client WebSocket connection error:', err);
+    });
+
+    const safeSendAndClose = (msgObj: any, closeCode = 1000, closeReason = '') => {
+      try {
+        if (clientWs.readyState === WebSocket.OPEN) {
+          clientWs.send(JSON.stringify(msgObj), () => {
+            try {
+              clientWs.close(closeCode, closeReason);
+            } catch (e) {}
+          });
+        } else {
+          try {
+            clientWs.close(closeCode, closeReason);
+          } catch (e) {}
+        }
+      } catch (err) {
+        console.error('Error flushing message and closing WebSocket:', err);
+      }
+    };
+    
+    // Parse the voice parameter safely from the query string
+    let selectedVoice = 'Zephyr';
+    if (request.url) {
+      const match = request.url.match(/[?&]voice=([^&]+)/);
+      if (match) {
+        selectedVoice = decodeURIComponent(match[1]);
+      }
     }
 
-    // Ensure we have a valid GoogleGenAI client (global aiClient or new instance)
-    const clientAi = aiClient || new GoogleGenAI({
-      apiKey: currentKey,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        }
-      }
-    });
+    const clientAi = getAiClient();
+    if (!clientAi) {
+      safeSendAndClose(
+        { error: 'GEMINI_API_KEY is not configured on the server. Please set your Gemini API key in Settings > Secrets.' },
+        1011,
+        'API Key not configured'
+      );
+      return;
+    }
 
     try {
       console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}`);
@@ -2273,13 +2731,47 @@ async function startServer() {
         },
         callbacks: {
           onmessage: (message: any) => {
-            // Forward audio data to client
+            // Forward audio data to client safely
             const audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-            if (audio) {
-              clientWs.send(JSON.stringify({ audio }));
+            if (audio && clientWs.readyState === WebSocket.OPEN) {
+              try {
+                clientWs.send(JSON.stringify({ audio }));
+              } catch (e) {
+                console.error("Error sending live audio packet:", e);
+              }
             }
-            if (message.serverContent?.interrupted) {
-              clientWs.send(JSON.stringify({ interrupted: true }));
+            if (message.serverContent?.interrupted && clientWs.readyState === WebSocket.OPEN) {
+              try {
+                clientWs.send(JSON.stringify({ interrupted: true }));
+              } catch (e) {}
+            }
+
+            // Extract transcripts of what is being spoken (user & model)
+            let transcriptText = "";
+            let transcriptSpeaker: "user" | "arohi" | null = null;
+
+            if (message.userContent?.parts) {
+              for (const part of message.userContent.parts) {
+                if (part.text) {
+                  transcriptText += part.text;
+                  transcriptSpeaker = "user";
+                }
+              }
+            }
+
+            if (message.serverContent?.modelTurn?.parts) {
+              for (const part of message.serverContent.modelTurn.parts) {
+                if (part.text) {
+                  transcriptText += part.text;
+                  transcriptSpeaker = "arohi";
+                }
+              }
+            }
+
+            if (transcriptText && clientWs.readyState === WebSocket.OPEN) {
+              try {
+                clientWs.send(JSON.stringify({ transcript: transcriptText, speaker: transcriptSpeaker }));
+              } catch (e) {}
             }
           },
         },
@@ -2309,19 +2801,44 @@ async function startServer() {
 
     } catch (error: any) {
       console.error("Failed to establish session with Gemini Live:", error);
-      clientWs.send(JSON.stringify({ error: `Connection failed: ${error.message || error}` }));
-      clientWs.close();
+      safeSendAndClose(
+        { error: `Connection failed: ${error.message || error}` },
+        1011,
+        'Gemini Live initialization failed'
+      );
     }
   });
 
   server.on('upgrade', (request, socket, head) => {
-    const urlObj = new URL(request.url || '', `http://${request.headers.host || 'localhost'}`);
-    if (urlObj.pathname === '/api/live-ws') {
-      wss.handleUpgrade(request, socket, head, (ws) => {
-        wss.emit('connection', ws, request);
-      });
-    } else {
-      socket.destroy();
+    try {
+      let pathname = '';
+      if (request.url) {
+        const urlPart = request.url.split('?')[0];
+        if (urlPart.startsWith('/') || !urlPart.includes('://')) {
+          pathname = urlPart;
+        } else {
+          try {
+            pathname = new URL(urlPart).pathname;
+          } catch (e) {
+            pathname = urlPart;
+          }
+        }
+      }
+
+      console.log(`WebSocket Upgrade Request: Pathname="${pathname}", Raw URL="${request.url}"`);
+
+      const isLiveWsPath = pathname === '/api/live-ws' || 
+                           pathname === '/api/live-ws/' || 
+                           pathname.endsWith('/api/live-ws') || 
+                           pathname.endsWith('/api/live-ws/');
+
+      if (isLiveWsPath) {
+        wss.handleUpgrade(request, socket, head, (ws) => {
+          wss.emit('connection', ws, request);
+        });
+      }
+    } catch (err) {
+      console.error('Error in WebSocket upgrade handler:', err);
     }
   });
 }

@@ -35,6 +35,7 @@ interface UserData {
   uid: string;
   email: string;
   displayName: string;
+  role?: 'candidate' | 'recruiter';
   profile: UserProfile;
   enrolledCourses: string[];
   completedModules: Record<string, string[]>;
@@ -42,6 +43,37 @@ interface UserData {
   earnedCertificates: string[];
   savedItems: Array<{ id: string; title: string; type: string; desc: string }>;
   applications: Application[];
+  arohiChats?: Array<{
+    id: string;
+    title: string;
+    date: string;
+    messages: Array<{
+      id: string;
+      role: 'user' | 'assistant';
+      content: string;
+      timestamp: string;
+    }>;
+  }>;
+  arohiCalls?: Array<{
+    id: string;
+    duration: number;
+    turns: any[];
+    date: string;
+    summaryText: string;
+    isCareerRelated: boolean;
+  }>;
+  diagnostics?: {
+    atsScore: number;
+    interviewScore: number;
+    businessScore: number;
+  };
+  activities?: Array<{
+    id: string;
+    type: string;
+    title: string;
+    description: string;
+    timestamp: string;
+  }>;
   updatedAt?: string;
 }
 
@@ -50,10 +82,10 @@ interface AuthContextType {
   userData: UserData | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name: string) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
-  signInWithApple: () => Promise<void>;
-  signInWithPhone: (phoneNumber: string, recaptchaVerifier: any) => Promise<any>;
+  signUp: (email: string, password: string, name: string, role?: 'candidate' | 'recruiter') => Promise<void>;
+  signInWithGoogle: (role?: 'candidate' | 'recruiter') => Promise<void>;
+  signInWithApple: (role?: 'candidate' | 'recruiter') => Promise<void>;
+  signInWithPhone: (phoneNumber: string, recaptchaVerifier: any, role?: 'candidate' | 'recruiter') => Promise<any>;
   signOutUser: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updateUserProfile: (profile: Partial<UserProfile>) => Promise<void>;
@@ -65,6 +97,20 @@ interface AuthContextType {
   }) => Promise<void>;
   updateBookmarks: (savedItems: Array<{ id: string; title: string; type: string; desc: string }>) => Promise<void>;
   updateApplications: (applications: Application[]) => Promise<void>;
+  updateArohiChats: (arohiChats: any[]) => Promise<void>;
+  updateArohiCalls: (arohiCalls: any[]) => Promise<void>;
+  updateDiagnostics: (diagnostics: {
+    atsScore?: number;
+    interviewScore?: number;
+    businessScore?: number;
+  }) => Promise<void>;
+  updateActivities: (activities: Array<{
+    id: string;
+    type: string;
+    title: string;
+    description: string;
+    timestamp: string;
+  }>) => Promise<void>;
 }
 
 enum OperationType {
@@ -122,7 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   // Helper to fetch or create user data with multiple fallback layers
-  const loadAndSyncUserData = async (firebaseUser: any): Promise<UserData> => {
+  const loadAndSyncUserData = async (firebaseUser: any, role?: 'candidate' | 'recruiter'): Promise<UserData> => {
     const uid = firebaseUser.uid;
     const email = firebaseUser.email || '';
     const displayName = firebaseUser.displayName || 'Honored Guest';
@@ -151,7 +197,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await fetch('/api/auth/google-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid, email, displayName })
+        body: JSON.stringify({ uid, email, displayName, role })
       });
       if (response.ok) {
         const resData = await response.json();
@@ -179,6 +225,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           uid,
           email,
           displayName,
+          role: role || 'candidate',
           profile: {
             name: displayName,
             email: email,
@@ -195,7 +242,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             { id: '1', title: 'PM Mudra Loan Scheme', type: 'Scheme', desc: 'Collateral free funding' },
             { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
           ],
-          applications: []
+          applications: [],
+          diagnostics: {
+            atsScore: 74,
+            interviewScore: 0,
+            businessScore: 84
+          },
+          activities: []
         };
         await setDoc(docRef, initialData);
         localStorage.setItem(`recruit_user_data_${uid}`, JSON.stringify(initialData));
@@ -220,6 +273,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       uid,
       email,
       displayName,
+      role: role || 'candidate',
       profile: {
         name: displayName,
         email: email,
@@ -236,7 +290,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         { id: '1', title: 'PM Mudra Loan Scheme', type: 'Scheme', desc: 'Collateral free funding' },
         { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
       ],
-      applications: []
+      applications: [],
+      diagnostics: {
+        atsScore: 74,
+        interviewScore: 0,
+        businessScore: 84
+      },
+      activities: []
     };
     localStorage.setItem(`recruit_user_data_${uid}`, JSON.stringify(fallbackData));
     return fallbackData;
@@ -255,8 +315,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(loggedUser);
           localStorage.setItem('recruit_user', JSON.stringify(loggedUser));
 
+          const storedRole = sessionStorage.getItem('recruit_phone_signup_role') as 'candidate' | 'recruiter' | null;
+          if (storedRole) {
+            sessionStorage.removeItem('recruit_phone_signup_role');
+          }
+
           // Fetch up-to-date userData through our multi-layer resilient function
-          const data = await loadAndSyncUserData(firebaseUser);
+          const data = await loadAndSyncUserData(firebaseUser, storedRole || undefined);
           setUserData(data);
         } else {
           setUser(null);
@@ -325,7 +390,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, name: string) => {
+  const signUp = async (email: string, password: string, name: string, role?: 'candidate' | 'recruiter') => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
@@ -337,6 +402,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         uid: firebaseUser.uid,
         email: firebaseUser.email || '',
         displayName: name,
+        role: role || 'candidate',
         profile: {
           name: name,
           email: firebaseUser.email || '',
@@ -353,7 +419,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           { id: '1', title: 'PM Mudra Loan Scheme', type: 'Scheme', desc: 'Collateral free funding' },
           { id: '2', title: 'Full-Stack JavaScript certification', type: 'Course', desc: '12 Weeks upskilling path' }
         ],
-        applications: []
+        applications: [],
+        diagnostics: {
+          atsScore: 74,
+          interviewScore: 0,
+          businessScore: 84
+        },
+        activities: []
       };
 
       // Attempt registration/sync via server-side first
@@ -364,7 +436,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           body: JSON.stringify({
             uid: firebaseUser.uid,
             email: firebaseUser.email,
-            displayName: name
+            displayName: name,
+            role: role || 'candidate'
           })
         });
         if (response.ok) {
@@ -403,7 +476,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, name })
+          body: JSON.stringify({ email, password, name, role: role || 'candidate' })
         });
         
         const resData = await response.json();
@@ -431,7 +504,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (role?: 'candidate' | 'recruiter') => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -447,11 +520,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('recruit_user', JSON.stringify(loggedUser));
 
     // Fetch user document
-    const data = await loadAndSyncUserData(firebaseUser);
+    const data = await loadAndSyncUserData(firebaseUser, role);
     setUserData(data);
   };
 
-  const signInWithApple = async () => {
+  const signInWithApple = async (role?: 'candidate' | 'recruiter') => {
     const provider = new OAuthProvider('apple.com');
     const result = await signInWithPopup(auth, provider);
     const firebaseUser = result.user;
@@ -465,12 +538,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('recruit_user', JSON.stringify(loggedUser));
 
     // Fetch user document
-    const data = await loadAndSyncUserData(firebaseUser);
+    const data = await loadAndSyncUserData(firebaseUser, role);
     setUserData(data);
   };
 
-  const signInWithPhone = async (phoneNumber: string, recaptchaVerifier: any) => {
+  const signInWithPhone = async (phoneNumber: string, recaptchaVerifier: any, role?: 'candidate' | 'recruiter') => {
     const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+    
+    // Store the desired role in session storage/local storage so we can associate it when confirmation finishes (if needed)
+    if (role) {
+      sessionStorage.setItem('recruit_phone_signup_role', role);
+    }
     return confirmationResult;
   };
 
@@ -659,6 +737,182 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateArohiChats = async (arohiChats: any[]) => {
+    if (!user) return;
+    const updatedUserData = userData ? { ...userData, arohiChats } : null;
+
+    // Optimistically update local state & cache
+    if (updatedUserData) {
+      setUserData(updatedUserData);
+      localStorage.setItem(`recruit_user_data_${user.uid}`, JSON.stringify(updatedUserData));
+    }
+
+    // Layer 1: Server-side API
+    try {
+      const response = await fetch('/api/auth/update-arohi-chats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: user.uid, arohiChats })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.userData) {
+          setUserData(data.userData);
+          localStorage.setItem(`recruit_user_data_${user.uid}`, JSON.stringify(data.userData));
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn("Server-side arohi-chats update failed, attempting direct client-side Firestore SDK:", err);
+    }
+
+    // Layer 2: Client-side Firestore SDK fallback
+    try {
+      const docRef = doc(db, 'users', user.uid);
+      await updateDoc(docRef, {
+        arohiChats,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (err) {
+      console.warn("Both server-side and client-side Firestore arohi-chats updates failed. Changes saved locally.", err);
+    }
+  };
+
+  const updateArohiCalls = async (arohiCalls: any[]) => {
+    if (!user) return;
+    const updatedUserData = userData ? { ...userData, arohiCalls } : null;
+
+    // Optimistically update local state & cache
+    if (updatedUserData) {
+      setUserData(updatedUserData);
+      localStorage.setItem(`recruit_user_data_${user.uid}`, JSON.stringify(updatedUserData));
+    }
+
+    // Layer 1: Server-side API
+    try {
+      const response = await fetch('/api/auth/update-arohi-calls', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: user.uid, arohiCalls })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.userData) {
+          setUserData(data.userData);
+          localStorage.setItem(`recruit_user_data_${user.uid}`, JSON.stringify(data.userData));
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn("Server-side arohi-calls update failed, attempting direct client-side Firestore SDK:", err);
+    }
+
+    // Layer 2: Client-side Firestore SDK fallback
+    try {
+      const docRef = doc(db, 'users', user.uid);
+      await updateDoc(docRef, {
+        arohiCalls,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (err) {
+      console.warn("Both server-side and client-side Firestore arohi-calls updates failed. Changes saved locally.", err);
+    }
+  };
+
+  const updateDiagnostics = async (diagnosticsUpdate: {
+    atsScore?: number;
+    interviewScore?: number;
+    businessScore?: number;
+  }) => {
+    if (!user) return;
+    const currentDiagnostics = userData?.diagnostics || { atsScore: 74, interviewScore: 0, businessScore: 84 };
+    const updatedDiagnostics = { ...currentDiagnostics, ...diagnosticsUpdate };
+    const updatedUserData = userData ? { ...userData, diagnostics: updatedDiagnostics } : null;
+
+    // Optimistically update local state & cache
+    if (updatedUserData) {
+      setUserData(updatedUserData);
+      localStorage.setItem(`recruit_user_data_${user.uid}`, JSON.stringify(updatedUserData));
+    }
+
+    // Layer 1: Server-side API
+    try {
+      const response = await fetch('/api/auth/update-diagnostics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: user.uid, diagnostics: updatedDiagnostics })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.userData) {
+          setUserData(data.userData);
+          localStorage.setItem(`recruit_user_data_${user.uid}`, JSON.stringify(data.userData));
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn("Server-side diagnostics update failed, attempting direct client-side Firestore SDK:", err);
+    }
+
+    // Layer 2: Client-side Firestore SDK fallback
+    try {
+      const docRef = doc(db, 'users', user.uid);
+      await updateDoc(docRef, {
+        diagnostics: updatedDiagnostics,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (err) {
+      console.warn("Both server-side and client-side Firestore diagnostics updates failed. Changes saved locally.", err);
+    }
+  };
+
+  const updateActivities = async (activities: Array<{
+    id: string;
+    type: string;
+    title: string;
+    description: string;
+    timestamp: string;
+  }>) => {
+    if (!user) return;
+    const updatedUserData = userData ? { ...userData, activities } : null;
+
+    // Optimistically update local state & cache
+    if (updatedUserData) {
+      setUserData(updatedUserData);
+      localStorage.setItem(`recruit_user_data_${user.uid}`, JSON.stringify(updatedUserData));
+    }
+
+    // Layer 1: Server-side API
+    try {
+      const response = await fetch('/api/auth/update-activities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: user.uid, activities })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.userData) {
+          setUserData(data.userData);
+          localStorage.setItem(`recruit_user_data_${user.uid}`, JSON.stringify(data.userData));
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn("Server-side activities update failed, attempting direct client-side Firestore SDK:", err);
+    }
+
+    // Layer 2: Client-side Firestore SDK fallback
+    try {
+      const docRef = doc(db, 'users', user.uid);
+      await updateDoc(docRef, {
+        activities,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (err) {
+      console.warn("Both server-side and client-side Firestore activities updates failed. Changes saved locally.", err);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -674,7 +928,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       updateUserProfile,
       updateCareerProgress,
       updateBookmarks,
-      updateApplications
+      updateApplications,
+      updateArohiChats,
+      updateArohiCalls,
+      updateDiagnostics,
+      updateActivities
     }}>
       {children}
     </AuthContext.Provider>

@@ -33,6 +33,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   } = useAuth();
 
   const [activeMode, setActiveMode] = useState<'signin' | 'signup' | 'forgot' | 'phone'>('signin');
+  const [role, setRole] = useState<'candidate' | 'recruiter'>('candidate');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -68,8 +69,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setSuccess(null);
     setIsLoading(true);
     try {
-      await signInWithGoogle();
-      setSuccess('Successfully authenticated with Google! Syncing...');
+      await signInWithGoogle(role);
+      setSuccess(`Successfully authenticated as ${role === 'recruiter' ? 'Recruiter' : 'Candidate'}! Syncing...`);
       setTimeout(() => {
         onClose();
       }, 1500);
@@ -98,8 +99,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setSuccess(null);
     setIsLoading(true);
     try {
-      await signInWithApple();
-      setSuccess('Successfully authenticated with Apple! Syncing...');
+      await signInWithApple(role);
+      setSuccess(`Successfully authenticated as ${role === 'recruiter' ? 'Recruiter' : 'Candidate'}! Syncing...`);
       setTimeout(() => {
         onClose();
       }, 1500);
@@ -153,7 +154,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         setRecaptchaVerifier(verifier);
       }
 
-      const confirmation = await signInWithPhone(formattedPhone, verifier);
+      const confirmation = await signInWithPhone(formattedPhone, verifier, role);
       setConfirmationResult(confirmation);
       setOtpSent(true);
       setSuccess(`Verification code sent successfully to ${formattedPhone}!`);
@@ -231,8 +232,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         if (password.length < 6) {
           throw new Error('Password must be at least 6 characters.');
         }
-        await signUp(email, password, name);
-        setSuccess('Account created successfully! Welcome to Recruit India.');
+        await signUp(email, password, name, role);
+        setSuccess(`Account created successfully as ${role === 'recruiter' ? 'Recruiter' : 'Candidate'}! Welcome to Recruit India.`);
         setTimeout(() => {
           onClose();
         }, 1500);
@@ -298,6 +299,39 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             Sign in securely to save your progress, bookmark courses, track job application statuses, and unlock all interactive dashboards.
           </p>
         </div>
+
+        {/* Account Type Selector */}
+        {activeMode !== 'forgot' && (
+          <div className="space-y-1.5 mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+            <label className="text-[10px] font-bold text-slate-300 uppercase tracking-wider block text-center">
+              Select Your Role / Account Type
+            </label>
+            <div className="grid grid-cols-2 gap-2 bg-[#070414] p-1 rounded-xl border border-[#231a4c]">
+              <button
+                type="button"
+                onClick={() => setRole('candidate')}
+                className={`py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                  role === 'candidate'
+                    ? 'bg-gradient-to-r from-purple-600/30 to-indigo-600/30 border border-[#7c3aed] text-white shadow-lg shadow-purple-500/10'
+                    : 'text-slate-400 hover:text-white border border-transparent'
+                }`}
+              >
+                <span className="text-sm">🧑‍🎓 Job Seeker</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole('recruiter')}
+                className={`py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                  role === 'recruiter'
+                    ? 'bg-gradient-to-r from-purple-600/30 to-indigo-600/30 border border-[#7c3aed] text-white shadow-lg shadow-purple-500/10'
+                    : 'text-slate-400 hover:text-white border border-transparent'
+                }`}
+              >
+                <span className="text-sm">🏢 Recruiter</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Mode-specific content */}
         {activeMode === 'phone' ? (
