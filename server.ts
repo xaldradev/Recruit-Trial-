@@ -2849,6 +2849,10 @@ async function startServer() {
 
     try {
       console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}`);
+      
+      let receivedCount = 0;
+      let sentCount = 0;
+
       const session = await clientAi.live.connect({
         model: "gemini-3.1-flash-live-preview",
         config: {
@@ -2856,18 +2860,27 @@ async function startServer() {
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
           },
-          tools: [{ googleSearch: {} }],
+          outputAudioTranscription: {},
+          inputAudioTranscription: {},
           systemInstruction: AROHI_SYSTEM_INSTRUCTION + "\n\nCRITICAL CONTEXT: You are currently connected via real-time live voice link. Speak very concisely, dynamically, and warmly. Keep responses extremely brief (1-3 sentences maximum per turn) so they read nicely as speech without lagging.",
         },
         callbacks: {
           onmessage: (message: any) => {
-            // Forward audio data to client safely
-            const audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-            if (audio && clientWs.readyState === WebSocket.OPEN) {
-              try {
-                clientWs.send(JSON.stringify({ audio }));
-              } catch (e) {
-                console.error("Error sending live audio packet:", e);
+            // Forward audio data to client safely by scanning all parts
+            if (message.serverContent?.modelTurn?.parts) {
+              for (const part of message.serverContent.modelTurn.parts) {
+                const audio = part.inlineData?.data;
+                if (audio && clientWs.readyState === WebSocket.OPEN) {
+                  try {
+                    sentCount++;
+                    if (sentCount % 20 === 1) {
+                      console.log(`[Arohi Live] Forwarding Gemini audio response chunk #${sentCount} to browser client`);
+                    }
+                    clientWs.send(JSON.stringify({ audio }));
+                  } catch (e) {
+                    console.error("Error sending live audio packet:", e);
+                  }
+                }
               }
             }
             if (message.serverContent?.interrupted && clientWs.readyState === WebSocket.OPEN) {
@@ -2911,17 +2924,21 @@ async function startServer() {
         try {
           const parsed = JSON.parse(data.toString());
           if (parsed.audio) {
+            receivedCount++;
+            if (receivedCount % 20 === 1) {
+              console.log(`[Arohi Live] Forwarding user audio chunk #${receivedCount} to Gemini`);
+            }
             session.sendRealtimeInput({
               audio: { data: parsed.audio, mimeType: "audio/pcm;rate=16000" },
             });
           }
-        } catch (err) {
-          console.error("Error forwarding user audio to Gemini Live:", err);
+        } catch (err: any) {
+          console.error("Error forwarding user audio to Gemini Live:", err.message || err);
         }
       });
 
       clientWs.on("close", () => {
-        console.log("Client closed live voice WebSocket connection.");
+        console.log(`Client closed live voice WebSocket connection. Total chunks forwarded: ${receivedCount}`);
         try {
           session.close();
         } catch (err) {

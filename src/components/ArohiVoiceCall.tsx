@@ -295,6 +295,14 @@ export default function ArohiVoiceCall({ onClose, language = 'en', onNavigateTab
         const outputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
         outputAudioCtxRef.current = outputCtx;
 
+        // Explicitly resume contexts to bypass browser autoplay/interaction suspension
+        if (inputCtx.state === 'suspended') {
+          await inputCtx.resume();
+        }
+        if (outputCtx.state === 'suspended') {
+          await outputCtx.resume();
+        }
+
         const source = inputCtx.createMediaStreamSource(stream);
         const processor = inputCtx.createScriptProcessor(4096, 1, 1);
         scriptProcessorRef.current = processor;
