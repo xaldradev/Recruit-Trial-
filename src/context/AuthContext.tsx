@@ -15,6 +15,7 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+import { authenticateBiometricDevice } from '../lib/webauthn';
 
 export interface User {
   uid: string;
@@ -81,10 +82,10 @@ interface AuthContextType {
   user: User | null;
   userData: UserData | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name: string, role?: 'candidate' | 'recruiter') => Promise<void>;
-  signInWithGoogle: (role?: 'candidate' | 'recruiter') => Promise<void>;
-  signInWithApple: (role?: 'candidate' | 'recruiter') => Promise<void>;
+  signIn: (email: string, password: string) => Promise<any>;
+  signUp: (email: string, password: string, name: string, role?: 'candidate' | 'recruiter', phone?: string) => Promise<void>;
+  signInWithGoogle: (role?: 'candidate' | 'recruiter') => Promise<any>;
+  signInWithApple: (role?: 'candidate' | 'recruiter') => Promise<any>;
   signInWithPhone: (phoneNumber: string, recaptchaVerifier: any, role?: 'candidate' | 'recruiter') => Promise<any>;
   signOutUser: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -111,6 +112,7 @@ interface AuthContextType {
     description: string;
     timestamp: string;
   }>) => Promise<void>;
+  signInWithBiometrics: (email: string) => Promise<void>;
 }
 
 enum OperationType {
@@ -231,8 +233,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: email,
             phone: '+91 98765 43210',
             location: 'Delhi NCR',
-            education: 'Graduate',
-            activeGoal: 'Government & Public Sector Career'
+            education: (role || 'candidate') === 'recruiter' ? 'Business Owner' : 'Graduate',
+            activeGoal: (role || 'candidate') === 'recruiter' ? 'Mudra Loan Business & Franchise Setup' : 'Skills, Courses & Career Preparation'
           },
           enrolledCourses: [],
           completedModules: {},
@@ -279,8 +281,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: email,
         phone: '+91 98765 43210',
         location: 'Delhi NCR',
-        education: 'Graduate',
-        activeGoal: 'Government & Public Sector Career'
+        education: (role || 'candidate') === 'recruiter' ? 'Business Owner' : 'Graduate',
+        activeGoal: (role || 'candidate') === 'recruiter' ? 'Mudra Loan Business & Franchise Setup' : 'Skills, Courses & Career Preparation'
       },
       enrolledCourses: [],
       completedModules: {},
@@ -354,6 +356,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Fetch user document
       const data = await loadAndSyncUserData(firebaseUser);
       setUserData(data);
+      return data;
     } catch (clientErr: any) {
       console.warn("Client sign-in failed. Trying server-side proxy fallback...", clientErr);
       
@@ -374,7 +377,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(loggedUser);
           localStorage.setItem('recruit_user', JSON.stringify(loggedUser));
           setUserData(resData.userData);
-          return;
+          return resData.userData;
         } else {
           throw new Error(resData?.error || 'Server-side sign-in failed.');
         }
@@ -390,7 +393,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, name: string, role?: 'candidate' | 'recruiter') => {
+  const signUp = async (email: string, password: string, name: string, role?: 'candidate' | 'recruiter', phone?: string) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
@@ -406,10 +409,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         profile: {
           name: name,
           email: firebaseUser.email || '',
-          phone: '+91 98765 43210',
+          phone: phone || '+91 98765 43210',
           location: 'Delhi NCR',
-          education: 'Graduate',
-          activeGoal: 'Government & Public Sector Career'
+          education: (role || 'candidate') === 'recruiter' ? 'Business Owner' : 'Graduate',
+          activeGoal: (role || 'candidate') === 'recruiter' ? 'Mudra Loan Business & Franchise Setup' : 'Skills, Courses & Career Preparation'
         },
         enrolledCourses: [],
         completedModules: {},
@@ -437,7 +440,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             uid: firebaseUser.uid,
             email: firebaseUser.email,
             displayName: name,
-            role: role || 'candidate'
+            role: role || 'candidate',
+            mobile: phone || ''
           })
         });
         if (response.ok) {
@@ -476,7 +480,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, name, role: role || 'candidate' })
+          body: JSON.stringify({ email, password, name, role: role || 'candidate', mobile: phone || '' })
         });
         
         const resData = await response.json();
@@ -522,6 +526,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Fetch user document
     const data = await loadAndSyncUserData(firebaseUser, role);
     setUserData(data);
+    return data;
   };
 
   const signInWithApple = async (role?: 'candidate' | 'recruiter') => {
@@ -540,6 +545,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Fetch user document
     const data = await loadAndSyncUserData(firebaseUser, role);
     setUserData(data);
+    return data;
   };
 
   const signInWithPhone = async (phoneNumber: string, recaptchaVerifier: any, role?: 'candidate' | 'recruiter') => {
@@ -563,11 +569,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await sendPasswordResetEmail(auth, email);
   };
 
+  const signInWithBiometrics = async (email: string) => {
+    const emailKey = email.trim().toLowerCase();
+    const rawRecord = localStorage.getItem(`recruit_biometric_${emailKey}`);
+    if (!rawRecord) {
+      throw new Error("No enrolled biometric credentials found on this device for this email. Please sign in with email/password first, then enroll this device in your Profile.");
+    }
+
+    const verified = await authenticateBiometricDevice(emailKey);
+    if (!verified) {
+      throw new Error("Biometric verification was rejected.");
+    }
+
+    const storedUserStr = localStorage.getItem(`recruit_biometric_user_${emailKey}`);
+    if (!storedUserStr) {
+      throw new Error("Biometric association context not found. Please sign in with email/password once to sync.");
+    }
+
+    const cachedUser = JSON.parse(storedUserStr);
+    const loggedUser: User = {
+      uid: cachedUser.uid,
+      email: cachedUser.email,
+      displayName: cachedUser.displayName || email.split('@')[0]
+    };
+
+    setUser(loggedUser);
+    localStorage.setItem('recruit_user', JSON.stringify(loggedUser));
+
+    try {
+      const data = await loadAndSyncUserData({ uid: cachedUser.uid, email: cachedUser.email } as any);
+      setUserData(data);
+    } catch (err) {
+      console.warn("Could not load real-time Firestore user data during biometric login. Loading local cache...", err);
+      const localDataStr = localStorage.getItem(`recruit_user_data_${cachedUser.uid}`);
+      if (localDataStr) {
+        setUserData(JSON.parse(localDataStr));
+      }
+    }
+  };
+
   const updateUserProfile = async (profileUpdate: Partial<UserProfile>) => {
     if (!user) return;
     const currentProfile = userData?.profile || {};
     const updatedProfile = { ...currentProfile, ...profileUpdate };
-    const updatedUserData = userData ? { ...userData, profile: updatedProfile as UserProfile } : null;
+    const updatedUserData = userData ? { 
+      ...userData, 
+      profile: updatedProfile as UserProfile,
+      displayName: profileUpdate.name || userData.displayName
+    } : null;
 
     // Optimistically update local state & cache
     if (updatedUserData) {
@@ -597,10 +646,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Layer 2: Client-side Firestore SDK fallback
     try {
       const docRef = doc(db, 'users', user.uid);
-      await updateDoc(docRef, {
+      const updatePayload: any = {
         profile: updatedProfile,
         updatedAt: new Date().toISOString()
-      });
+      };
+      if (profileUpdate.name) {
+        updatePayload.displayName = profileUpdate.name;
+      }
+      await updateDoc(docRef, updatePayload);
     } catch (err) {
       console.warn("Both server-side and client-side Firestore profile updates failed. Changes saved locally.", err);
     }
@@ -925,6 +978,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signInWithPhone,
       signOutUser,
       resetPassword,
+      signInWithBiometrics,
       updateUserProfile,
       updateCareerProgress,
       updateBookmarks,

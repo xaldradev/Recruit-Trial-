@@ -12,10 +12,12 @@ import {
   CheckCircle2,
   Phone,
   Smartphone,
-  ChevronLeft
+  ChevronLeft,
+  Fingerprint
 } from 'lucide-react';
 import { auth } from '../firebase';
 import { RecaptchaVerifier } from 'firebase/auth';
+import { isBiometricSupported } from '../lib/webauthn';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -29,14 +31,99 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     signInWithGoogle, 
     signInWithApple, 
     signInWithPhone, 
-    resetPassword 
+    resetPassword,
+    signInWithBiometrics,
+    userData,
+    updateUserProfile
   } = useAuth();
 
-  const [activeMode, setActiveMode] = useState<'signin' | 'signup' | 'forgot' | 'phone'>('signin');
+  const [activeMode, setActiveMode] = useState<'signin' | 'signup' | 'forgot' | 'phone' | 'onboarding'>('signin');
   const [role, setRole] = useState<'candidate' | 'recruiter'>('candidate');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [signupPhone, setSignupPhone] = useState('');
+  const [onboardName, setOnboardName] = useState('');
+  const [onboardPhone, setOnboardPhone] = useState('');
+
+  const checkProfileCompleteness = (uData: any) => {
+    if (!uData) return true; // Default to incomplete if no user data
+    const phone = uData.profile?.phone || '';
+    const nameVal = uData.profile?.name || uData.displayName || '';
+    
+    const isPhoneDefault = phone === '+91 98765 43210' || phone === '9876543210' || phone === '' || !phone;
+    const isNameDefault = nameVal === 'Honored Guest' || nameVal.trim() === '' || !nameVal;
+    
+    return isPhoneDefault || isNameDefault;
+  };
+
+  useEffect(() => {
+    if (activeMode === 'onboarding' && userData) {
+      if (!onboardName) {
+        if (userData.profile?.name && userData.profile.name !== 'Honored Guest') {
+          setOnboardName(userData.profile.name);
+        } else if (userData.displayName && userData.displayName !== 'Honored Guest') {
+          setOnboardName(userData.displayName);
+        }
+      }
+      
+      if (!onboardPhone) {
+        const currentPhone = userData.profile?.phone || '';
+        const isPhoneDefault = currentPhone === '+91 98765 43210' || currentPhone === '9876543210' || currentPhone === '';
+        if (!isPhoneDefault) {
+          setOnboardPhone(currentPhone.replace(/^\+91\s*/, '').replace(/\s+/g, ''));
+        }
+      }
+    }
+  }, [activeMode, userData, onboardName, onboardPhone]);
+
+  // Biometric Auth Support States
+  const [isBioSupported, setIsBioSupported] = useState(false);
+  const [hasEnrolledKey, setHasEnrolledKey] = useState(false);
+
+  // Check biometric support when the modal is active
+  useEffect(() => {
+    async function checkSupport() {
+      const supported = await isBiometricSupported();
+      setIsBioSupported(supported);
+    }
+    if (isOpen) {
+      checkSupport();
+    }
+  }, [isOpen]);
+
+  // Check if a passkey has been registered for the input email address
+  useEffect(() => {
+    if (email) {
+      const enrolled = !!localStorage.getItem(`recruit_biometric_${email.trim().toLowerCase()}`);
+      setHasEnrolledKey(enrolled);
+    } else {
+      setHasEnrolledKey(false);
+    }
+  }, [email]);
+
+  const handleBiometricLogin = async () => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError("Please input your email address first to login using biometric scanners.");
+      return;
+    }
+    setError(null);
+    setSuccess(null);
+    setIsLoading(true);
+    try {
+      await signInWithBiometrics(trimmedEmail);
+      setSuccess("⚡ Cryptographic signature matched! Logging in securely...");
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Fingerprint / Face ID verification was rejected or cancelled.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   // Phone sign-in states
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -69,11 +156,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setSuccess(null);
     setIsLoading(true);
     try {
-      await signInWithGoogle(role);
-      setSuccess(`Successfully authenticated as ${role === 'recruiter' ? 'Recruiter' : 'Candidate'}! Syncing...`);
-      setTimeout(() => {
-        onClose();
-      }, 1500);
+      const uData = await signInWithGoogle(role);
+      if (checkProfileCompleteness(uData)) {
+        setSuccess('Successfully authenticated! Please complete your mandatory profile details next...');
+        setTimeout(() => {
+          setSuccess(null);
+          setActiveMode('onboarding');
+        }, 1500);
+      } else {
+        setSuccess(`Successfully authenticated as ${role === 'recruiter' ? 'Startup Aspirant' : 'Student & Seeker'}! Syncing...`);
+        setTimeout(() => {
+          onClose();
+        }, 1500);
+      }
     } catch (err: any) {
       console.error(err);
       let errMsg = err.message || 'An error occurred during Google sign-in.';
@@ -99,11 +194,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setSuccess(null);
     setIsLoading(true);
     try {
-      await signInWithApple(role);
-      setSuccess(`Successfully authenticated as ${role === 'recruiter' ? 'Recruiter' : 'Candidate'}! Syncing...`);
-      setTimeout(() => {
-        onClose();
-      }, 1500);
+      const uData = await signInWithApple(role);
+      if (checkProfileCompleteness(uData)) {
+        setSuccess('Successfully authenticated! Please complete your mandatory profile details next...');
+        setTimeout(() => {
+          setSuccess(null);
+          setActiveMode('onboarding');
+        }, 1500);
+      } else {
+        setSuccess(`Successfully authenticated as ${role === 'recruiter' ? 'Startup Aspirant' : 'Student & Seeker'}! Syncing...`);
+        setTimeout(() => {
+          onClose();
+        }, 1500);
+      }
     } catch (err: any) {
       console.error(err);
       let errMsg = err.message || 'An error occurred during Apple sign-in.';
@@ -193,9 +296,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       }
 
       await confirmationResult.confirm(otp);
-      setSuccess('Successfully signed in with Phone! Syncing profile...');
+      setSuccess('Successfully signed in with Phone! Let\'s complete your mandatory profile details...');
       setTimeout(() => {
-        onClose();
+        setSuccess(null);
+        setActiveMode('onboarding');
       }, 1500);
     } catch (err: any) {
       console.error(err);
@@ -220,20 +324,32 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         if (!email || !password) {
           throw new Error('Please fill in all fields.');
         }
-        await signIn(email, password);
-        setSuccess('Successfully signed in! Syncing data...');
-        setTimeout(() => {
-          onClose();
-        }, 1500);
+        const uData = await signIn(email, password);
+        if (checkProfileCompleteness(uData)) {
+          setSuccess('Successfully signed in! Please complete your mandatory profile details...');
+          setTimeout(() => {
+            setSuccess(null);
+            setActiveMode('onboarding');
+          }, 1500);
+        } else {
+          setSuccess('Successfully signed in! Syncing data...');
+          setTimeout(() => {
+            onClose();
+          }, 1500);
+        }
       } else if (activeMode === 'signup') {
         if (!email || !password || !name) {
           throw new Error('Please fill in all fields.');
         }
+        if (!signupPhone || signupPhone.trim().length !== 10) {
+          throw new Error('Please enter your valid 10-digit mobile number.');
+        }
         if (password.length < 6) {
           throw new Error('Password must be at least 6 characters.');
         }
-        await signUp(email, password, name, role);
-        setSuccess(`Account created successfully as ${role === 'recruiter' ? 'Recruiter' : 'Candidate'}! Welcome to Recruit India.`);
+        const formattedPhone = `+91 ${signupPhone.trim().slice(0, 5)} ${signupPhone.trim().slice(5)}`;
+        await signUp(email, password, name, role, formattedPhone);
+        setSuccess(`Account created successfully as ${role === 'recruiter' ? 'Startup Aspirant' : 'Student & Seeker'}! Welcome to Recruit India.`);
         setTimeout(() => {
           onClose();
         }, 1500);
@@ -260,6 +376,41 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         errMsg = 'The password is too weak. Must be at least 6 characters.';
       }
       setError(errMsg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOnboardingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    setIsLoading(true);
+
+    try {
+      if (!onboardName.trim()) {
+        throw new Error('Please enter your Full Name.');
+      }
+      if (!onboardPhone || onboardPhone.replace(/\D/g, '').length !== 10) {
+        throw new Error('Please enter a valid 10-digit mobile number.');
+      }
+
+      const cleanPhone = onboardPhone.replace(/\D/g, '');
+      const formattedPhone = `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`;
+
+      await updateUserProfile({
+        name: onboardName.trim(),
+        phone: formattedPhone
+      });
+
+      setSuccess('Mandatory details updated successfully! Welcome back.');
+      setTimeout(() => {
+        onClose();
+        setActiveMode('signin');
+      }, 1500);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Failed to update mandatory details.');
     } finally {
       setIsLoading(false);
     }
@@ -301,40 +452,122 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         </div>
 
         {/* Account Type Selector */}
-        {activeMode !== 'forgot' && (
+        {activeMode !== 'forgot' && activeMode !== 'onboarding' && (
           <div className="space-y-1.5 mb-6 animate-in fade-in slide-in-from-top-4 duration-300">
             <label className="text-[10px] font-bold text-slate-300 uppercase tracking-wider block text-center">
-              Select Your Role / Account Type
+              Select Your Profile Type
             </label>
             <div className="grid grid-cols-2 gap-2 bg-[#070414] p-1 rounded-xl border border-[#231a4c]">
               <button
                 type="button"
                 onClick={() => setRole('candidate')}
-                className={`py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                className={`py-2 px-3 rounded-lg font-bold text-xs flex flex-col items-center justify-center gap-1 cursor-pointer transition-all ${
                   role === 'candidate'
                     ? 'bg-gradient-to-r from-purple-600/30 to-indigo-600/30 border border-[#7c3aed] text-white shadow-lg shadow-purple-500/10'
                     : 'text-slate-400 hover:text-white border border-transparent'
                 }`}
               >
-                <span className="text-sm">🧑‍🎓 Job Seeker</span>
+                <span className="text-base">🧑‍🎓</span>
+                <span className="text-[10px] font-black uppercase tracking-wider">Student &amp; Seeker</span>
               </button>
               <button
                 type="button"
                 onClick={() => setRole('recruiter')}
-                className={`py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                className={`py-2 px-3 rounded-lg font-bold text-xs flex flex-col items-center justify-center gap-1 cursor-pointer transition-all ${
                   role === 'recruiter'
                     ? 'bg-gradient-to-r from-purple-600/30 to-indigo-600/30 border border-[#7c3aed] text-white shadow-lg shadow-purple-500/10'
                     : 'text-slate-400 hover:text-white border border-transparent'
                 }`}
               >
-                <span className="text-sm">🏢 Recruiter</span>
+                <span className="text-base">🚀</span>
+                <span className="text-[10px] font-black uppercase tracking-wider">Startup Aspirant</span>
               </button>
             </div>
           </div>
         )}
 
         {/* Mode-specific content */}
-        {activeMode === 'phone' ? (
+        {activeMode === 'onboarding' ? (
+          /* MANDATORY PROFILE ONBOARDING */
+          <div className="space-y-4">
+            <div className="p-4 bg-[#08051a] border border-[#231a4c] rounded-2xl mb-4 text-center">
+              <Sparkles className="w-8 h-8 text-yellow-400 mx-auto mb-2 animate-bounce" />
+              <h3 className="text-sm font-black text-white mb-1 uppercase tracking-wider">
+                Complete Your Profile Setup
+              </h3>
+              <p className="text-xs text-slate-400 leading-normal">
+                Name and Mobile number are mandatory to access the Recruit India platform dashboards, courses, and job boards.
+              </p>
+            </div>
+
+            {error && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-200 text-xs flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <span className="font-semibold leading-relaxed">{error}</span>
+              </div>
+            )}
+
+            {success && (
+              <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-200 text-xs flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5 animate-bounce" />
+                <span className="font-semibold leading-relaxed">{success}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleOnboardingSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-300 uppercase tracking-wider block">Full Name</label>
+                <div className="relative">
+                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <input
+                    type="text"
+                    placeholder="Enter your name"
+                    value={onboardName}
+                    onChange={(e) => setOnboardName(e.target.value)}
+                    className="w-full bg-[#070414] border border-[#231a4c] rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 transition-all"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-300 uppercase tracking-wider block">Mobile Number</label>
+                <div className="relative flex">
+                  <div className="flex items-center justify-center bg-[#070414] border border-[#231a4c] border-r-0 rounded-l-xl px-3 text-xs font-bold text-slate-300">
+                    +91
+                  </div>
+                  <div className="relative flex-1">
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                    <input
+                      type="tel"
+                      placeholder="9876543210"
+                      value={onboardPhone}
+                      onChange={(e) => setOnboardPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      className="w-full bg-[#070414] border border-[#231a4c] rounded-r-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 transition-all"
+                      required
+                      pattern="[0-9]{10}"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 transition-all transform active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <span>Save &amp; Enter Dashboard</span>
+                )}
+              </button>
+            </form>
+          </div>
+        ) : activeMode === 'phone' ? (
           /* PHONE SIGN-IN FLOW */
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-2">
@@ -510,20 +743,44 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               
               {/* Full Name field (for Signup only) */}
               {activeMode === 'signup' && (
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-300 uppercase tracking-wider block">Full Name</label>
-                  <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                    <input
-                      type="text"
-                      placeholder="Enter your name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-[#070414] border border-[#231a4c] rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 transition-all"
-                      required
-                    />
+                <>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-300 uppercase tracking-wider block">Full Name</label>
+                    <div className="relative">
+                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                      <input
+                        type="text"
+                        placeholder="Enter your name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full bg-[#070414] border border-[#231a4c] rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 transition-all"
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-300 uppercase tracking-wider block">Mobile Number</label>
+                    <div className="relative flex">
+                      <div className="flex items-center justify-center bg-[#070414] border border-[#231a4c] border-r-0 rounded-l-xl px-3 text-xs font-bold text-slate-300">
+                        +91
+                      </div>
+                      <div className="relative flex-1">
+                        <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                        <input
+                          type="tel"
+                          placeholder="9876543210"
+                          value={signupPhone}
+                          onChange={(e) => setSignupPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                          className="w-full bg-[#070414] border border-[#231a4c] rounded-r-xl py-2.5 pl-10 pr-4 text-xs font-semibold text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 transition-all"
+                          required
+                          pattern="[0-9]{10}"
+                        />
+                      </div>
+                    </div>
+                    <span className="text-[9px] text-slate-500 block">Enter your 10-digit mobile number for mandatory verification.</span>
+                  </div>
+                </>
               )}
 
               {/* Email field */}
@@ -595,6 +852,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   </span>
                 )}
               </button>
+
+              {/* Biometric login shortcut */}
+              {activeMode === 'signin' && isBioSupported && hasEnrolledKey && (
+                <button
+                  type="button"
+                  onClick={handleBiometricLogin}
+                  disabled={isLoading}
+                  className="w-full py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider text-[#a78bfa] bg-[#120a2e] hover:bg-[#1a0e3f] border border-purple-500/30 hover:border-purple-500/60 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Fingerprint className="w-4 h-4 text-purple-400 animate-pulse" />
+                  <span>SIGN IN WITH TOUCH ID / FACE ID</span>
+                </button>
+              )}
 
               {/* Back to sign in link for Forgot Password mode */}
               {activeMode === 'forgot' && (

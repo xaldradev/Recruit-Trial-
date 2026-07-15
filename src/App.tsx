@@ -28,6 +28,7 @@ import NotificationToast from './components/NotificationToast';
 import WelcomeLanding from './components/WelcomeLanding';
 import ArohiAvatar from './components/ArohiAvatar';
 import WalkthroughTour from './components/WalkthroughTour';
+import FranchisePage from './components/FranchisePage';
 
 import { initialPostings } from './data/initialData';
 import { INITIAL_REVIEWS, Review } from './data/reviewsData';
@@ -147,6 +148,11 @@ export default function App() {
     if (path === '/admin' || window.location.hash === '#admin' || window.location.search.includes('admin')) {
       return 'admin';
     }
+    const tab = path.replace('/', '') || 'home';
+    const validTabs = ['home', 'jobs', 'career', 'resume', 'interview', 'business', 'schemes', 'courses', 'syllabus', 'dashboard', 'employer', 'admin', 'arohi', 'privacy', 'terms', 'refunds', 'payments', 'contact', 'faqs', 'franchise'];
+    if (validTabs.includes(tab)) {
+      return tab;
+    }
     return 'home';
   });
   const [prevTab, setPrevTab] = useState('home');
@@ -160,7 +166,7 @@ export default function App() {
         setActiveTab('admin');
       } else {
         const tab = path.replace('/', '') || 'home';
-        const validTabs = ['home', 'jobs', 'career', 'resume', 'interview', 'business', 'schemes', 'courses', 'syllabus', 'dashboard', 'employer', 'admin', 'arohi', 'privacy', 'terms', 'refunds', 'payments', 'contact', 'faqs'];
+        const validTabs = ['home', 'jobs', 'career', 'resume', 'interview', 'business', 'schemes', 'courses', 'syllabus', 'dashboard', 'employer', 'admin', 'arohi', 'privacy', 'terms', 'refunds', 'payments', 'contact', 'faqs', 'franchise'];
         if (validTabs.includes(tab)) {
           setActiveTab(tab);
         } else {
@@ -180,6 +186,18 @@ export default function App() {
       window.history.pushState(null, '', targetPath);
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    // Initial page load telemetry for Recruit.org.in persistent visitor counter
+    fetch('/api/track-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'visit',
+        description: 'Anonymous visitor loaded Recruit.org.in landing interface'
+      })
+    }).catch(err => console.log('Telemetry offline:', err));
+  }, []);
 
   useEffect(() => {
     if (activeTab !== currentTabRef.current) {
@@ -222,6 +240,7 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedPosting, setSelectedPosting] = useState<Posting | null>(null);
   const [activeDepartment, setActiveDepartment] = useState('All');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isChatMinimized, setIsChatMinimized] = useState(false);
   const [isSyncingJobs, setIsSyncingJobs] = useState(false);
@@ -737,6 +756,10 @@ export default function App() {
     }
 
     return matchesSearch && matchesCategory && matchesDepartment && matchesRegion && matchesSector;
+  }).sort((a, b) => {
+    const dateA = new Date(a.postDate).getTime() || 0;
+    const dateB = new Date(b.postDate).getTime() || 0;
+    return sortBy === 'newest' ? dateB - dateA : dateA - dateB;
   });
 
   const getCategorizedPostings = (cat: CategoryType) => {
@@ -868,6 +891,8 @@ export default function App() {
             </div>
           </div>
         );
+      case 'franchise':
+        return <FranchisePage />;
       default:
         return renderHomeHero();
     }
@@ -2013,6 +2038,20 @@ export default function App() {
                 </button>
               </div>
             </div>
+
+            {/* Sorting Dropdown */}
+            <div className="flex items-center gap-2 shrink-0 bg-[#0a0715] border border-[#2d2163] rounded-xl px-3 py-2.5 focus-within:border-[#7c3aed] transition-all">
+              <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider whitespace-nowrap">Sort:</span>
+              <select
+                id="jobs-sort-by-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest')}
+                className="bg-transparent text-xs font-black text-[#c084fc] hover:text-white focus:outline-none cursor-pointer pr-1"
+              >
+                <option value="newest" className="bg-[#0f0b24] text-white font-bold">Newest First</option>
+                <option value="oldest" className="bg-[#0f0b24] text-white font-bold">Oldest First</option>
+              </select>
+            </div>
           </div>
 
           {/* Voice Search Status & Errors */}
@@ -2994,10 +3033,19 @@ export default function App() {
             </button>
           </div>
 
-          {/* Col 2: Legal Documents */}
+          {/* Col 2: Legal Documents & Opportunities */}
           <div className="space-y-3">
-            <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Legal Documents</h4>
+            <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Links &amp; Documents</h4>
             <ul className="space-y-2 text-xs font-semibold">
+              <li>
+                <button 
+                  onClick={() => setActiveTab('franchise')} 
+                  className="text-slate-400 hover:text-white transition-colors cursor-pointer text-left font-black text-purple-400 hover:text-purple-300 flex items-center gap-1.5"
+                >
+                  <span>AECN Franchise Hub</span>
+                  <span className="bg-purple-600/25 border border-purple-500/30 text-purple-300 text-[8px] font-black uppercase px-1.5 py-0.5 rounded-full animate-pulse">New</span>
+                </button>
+              </li>
               <li>
                 <button 
                   onClick={() => setActiveTab('privacy')} 

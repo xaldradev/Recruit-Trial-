@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Bot, Sparkles, Award, Menu, X, Landmark, Briefcase, Settings, User, BookOpen, FileText, ChevronDown, LogOut, LogIn, ShieldCheck, Globe, Share2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
@@ -110,6 +111,7 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
     { id: 'courses', label: getTranslation('skills', language), hasDropdown: true },
     { id: 'syllabus', label: getTranslation('syllabus', language), hasBadge: true, badgeText: 'Odia/CBSE' },
     { id: 'business', label: getTranslation('business', language), hasBadge: true, badgeText: 'New' },
+    { id: 'franchise', label: 'Franchise (AECN)', hasBadge: true, badgeText: 'AI Hub' },
     { id: 'arohi', label: getTranslation('arohiChat', language), hasDropdown: false },
     { id: 'employer', label: 'Recruiters', hasBadge: true, badgeText: 'Free' },
     { id: 'privacy', label: 'Privacy', hasDropdown: false },
@@ -123,7 +125,8 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
   const secondaryLinks = navLinks.filter(l => ['privacy', 'terms', 'refunds', 'payments', 'contact'].includes(l.id));
 
   return (
-    <header className="sticky top-0 z-50 bg-[#06040b] border-b border-[#171329] text-white shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
+    <>
+      <header className="sticky top-0 z-50 bg-[#06040b] border-b border-[#171329] text-white shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
       
       {/* Top micro promo banner - Replaced with premium Apple-style status announcement */}
       <div className="bg-gradient-to-r from-[#070510] via-[#100a29] to-[#070510] text-slate-300 text-xs py-2 px-4 flex justify-center items-center gap-3 overflow-hidden border-b border-[#1b1535] text-center shadow-md">
@@ -147,7 +150,7 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
       </div>
 
       {/* Main Navbar: Height 80px */}
-      <div className="max-w-7xl mx-auto px-4 h-20 flex justify-between items-center gap-4">
+      <div className="max-w-7xl mx-auto px-4 min-h-20 h-auto py-2 sm:py-0 flex justify-between items-center gap-4">
         
         {/* Left Side: Logo */}
         <div 
@@ -368,20 +371,23 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
             </div>
           )}
 
-          {/* Mobile Menu Icon */}
+          {/* Mobile Menu Icon with responsive width, padding and touch-safe targets */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="xl:hidden p-2 rounded-xl bg-[#1c1836] hover:bg-[#2c2654] border border-[#2d255a] cursor-pointer"
+            className="xl:hidden p-3 sm:p-3.5 rounded-2xl bg-[#1c1836] hover:bg-[#2c2654] border border-[#2d255a] hover:border-purple-500/50 cursor-pointer flex items-center justify-center min-w-[44px] sm:min-w-[48px] h-11 sm:h-12 text-slate-100 hover:text-white transition-all shadow-md active:scale-95 shrink-0"
+            aria-label="Navigation Menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-5.5 h-5.5 sm:w-6 sm:h-6" /> : <Menu className="w-5.5 h-5.5 sm:w-6 sm:h-6" />}
           </button>
 
         </div>
 
       </div>
 
-      {/* Mobile Navigation Menu */}
-      <AnimatePresence>
+    </header>
+
+    {/* Mobile Navigation Menu */}
+    <AnimatePresence>
         {mobileMenuOpen && (
           <>
             {/* Immersive backdrop with custom blur and fade */}
@@ -393,49 +399,38 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
               className="fixed inset-0 bg-[#04020a]/85 backdrop-blur-md z-[100] xl:hidden"
             />
 
-            {/* Immersive 3D perspective floating menu */}
-            <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 xl:hidden pointer-events-none perspective-[1200px]">
+            {/* Elegant premium immersive mobile menu */}
+            <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 xl:hidden pointer-events-none">
               <motion.div
                 initial={{ 
                   opacity: 0, 
-                  scale: 0.85, 
-                  rotateX: 18, 
-                  rotateY: -10, 
-                  z: -150,
-                  y: -30
+                  scale: 0.92, 
+                  y: 15
                 }}
                 animate={{ 
                   opacity: 1, 
                   scale: 1, 
-                  rotateX: 0, 
-                  rotateY: 0, 
-                  z: 0,
                   y: 0,
                   transition: { 
                     type: 'spring', 
-                    damping: 24, 
-                    stiffness: 110,
-                    mass: 1
+                    damping: 25, 
+                    stiffness: 150
                   }
                 }}
                 exit={{ 
                   opacity: 0, 
-                  scale: 0.9, 
-                  rotateX: -15, 
-                  rotateY: 5, 
-                  z: -100,
-                  y: 40,
-                  transition: { duration: 0.25 }
+                  scale: 0.95, 
+                  y: 10,
+                  transition: { duration: 0.15 }
                 }}
-                style={{ transformStyle: 'preserve-3d' }}
-                className="pointer-events-auto relative w-full max-w-md bg-[#0a061a]/90 border border-purple-500/40 rounded-[2.5rem] p-6 sm:p-8 shadow-[0_30px_70px_rgba(124,58,237,0.35)] overflow-hidden flex flex-col max-h-[85vh]"
+                className="pointer-events-auto relative w-full max-w-md bg-[#0a061a]/95 border border-purple-500/40 rounded-[2rem] sm:rounded-[2.5rem] p-4 sm:p-7 shadow-[0_30px_70px_rgba(124,58,237,0.35)] overflow-hidden flex flex-col h-[calc(100dvh-2rem)] sm:h-[85vh] max-h-[800px]"
               >
                 {/* Decorative premium corner glowing rings */}
                 <div className="absolute -top-32 -left-32 w-64 h-64 rounded-full bg-purple-600/25 blur-3xl pointer-events-none animate-pulse" />
                 <div className="absolute -bottom-32 -right-32 w-64 h-64 rounded-full bg-blue-500/20 blur-3xl pointer-events-none animate-pulse" />
                 
-                {/* Header section of 3D floating board */}
-                <div className="flex justify-between items-center pb-4 mb-4 border-b border-purple-950/40 relative z-10" style={{ transform: 'translateZ(30px)' }}>
+                {/* Header section of mobile floating board */}
+                <div className="flex justify-between items-center pb-4 mb-4 border-b border-purple-950/40 relative z-10">
                   <div className="flex items-center gap-2.5">
                     <div className="bg-[#7c3aed] p-2 rounded-xl border border-purple-400/30">
                       <Bot className="w-5 h-5 text-white animate-bounce" />
@@ -455,220 +450,224 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
 
                 {/* Grid of Link items: Scrollable container */}
                 <div 
-                  className="flex-1 overflow-y-auto pr-1 flex flex-col gap-2 relative z-10 custom-scrollbar mb-4 py-1"
-                  style={{ transform: 'translateZ(20px)' }}
+                  className="flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col relative z-10 custom-scrollbar py-1"
                 >
-                  {navLinks.map((link, idx) => {
-                    const isActive = activeTab === link.id;
-                    
-                    // Inline helper to render icons inside the menu beautifully
-                    const getLinkIcon = (id: string) => {
-                      switch (id) {
-                        case 'home': return <Landmark className="w-4 h-4 text-purple-400" />;
-                        case 'dashboard': return <User className="w-4 h-4 text-[#00e676]" />;
-                        case 'jobs': return <Briefcase className="w-4 h-4 text-blue-400" />;
-                        case 'courses': return <BookOpen className="w-4 h-4 text-emerald-400" />;
-                        case 'syllabus': return <FileText className="w-4 h-4 text-amber-400" />;
-                        case 'business': return <Sparkles className="w-4 h-4 text-pink-400" />;
-                        case 'arohi': return <Bot className="w-4 h-4 text-fuchsia-400" />;
-                        case 'employer': return <Briefcase className="w-4 h-4 text-rose-400" />;
-                        case 'privacy': return <ShieldCheck className="w-4 h-4 text-teal-400" />;
-                        case 'terms': return <FileText className="w-4 h-4 text-indigo-400" />;
-                        case 'refunds': return <Landmark className="w-4 h-4 text-red-400" />;
-                        case 'payments': return <Award className="w-4 h-4 text-violet-400" />;
-                        case 'contact': return <User className="w-4 h-4 text-cyan-400" />;
-                        default: return <Sparkles className="w-4 h-4 text-purple-400" />;
-                      }
-                    };
+                  {/* Navigation Links List */}
+                  <div className="flex flex-col gap-2 mb-4">
+                    {navLinks.map((link, idx) => {
+                      const isActive = activeTab === link.id;
+                      
+                      // Inline helper to render icons inside the menu beautifully
+                      const getLinkIcon = (id: string) => {
+                        switch (id) {
+                          case 'home': return <Landmark className="w-4 h-4 text-purple-400" />;
+                          case 'dashboard': return <User className="w-4 h-4 text-[#00e676]" />;
+                          case 'jobs': return <Briefcase className="w-4 h-4 text-blue-400" />;
+                          case 'courses': return <BookOpen className="w-4 h-4 text-emerald-400" />;
+                          case 'syllabus': return <FileText className="w-4 h-4 text-amber-400" />;
+                          case 'business': return <Sparkles className="w-4 h-4 text-pink-400" />;
+                          case 'arohi': return <Bot className="w-4 h-4 text-fuchsia-400" />;
+                          case 'employer': return <Briefcase className="w-4 h-4 text-rose-400" />;
+                          case 'privacy': return <ShieldCheck className="w-4 h-4 text-teal-400" />;
+                          case 'terms': return <FileText className="w-4 h-4 text-indigo-400" />;
+                          case 'refunds': return <Landmark className="w-4 h-4 text-red-400" />;
+                          case 'payments': return <Award className="w-4 h-4 text-violet-400" />;
+                          case 'contact': return <User className="w-4 h-4 text-cyan-400" />;
+                          default: return <Sparkles className="w-4 h-4 text-purple-400" />;
+                        }
+                      };
 
-                    return (
-                      <motion.button
-                        key={link.id}
-                        initial={{ opacity: 0, x: -15, z: -20 }}
-                        animate={{ 
-                          opacity: 1, 
-                          x: 0, 
-                          z: 0,
-                          transition: { delay: idx * 0.03 } 
-                        }}
-                        whileHover={{ 
-                          scale: 1.02, 
-                          x: 4, 
-                          translateZ: 15,
-                          backgroundColor: 'rgba(124, 58, 237, 0.15)',
-                          borderColor: 'rgba(167, 139, 250, 0.4)' 
-                        }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          onTabChange(link.id);
-                          setMobileMenuOpen(false);
-                        }}
-                        className={`w-full text-left py-3 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-between border cursor-pointer ${
-                          isActive
-                            ? 'bg-gradient-to-r from-[#2c1d54] to-[#1a113a] text-white border-purple-500 shadow-[0_4px_15px_rgba(124,58,237,0.25)]'
-                            : 'bg-[#120a28]/60 text-slate-300 border-purple-950/40 hover:text-white'
-                        }`}
+                      return (
+                        <motion.button
+                          key={link.id}
+                          initial={{ opacity: 0, x: -15 }}
+                          animate={{ 
+                            opacity: 1, 
+                            x: 0, 
+                            transition: { delay: idx * 0.03 } 
+                          }}
+                          whileHover={{ 
+                            scale: 1.02, 
+                            x: 4, 
+                            backgroundColor: 'rgba(124, 58, 237, 0.15)',
+                            borderColor: 'rgba(167, 139, 250, 0.4)' 
+                          }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => {
+                            onTabChange(link.id);
+                            setMobileMenuOpen(false);
+                          }}
+                          className={`w-full text-left py-3 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-between border cursor-pointer ${
+                            isActive
+                              ? 'bg-gradient-to-r from-[#2c1d54] to-[#1a113a] text-white border-purple-500 shadow-[0_4px_15px_rgba(124,58,237,0.25)]'
+                              : 'bg-[#120a28]/60 text-slate-300 border-purple-950/40 hover:text-white'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className={`p-1.5 rounded-lg ${isActive ? 'bg-purple-500/25' : 'bg-purple-950/40'}`}>
+                              {getLinkIcon(link.id)}
+                            </span>
+                            <span className="tracking-wide">{link.label}</span>
+                          </div>
+                          
+                          {link.hasBadge && (
+                            <span className="bg-gradient-to-r from-purple-600 to-pink-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse shadow-sm">
+                              {link.badgeText}
+                            </span>
+                          )}
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Profile/Auth CTA panel inside the scrollable board wrapper */}
+                  <div 
+                    className="pt-4 border-t border-purple-950/40 relative z-10 mt-auto"
+                  >
+                    {/* Mobile Language Selector */}
+                    <div className="mb-2.5 px-3 py-1.5 bg-[#120a28]/60 border border-purple-950/40 rounded-xl flex flex-col gap-1 transition-all">
+                      <button
+                        onClick={() => setIsMobileLangOpen(!isMobileLangOpen)}
+                        className="flex items-center justify-between w-full text-left cursor-pointer py-1"
                       >
-                        <div className="flex items-center gap-3">
-                          <span className={`p-1.5 rounded-lg ${isActive ? 'bg-purple-500/25' : 'bg-purple-950/40'}`}>
-                            {getLinkIcon(link.id)}
+                        <div className="flex items-center gap-2">
+                          <Globe className="w-4 h-4 text-purple-400" />
+                          <span className="text-xs text-slate-300 font-bold">
+                            {getTranslation('selectLang', language)}: <span className="text-emerald-400 font-extrabold ml-1">
+                              {LANGUAGES_LIST.find(l => l.code === language)?.native || 'English'}
+                            </span>
                           </span>
-                          <span className="tracking-wide">{link.label}</span>
+                        </div>
+                        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-300 ${isMobileLangOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      
+                      {isMobileLangOpen && (
+                        <div className="grid grid-cols-3 gap-1 mt-1 max-h-32 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-purple-900/60 scrollbar-track-transparent animate-in fade-in slide-in-from-top-1.5 duration-200">
+                          {LANGUAGES_LIST.map((lang) => (
+                            <button
+                              key={lang.code}
+                              onClick={() => {
+                                onLanguageChange(lang.code as Language);
+                                setIsMobileLangOpen(false);
+                              }}
+                              className={`px-1.5 py-1 rounded-lg text-[9px] font-black cursor-pointer transition-all text-center truncate ${
+                                language === lang.code
+                                  ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white border border-purple-400/45 shadow-md'
+                                  : 'bg-purple-950/35 hover:bg-purple-900/30 text-slate-300 border border-purple-950/40'
+                              }`}
+                              title={`${lang.native} ${lang.english ? `(${lang.english})` : ''}`}
+                            >
+                              {lang.native}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Grid for Welcome Intro and Share buttons if present */}
+                    {(onRevisitWelcome || onShare) && (
+                      <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+                        {onRevisitWelcome && (
+                          <motion.button
+                            whileHover={{ scale: 1.02, backgroundColor: 'rgba(124, 58, 237, 0.15)', borderColor: 'rgba(124, 58, 237, 0.4)' }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              onRevisitWelcome();
+                              setMobileMenuOpen(false);
+                            }}
+                            className="w-full text-center bg-purple-950/30 border border-purple-500/25 text-[#c8bdfd] py-2 rounded-xl text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                            <span>3D Intro</span>
+                          </motion.button>
+                        )}
+
+                        {onShare && (
+                          <motion.button
+                            whileHover={{ scale: 1.02, backgroundColor: 'rgba(0, 230, 118, 0.15)' }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              onShare();
+                              setMobileMenuOpen(false);
+                            }}
+                            className="w-full text-center bg-gradient-to-r from-emerald-500/10 via-[#00e676]/10 to-teal-500/10 border border-[#00e676]/30 text-[#00e676] py-2 rounded-xl text-[10px] font-black uppercase tracking-wider cursor-pointer flex items-center justify-center gap-1.5 transition-all shadow-sm"
+                          >
+                            <Share2 className="w-3.5 h-3.5 text-[#00e676]" />
+                            <span>Share App</span>
+                          </motion.button>
+                        )}
+                      </div>
+                    )}
+
+                     {user ? (
+                      <div className="flex flex-col gap-2.5">
+                        <div 
+                          onClick={() => {
+                            onTabChange('dashboard');
+                            setMobileMenuOpen(false);
+                          }}
+                          className="flex items-center gap-3 px-3.5 py-2 bg-[#130b2c]/80 hover:bg-[#1a0f3d]/80 border border-purple-950/40 rounded-xl shadow-inner cursor-pointer transition-all"
+                          title="Go to User Dashboard"
+                        >
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#7c3aed] to-[#a855f7] flex items-center justify-center text-white text-[10px] font-black uppercase shadow-md border border-purple-400/30">
+                            {userData?.profile?.name?.slice(0, 2) || user.displayName?.slice(0, 2) || 'IN'}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[11px] font-black text-white uppercase tracking-wide truncate">
+                              {userData?.profile?.name || user.displayName}
+                            </p>
+                            <p className="text-[8px] text-slate-400 font-bold tracking-tight truncate leading-none mt-0.5">
+                              {user.email}
+                            </p>
+                          </div>
+                          <div className="flex h-2 w-2 relative">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                          </div>
                         </div>
                         
-                        {link.hasBadge && (
-                          <span className="bg-gradient-to-r from-purple-600 to-pink-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse shadow-sm">
-                            {link.badgeText}
-                          </span>
-                        )}
-                      </motion.button>
-                    );
-                  })}
-                </div>
-
-                {/* Profile/Auth CTA panel at the bottom of the board */}
-                <div 
-                  className="pt-4 border-t border-purple-950/40 relative z-10 mt-auto"
-                  style={{ transform: 'translateZ(40px)' }}
-                >
-                  {/* Mobile Language Selector */}
-                  <div className="mb-3 px-3 py-2 bg-[#120a28]/60 border border-purple-950/40 rounded-2xl flex flex-col gap-1.5 transition-all">
-                    <button
-                      onClick={() => setIsMobileLangOpen(!isMobileLangOpen)}
-                      className="flex items-center justify-between w-full text-left cursor-pointer py-1"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Globe className="w-4 h-4 text-purple-400" />
-                        <span className="text-xs text-slate-300 font-bold">
-                          {getTranslation('selectLang', language)}: <span className="text-emerald-400 font-extrabold ml-1">
-                            {LANGUAGES_LIST.find(l => l.code === language)?.native || 'English'}
-                          </span>
-                        </span>
+                        <motion.button
+                          whileHover={{ scale: 1.02, backgroundColor: 'rgba(239, 68, 68, 0.25)', borderColor: 'rgba(239, 68, 68, 0.4)' }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => {
+                            signOutUser();
+                            setMobileMenuOpen(false);
+                          }}
+                          className="w-full text-center bg-red-950/40 border border-red-500/20 text-red-200 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest cursor-pointer shadow-md transition-colors"
+                        >
+                          Sign Out
+                        </motion.button>
                       </div>
-                      <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-300 ${isMobileLangOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    
-                    {isMobileLangOpen && (
-                      <div className="grid grid-cols-3 gap-1 mt-1 max-h-32 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-purple-900/60 scrollbar-track-transparent animate-in fade-in slide-in-from-top-1.5 duration-200">
-                        {LANGUAGES_LIST.map((lang) => (
-                          <button
-                            key={lang.code}
+                    ) : (
+                      <div className="flex flex-col gap-2.5">
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <motion.button
+                            whileHover={{ scale: 1.02, backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                            whileTap={{ scale: 0.98 }}
                             onClick={() => {
-                              onLanguageChange(lang.code as Language);
-                              setIsMobileLangOpen(false);
+                              onOpenAuth();
+                              setMobileMenuOpen(false);
                             }}
-                            className={`px-1.5 py-1 rounded-lg text-[9px] font-black cursor-pointer transition-all text-center truncate ${
-                              language === lang.code
-                                ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white border border-purple-400/45 shadow-md'
-                                : 'bg-purple-950/35 hover:bg-purple-900/30 text-slate-300 border border-purple-950/40'
-                            }`}
-                            title={`${lang.native} ${lang.english ? `(${lang.english})` : ''}`}
+                            className="w-full text-center bg-purple-950/20 hover:bg-[#130b2c] border border-purple-500/25 text-purple-300 hover:text-white py-2.5 rounded-xl text-xs font-black uppercase tracking-wider cursor-pointer transition-all"
                           >
-                            {lang.native}
-                          </button>
-                        ))}
+                            Sign In
+                          </motion.button>
+                          
+                          <motion.button
+                            whileHover={{ scale: 1.02, boxShadow: '0 0 20px rgba(124, 58, 237, 0.4)' }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              onOpenAuth();
+                              setMobileMenuOpen(false);
+                            }}
+                            className="w-full text-center bg-gradient-to-r from-[#7c3aed] to-[#a855f7] text-white py-2.5 rounded-xl text-xs font-black uppercase tracking-wider cursor-pointer shadow-lg"
+                          >
+                            Sign Up
+                          </motion.button>
+                        </div>
                       </div>
                     )}
                   </div>
-
-                  {onRevisitWelcome && (
-                    <motion.button
-                      whileHover={{ scale: 1.02, backgroundColor: 'rgba(124, 58, 237, 0.15)', borderColor: 'rgba(124, 58, 237, 0.4)' }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        onRevisitWelcome();
-                        setMobileMenuOpen(false);
-                      }}
-                      className="w-full text-center bg-purple-950/30 border border-purple-500/25 text-[#c8bdfd] py-3 rounded-2xl text-xs font-black uppercase tracking-wider cursor-pointer mb-3 transition-all flex items-center justify-center gap-1.5"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-                      <span>3D Welcome Intro</span>
-                    </motion.button>
-                  )}
-
-                   {user ? (
-                    <div className="flex flex-col gap-3">
-                      <div 
-                        onClick={() => {
-                          onTabChange('dashboard');
-                          setMobileMenuOpen(false);
-                        }}
-                        className="flex items-center gap-3 px-4 py-3 bg-[#130b2c]/80 hover:bg-[#1a0f3d]/80 border border-purple-950/40 rounded-2xl shadow-inner cursor-pointer transition-all"
-                        title="Go to User Dashboard"
-                      >
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#7c3aed] to-[#a855f7] flex items-center justify-center text-white text-xs font-black uppercase shadow-md border border-purple-400/30">
-                          {userData?.profile?.name?.slice(0, 2) || user.displayName?.slice(0, 2) || 'IN'}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-black text-white uppercase tracking-wide truncate">
-                            {userData?.profile?.name || user.displayName}
-                          </p>
-                          <p className="text-[9px] text-slate-400 font-bold tracking-tight truncate leading-none mt-0.5">
-                            {user.email}
-                          </p>
-                        </div>
-                        <div className="flex h-2.5 w-2.5 relative">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                        </div>
-                      </div>
-                      
-                      <motion.button
-                        whileHover={{ scale: 1.02, backgroundColor: 'rgba(239, 68, 68, 0.25)', borderColor: 'rgba(239, 68, 68, 0.4)' }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          signOutUser();
-                          setMobileMenuOpen(false);
-                        }}
-                        className="w-full text-center bg-red-950/40 border border-red-500/20 text-red-200 py-3 rounded-2xl text-xs font-black uppercase tracking-widest cursor-pointer shadow-md transition-colors"
-                      >
-                        Sign Out
-                      </motion.button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-2.5">
-                      <div className="grid grid-cols-2 gap-2.5">
-                        <motion.button
-                          whileHover={{ scale: 1.02, backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => {
-                            onOpenAuth();
-                            setMobileMenuOpen(false);
-                          }}
-                          className="w-full text-center bg-purple-950/20 hover:bg-[#130b2c] border border-purple-500/25 text-purple-300 hover:text-white py-3 rounded-2xl text-xs font-black uppercase tracking-wider cursor-pointer transition-all"
-                        >
-                          Sign In
-                        </motion.button>
-                        
-                        <motion.button
-                          whileHover={{ scale: 1.02, boxShadow: '0 0 20px rgba(124, 58, 237, 0.4)' }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => {
-                            onOpenAuth();
-                            setMobileMenuOpen(false);
-                          }}
-                          className="w-full text-center bg-gradient-to-r from-[#7c3aed] to-[#a855f7] text-white py-3 rounded-2xl text-xs font-black uppercase tracking-wider cursor-pointer shadow-lg"
-                        >
-                          Sign Up
-                        </motion.button>
-                      </div>
-                    </div>
-                  )}
-
-                  {onShare && (
-                    <motion.button
-                      whileHover={{ scale: 1.02, backgroundColor: 'rgba(0, 230, 118, 0.15)' }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        onShare();
-                        setMobileMenuOpen(false);
-                      }}
-                      className="w-full text-center bg-gradient-to-r from-emerald-500/10 via-[#00e676]/10 to-teal-500/10 border border-[#00e676]/30 text-[#00e676] py-3 rounded-2xl text-xs font-black uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2 mt-4 shadow-sm"
-                    >
-                      <Share2 className="w-4 h-4 text-[#00e676]" />
-                      <span>Share Platform with Friends</span>
-                    </motion.button>
-                  )}
                 </div>
 
               </motion.div>
@@ -676,7 +675,6 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
           </>
         )}
       </AnimatePresence>
-
-    </header>
+    </>
   );
 }

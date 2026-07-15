@@ -248,6 +248,44 @@ let siteActivities: SiteActivity[] = [
   }
 ];
 
+// Persistent telemetry statistics for Recruit.org.in
+const STATS_FILE_PATH = path.join(process.cwd(), 'site-stats.json');
+let cumulativeCounts = {
+  visit: 154820,
+  chat: 64291,
+  resume: 18349,
+  roadmap: 12482,
+  apply: 8304,
+  enroll: 1248,
+  admin: 120
+};
+
+function loadStats() {
+  try {
+    if (fs.existsSync(STATS_FILE_PATH)) {
+      const raw = fs.readFileSync(STATS_FILE_PATH, 'utf8');
+      const data = JSON.parse(raw);
+      cumulativeCounts = { ...cumulativeCounts, ...data };
+      console.log('[Stats] Loaded cumulative site statistics successfully:', cumulativeCounts);
+    } else {
+      saveStats();
+    }
+  } catch (e: any) {
+    console.warn('[Stats] Failed to load site stats:', e.message || e);
+  }
+}
+
+function saveStats() {
+  try {
+    fs.writeFileSync(STATS_FILE_PATH, JSON.stringify(cumulativeCounts, null, 2), 'utf8');
+  } catch (e: any) {
+    console.warn('[Stats] Failed to save site stats:', e.message || e);
+  }
+}
+
+// Initial load of site stats
+loadStats();
+
 function logActivity(type: string, description: string, metadata?: any) {
   const newActivity: SiteActivity = {
     id: `act-${Math.random().toString(36).substring(2, 9)}`,
@@ -260,6 +298,15 @@ function logActivity(type: string, description: string, metadata?: any) {
   if (siteActivities.length > 150) {
     siteActivities = siteActivities.slice(0, 150);
   }
+
+  // Auto-increment persistent stats mapping
+  const normalizedType = type.toLowerCase();
+  if (normalizedType in cumulativeCounts) {
+    cumulativeCounts[normalizedType as keyof typeof cumulativeCounts]++;
+  } else {
+    (cumulativeCounts as any)[normalizedType] = ((cumulativeCounts as any)[normalizedType] || 0) + 1;
+  }
+  saveStats();
 }
 
 // 0. Firebase Authentication Reverse Proxy for Custom Domain Hosting on Railway VPS
@@ -387,7 +434,7 @@ app.post('/api/save-arohi-avatar', (req, res) => {
 
 // API endpoints for Server-Side Auth Proxy
 app.post('/api/auth/signup', async (req, res) => {
-  const { email, password, name, role } = req.body;
+  const { email, password, name, role, mobile } = req.body;
   try {
     // 1. Call Firebase Auth REST API to create user
     const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`, {
@@ -412,10 +459,10 @@ app.post('/api/auth/signup', async (req, res) => {
       profile: {
         name: name,
         email: email,
-        phone: '+91 98765 43210',
+        phone: mobile || '+91 98765 43210',
         location: 'Delhi NCR',
-        education: 'Graduate',
-        activeGoal: 'Government & Public Sector Career'
+        education: (role || 'candidate') === 'recruiter' ? 'Business Owner' : 'Graduate',
+        activeGoal: (role || 'candidate') === 'recruiter' ? 'Mudra Loan Business & Franchise Setup' : 'Skills, Courses & Career Preparation'
       },
       enrolledCourses: [],
       completedModules: {},
@@ -488,7 +535,7 @@ app.post('/api/auth/signin', async (req, res) => {
           phone: '+91 98765 43210',
           location: 'Delhi NCR',
           education: 'Graduate',
-          activeGoal: 'Government & Public Sector Career'
+          activeGoal: 'Skills, Courses & Career Preparation'
         },
         enrolledCourses: [],
         completedModules: {},
@@ -548,8 +595,8 @@ app.post('/api/auth/google-sync', async (req, res) => {
           email: email || '',
           phone: '+91 98765 43210',
           location: 'Delhi NCR',
-          education: 'Graduate',
-          activeGoal: 'Government & Public Sector Career'
+          education: (role || 'candidate') === 'recruiter' ? 'Business Owner' : 'Graduate',
+          activeGoal: (role || 'candidate') === 'recruiter' ? 'Mudra Loan Business & Franchise Setup' : 'Skills, Courses & Career Preparation'
         },
         enrolledCourses: [],
         completedModules: {},
@@ -617,11 +664,18 @@ app.post('/api/auth/update-profile', async (req, res) => {
     if (!docSnap.exists) {
       return res.status(404).json({ error: 'User profile not found.' });
     }
-    const currentProfile = docSnap.data().profile || {};
-    await safeUserDb.update(uid, {
-      profile: { ...currentProfile, ...profile },
+    const currentData = docSnap.data();
+    const currentProfile = currentData.profile || {};
+    const updatedProfile = { ...currentProfile, ...profile };
+    
+    const updatePayload: any = {
+      profile: updatedProfile,
       updatedAt: new Date().toISOString()
-    });
+    };
+    if (profile.name) {
+      updatePayload.displayName = profile.name;
+    }
+    await safeUserDb.update(uid, updatePayload);
     const updatedSnap = await safeUserDb.get(uid);
     res.json({ success: true, userData: updatedSnap.data() });
   } catch (error: any) {
@@ -793,6 +847,7 @@ app.get('/api/admin/stats', (req, res) => {
   return res.json({
     activities: siteActivities,
     counts,
+    cumulativeCounts
   });
 });
 

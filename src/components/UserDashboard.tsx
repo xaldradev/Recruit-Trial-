@@ -3,10 +3,12 @@ import {
   User, Mail, Phone, MapPin, Award, CheckCircle2, Bookmark, FileText, 
   Bot, Briefcase, Landmark, ExternalLink, Sparkles, AlertCircle, 
   ShieldCheck, Edit3, Save, LogIn, Trash2, X, ChevronRight, 
-  Download, RefreshCw, Trophy, Calendar, Check, Play, GraduationCap, Map, Clock, Share2
+  Download, RefreshCw, Trophy, Calendar, Check, Play, GraduationCap, Map, Clock, Share2,
+  Fingerprint
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { initialCourses } from '../data/coursesData';
+import { isBiometricSupported, registerBiometricDevice, authenticateBiometricDevice } from '../lib/webauthn';
 
 interface UserDashboardProps {
   subscriptions?: Record<string, boolean>;
@@ -44,6 +46,57 @@ export default function UserDashboard({
   const [editedEducation, setEditedEducation] = useState('');
   const [editedGoal, setEditedGoal] = useState('');
   const [editedResume, setEditedResume] = useState('');
+
+  // Biometric Auth states
+  const [isBioSupported, setIsBioSupported] = useState(false);
+  const [isBioEnrolled, setIsBioEnrolled] = useState(false);
+  const [bioError, setBioError] = useState<string | null>(null);
+  const [bioSuccess, setBioSuccess] = useState<string | null>(null);
+  const [isEnrolling, setIsEnrolling] = useState(false);
+
+  // Detect biometric capabilities & enrollment status
+  useEffect(() => {
+    async function checkBio() {
+      const supported = await isBiometricSupported();
+      setIsBioSupported(supported);
+      if (profile.email) {
+        const enrolled = !!localStorage.getItem(`recruit_biometric_${profile.email.toLowerCase()}`);
+        setIsBioEnrolled(enrolled);
+      }
+    }
+    checkBio();
+  }, [profile.email]);
+
+  const handleRegisterBiometric = async () => {
+    if (!profile.email) return;
+    setBioError(null);
+    setBioSuccess(null);
+    setIsEnrolling(true);
+    try {
+      const record = await registerBiometricDevice(profile.email, user?.uid || 'guest');
+      localStorage.setItem(`recruit_biometric_user_${profile.email.toLowerCase()}`, JSON.stringify({
+        uid: user?.uid || 'guest',
+        email: profile.email,
+        displayName: profile.name
+      }));
+      setIsBioEnrolled(true);
+      setBioSuccess(`Successfully registered secure FIDO2 passkey (${record.deviceName}) for secure fingerprint/Face ID sign-in on this device!`);
+      addActivity('profile', 'Biometric credential enrolled', `Device authenticated with passkey for ${profile.email}`);
+    } catch (err: any) {
+      console.error(err);
+      setBioError(err.message || 'Verification was cancelled or timed out.');
+    } finally {
+      setIsEnrolling(false);
+    }
+  };
+
+  const handleRemoveBiometric = () => {
+    if (!profile.email) return;
+    localStorage.removeItem(`recruit_biometric_${profile.email.toLowerCase()}`);
+    setIsBioEnrolled(false);
+    setBioSuccess('Biometric registration removed.');
+    addActivity('profile', 'Biometric credential removed', `Removed registered biometric passkey for ${profile.email}`);
+  };
 
   // Enrolled courses state (derived dynamically)
   const [enrolledCourseList, setEnrolledCourseList] = useState<any[]>([]);
@@ -1284,6 +1337,107 @@ export default function UserDashboard({
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* SECURE BIOMETRIC PASSKEY CENTER */}
+          <div className="bg-[#0b071c] border border-purple-500/30 p-6 rounded-[2rem] text-left text-white relative overflow-hidden shadow-2xl">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl"></div>
+            
+            <h3 className="text-xs font-black uppercase tracking-wider text-[#a78bfa] mb-3 border-b border-purple-900/50 pb-2.5 flex items-center gap-2">
+              <Fingerprint className="w-5 h-5 text-purple-400 animate-pulse" /> Biometric Authentication
+            </h3>
+
+            {!isBioSupported ? (
+              <div className="space-y-2 text-xs">
+                <p className="text-slate-400 leading-normal font-semibold">
+                  Secure cryptographic Touch ID / Face ID bypasses traditional phishing.
+                </p>
+                <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-200 text-[10px] leading-relaxed font-bold">
+                  ⚠️ WebAuthn cryptographic biometrics require secure execution. If running in an iframe, click <span className="text-white font-black">"Open in New Tab"</span> at the top right of your preview window to register your sensor!
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3 text-xs">
+                <p className="text-slate-400 leading-normal font-semibold">
+                  Register your device to log in instantly using Face ID or your fingerprint.
+                </p>
+
+                {bioError && (
+                  <div className="p-2.5 bg-red-500/10 border border-red-500/25 rounded-xl text-red-300 text-[10px] font-semibold leading-relaxed">
+                    {bioError}
+                  </div>
+                )}
+
+                {bioSuccess && (
+                  <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/25 rounded-xl text-emerald-300 text-[10px] font-semibold leading-relaxed">
+                    {bioSuccess}
+                  </div>
+                )}
+
+                {isBioEnrolled ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 bg-[#120c2a] border border-[#3b218f] p-3 rounded-xl">
+                      <div className="bg-emerald-500/10 p-1.5 rounded-lg border border-emerald-500/20">
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-[10px] font-extrabold uppercase text-emerald-400 tracking-wider">Passkey Enrolled</p>
+                        <p className="text-[9px] text-slate-400 font-mono mt-0.5">Device key active for your email</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={async () => {
+                          setBioError(null);
+                          setBioSuccess(null);
+                          try {
+                            const success = await authenticateBiometricDevice(profile.email);
+                            if (success) {
+                              setBioSuccess("✅ Touch ID / Face ID validation succeeded! Physical presence verified.");
+                            }
+                          } catch (err: any) {
+                            setBioError(err.message || "Verification cancelled.");
+                          }
+                        }}
+                        className="flex-1 py-2 px-3 bg-purple-600 hover:bg-purple-500 text-white font-black text-[10px] uppercase tracking-wider rounded-xl cursor-pointer transition-all active:scale-95 text-center font-bold"
+                      >
+                        Test Sensor
+                      </button>
+                      <button
+                        onClick={handleRemoveBiometric}
+                        className="py-2 px-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-300 font-black text-[10px] uppercase tracking-wider rounded-xl cursor-pointer transition-all active:scale-95 font-bold"
+                      >
+                        Delete Key
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleRegisterBiometric}
+                    disabled={isEnrolling}
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-[11px] uppercase tracking-wider rounded-xl shadow-lg hover:shadow-purple-500/20 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    {isEnrolling ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Scanning sensor...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Fingerprint className="w-4 h-4 text-purple-200" />
+                        <span>Register Fingerprint/FaceID</span>
+                      </>
+                    )}
+                  </button>
+                )}
+
+                <div className="text-[9px] text-slate-500 font-mono flex items-center gap-1 mt-1 justify-center border-t border-purple-950/40 pt-2">
+                  <ShieldCheck className="w-3.5 h-3.5 text-cyan-500" />
+                  <span>SECURE PASSKEY (AES-GCM CRYPTO)</span>
+                </div>
+              </div>
+            )}
           </div>
 
         </div>

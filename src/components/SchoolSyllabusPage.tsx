@@ -573,7 +573,22 @@ const getTopicEducationalData = (board: string, subjectId: string, chapterName: 
 
 const getChaptersForClass = (catKey: string, classNum: number, board: string): { name: string; description: string; topics: string[]; weightage: string }[] => {
   const cat = classNum <= 2 ? 'primary' : classNum <= 5 ? 'elementary' : classNum <= 8 ? 'middle' : 'high';
-  const baseChapters = CHAPTER_TEMPLATES[catKey]?.[cat] || CHAPTER_TEMPLATES[catKey]?.high || CHAPTER_TEMPLATES.language.primary;
+  let baseChapters = CHAPTER_TEMPLATES[catKey]?.[cat] || CHAPTER_TEMPLATES[catKey]?.high || CHAPTER_TEMPLATES.language.primary;
+
+  // Prevent primary language fallback for separate sciences (physics, chemistry, biology) in lower classes
+  if (['physics', 'chemistry', 'biology'].includes(catKey)) {
+    let count = 4;
+    if (classNum <= 5) {
+      if (catKey === 'physics') {
+        count = classNum <= 2 ? 1 : 2;
+      } else {
+        count = 1;
+      }
+    } else if (classNum <= 8) {
+      count = 2;
+    }
+    baseChapters = Array(count).fill({ name: "", description: "", topics: [] });
+  }
 
   return baseChapters.map((ch, idx) => {
     let name = ch.name;
@@ -1302,6 +1317,45 @@ const getChaptersForClass = (catKey: string, classNum: number, board: string): {
           description = "Sectors of the Indian economy, employment generation, and NREGA 100 days guidelines.";
           topics = ["Primary, secondary, tertiary", "GDP estimation methods", "Organized vs unorganized labor", "NREGA 100 days guarantees"];
         }
+      }
+    }
+
+    // Mapped board-specific academic customization for 100% curriculum differentiation
+    if (board === 'cbse') {
+      if (catKey === 'maths') {
+        name = `NCERT: ${name}`;
+        description = `${description} (Prepares for CBSE board exams using standard conceptual NCERT exercises and competency assessments.)`;
+        topics = [...topics, "NCERT Exemplar Problems", "CBSE Competency MCQ Drills"];
+      } else if (['science', 'physics', 'chemistry', 'biology'].includes(catKey)) {
+        name = `CBSE Science: ${name}`;
+        description = `${description} (Covers CBSE syllabus with a strong focus on practical laboratory activities and interactive experiments.)`;
+        topics = [...topics, "CBSE Lab Manual Experiments", "Case-Study Competency Questions"];
+      } else if (['social', 'history', 'geography'].includes(catKey)) {
+        name = `CBSE Social: ${name}`;
+        description = `${description} (Covers CBSE social sciences with emphasis on historical context, source-based questions, and map work.)`;
+        topics = [...topics, "NCERT Map Work Activities", "CBSE Source-Based Exercises"];
+      } else {
+        name = `CBSE: ${name}`;
+        description = `${description} (Aligned with CBSE secondary board guidelines and interactive NCERT textbooks.)`;
+        topics = [...topics, "CBSE Board Practice Sets"];
+      }
+    } else if (board === 'icse') {
+      if (catKey === 'maths') {
+        name = `Concise Maths: ${name}`;
+        description = `${description} (Aligned with CISCE standards, emphasizing step-by-step descriptive proofs and advanced calculations.)`;
+        topics = [...topics, "Selina Concise Exercises", "ICSE Past 10-Year Board Questions"];
+      } else if (['physics', 'chemistry', 'biology'].includes(catKey)) {
+        name = `ICSE Concise ${catKey.charAt(0).toUpperCase() + catKey.slice(1)}: ${name}`;
+        description = `${description} (Emphasizes descriptive derivations, precise chemical/physical formulas, and deep botanical/zoological models according to ICSE standards.)`;
+        topics = [...topics, "Concise Chapter-End Solutions", "ICSE Specimen Paper Practice"];
+      } else if (['social', 'history', 'geography'].includes(catKey)) {
+        name = `ICSE Civics/Geo: ${name}`;
+        description = `${description} (Structured according to ICSE Board guidelines, featuring deep descriptive essay structures and map readings.)`;
+        topics = [...topics, "ICSE Topographical Sheet Reading", "Detailed Essay-Type Board Answers"];
+      } else {
+        name = `ICSE: ${name}`;
+        description = `${description} (Following CISCE comprehensive descriptive curriculum standards.)`;
+        topics = [...topics, "ICSE High-Level Analytical Questions"];
       }
     }
 
