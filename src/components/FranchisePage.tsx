@@ -43,10 +43,44 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ArohiAvatar from './ArohiAvatar';
+import { useAuth } from '../context/AuthContext';
 
 export default function FranchisePage() {
   // Navigation Tabs Scroll Synchronizer
   const [activeSection, setActiveSection] = useState('hero');
+
+  const { user, userData, updateActivities } = useAuth();
+
+  const logFranchiseActivity = (actionType: string, title: string, description: string) => {
+    try {
+      const newAct = {
+        id: `act-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        type: actionType,
+        title,
+        description,
+        timestamp: new Date().toISOString()
+      };
+
+      // 1. Update localStorage
+      const existingRaw = localStorage.getItem('recruit_activities');
+      const existing = existingRaw ? JSON.parse(existingRaw) : [];
+      const updated = [newAct, ...existing].slice(0, 15);
+      localStorage.setItem('recruit_activities', JSON.stringify(updated));
+
+      // 2. Dispatch event for real-time UI updates
+      window.dispatchEvent(new Event('recruit_activities_update'));
+
+      // 3. Update Firebase/Firestore if user is logged in
+      if (user) {
+        const firebaseActivities = [newAct, ...(userData?.activities || [])].slice(0, 15);
+        updateActivities(firebaseActivities).catch(err => {
+          console.error("Firebase activities sync error:", err);
+        });
+      }
+    } catch (e) {
+      console.error("Error logging franchise activity:", e);
+    }
+  };
   
   // Interactive Arohi Chat States
   const [isArohiChatOpen, setIsArohiChatOpen] = useState(false);
@@ -422,6 +456,14 @@ export default function FranchisePage() {
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       setFormSuccessMessage(`🎉 Application Registered Successfully! Reference ID: ${newApp.id}. Our Regional Alliance Partner will call you on ${formData.phone} within 24 hours.`);
+      
+      // Log tracking event in activity log and Firebase
+      logFranchiseActivity(
+        'franchise',
+        'Franchise Proposal Submitted',
+        `Submitted AECN Franchise interest proposal for ${formData.preferredCity}, ${formData.preferredState} (${formData.investmentCap}). Reference ID: ${newApp.id}`
+      );
+
       setFormStep(6); // Success Step
     } catch (err) {
       setFormError("Something went wrong during submission. Please try again.");
@@ -2063,6 +2105,14 @@ export default function FranchisePage() {
                         return;
                       }
                       setFormError(null);
+                      
+                      // Log step navigation click
+                      logFranchiseActivity(
+                        'franchise',
+                        `Franchise Inquiry Step ${formStep} Completed`,
+                        `Advanced to Step ${formStep + 1} of the interactive AECN Franchise inquiry form.`
+                      );
+
                       setFormStep(prev => prev + 1);
                     }}
                     className="bg-[#17113e] hover:bg-[#251b63] text-[#c084fc] hover:text-white border border-[#3c2980]/50 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5"

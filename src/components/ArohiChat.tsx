@@ -336,12 +336,12 @@ const SITE_PRODUCTS = [
   {
     id: 'franchise-hub',
     type: 'service',
-    title: 'Franchise Discovery Hub & Operations',
-    price: 'Ready Launch',
-    badge: 'Ready Franchises',
-    description: 'Browse lucrative tea shop, EV station, or digital service center franchise opportunities.',
+    title: 'AECN Franchise Hub (Arohi Experience Center)',
+    price: 'From ₹5L',
+    badge: 'High ROI AI Hub',
+    description: 'Partner with Recruit.org.in to launch physical AI soundproof pods, interview prep booths, and biometric registries.',
     tab: 'franchise',
-    keywords: ['franchise discovery', 'franchise hub', 'tea shop franchise', 'ev station franchise', 'apply franchise', 'franchise']
+    keywords: ['aecn', 'aecn franchise', 'arohi experience center', 'physical network', 'franchise partner', 'buy franchise', 'setup franchise', 'juggernaut os', 'invest franchise', 'franchise discovery', 'franchise hub', 'tea shop franchise', 'ev station franchise', 'apply franchise', 'franchise']
   },
   {
     id: 'schemes-finder',
