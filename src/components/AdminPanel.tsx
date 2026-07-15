@@ -105,19 +105,6 @@ export default function AdminPanel({
   const [isSimulatingEvent, setIsSimulatingEvent] = useState<string | null>(null);
   const [searchUserQuery, setSearchUserQuery] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastRefreshTime, setLastRefreshTime] = useState<string>('Never');
-  
-  // Date-Range Filters for Analytics
-  const [dateRangeOption, setDateRangeOption] = useState<'7days' | '30days' | 'custom'>('30days');
-  const [customStartDate, setCustomStartDate] = useState<string>(() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 30);
-    return d.toISOString().split('T')[0];
-  });
-  const [customEndDate, setCustomEndDate] = useState<string>(() => {
-    return new Date().toISOString().split('T')[0];
-  });
 
   // Master Command Center State parameters
   const [aiTemperature, setAiTemperature] = useState(0.7);
@@ -162,7 +149,6 @@ export default function AdminPanel({
 
   // Real data fetch function
   const fetchRealData = async () => {
-    setIsRefreshing(true);
     const adminToken = sessionStorage.getItem('recruit_admin_token') || 'recruit_admin_authorized_token_2026';
     try {
       // 1. Fetch Users List
@@ -219,14 +205,8 @@ export default function AdminPanel({
           })));
         }
       }
-      setLastRefreshTime(new Date().toTimeString().split(' ')[0]);
     } catch (err) {
       console.error('Failed to sync administrative data from live backend server:', err);
-    } finally {
-      // Small timeout to give a nice feedback animation
-      setTimeout(() => {
-        setIsRefreshing(false);
-      }, 600);
     }
   };
 
@@ -629,100 +609,19 @@ export default function AdminPanel({
   const totalMRR = payments.filter(p => p.status === 'Verified').reduce((acc, p) => acc + p.amount, 0);
 
   // Analytics dataset computed helper functions
-  // Analytics date helper functions
-  const getSelectedDateRangeDetails = () => {
-    let startDate = new Date();
-    let endDate = new Date();
-    
-    if (dateRangeOption === '7days') {
-      startDate.setDate(endDate.getDate() - 6);
-    } else if (dateRangeOption === '30days') {
-      startDate.setDate(endDate.getDate() - 29);
-    } else {
-      startDate = new Date(customStartDate || Date.now());
-      endDate = new Date(customEndDate || Date.now());
-    }
-    
-    if (isNaN(startDate.getTime())) {
-      startDate = new Date();
-      startDate.setDate(startDate.getDate() - 29);
-    }
-    if (isNaN(endDate.getTime())) {
-      endDate = new Date();
-    }
-    
-    if (startDate > endDate) {
-      const temp = startDate;
-      startDate = endDate;
-      endDate = temp;
-    }
-    
-    // Set hours to boundaries
-    startDate.setHours(0, 0, 0, 0);
-    endDate.setHours(23, 59, 59, 999);
-    
-    return { startDate, endDate };
-  };
-
-  const getSelectedRangeScale = () => {
-    const { startDate, endDate } = getSelectedDateRangeDetails();
-    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-    return diffDays / 30; // base standard of 30 days
-  };
-
-  const getFilteredApplications = () => {
-    const { startDate, endDate } = getSelectedDateRangeDetails();
-    
-    const isWithinRange = (dateStr: string) => {
-      if (!dateStr) return false;
-      const d = new Date(dateStr);
-      if (isNaN(d.getTime())) return false;
-      return d >= startDate && d <= endDate;
-    };
-
-    if (applications && applications.length > 0) {
-      return applications.filter(app => isWithinRange(app.appliedDate));
-    }
-    return [];
-  };
-
-  const getFilteredCumulativeCounts = () => {
-    const scale = getSelectedRangeScale();
-    return {
-      visit: Math.round(cumulativeCounts.visit * scale),
-      chat: Math.round(cumulativeCounts.chat * scale),
-      resume: Math.round(cumulativeCounts.resume * scale),
-      roadmap: Math.round(cumulativeCounts.roadmap * scale),
-      apply: Math.round(cumulativeCounts.apply * scale),
-      enroll: Math.round(cumulativeCounts.enroll * scale),
-      admin: cumulativeCounts.admin,
-    };
-  };
-
   const getDauData = () => {
-    const { startDate, endDate } = getSelectedDateRangeDetails();
-    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-    
-    const totalDays = Math.min(diffDays, 90);
     const baseDAU = [32, 45, 38, 54, 49, 63, 72];
     const baseChats = [140, 195, 170, 260, 215, 290, 360];
     
-    return Array.from({ length: totalDays }).map((_, idx) => {
-      const d = new Date(startDate);
-      d.setDate(d.getDate() + idx);
+    return Array.from({ length: 7 }).map((_, idx) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - idx));
       const dayLabel = d.toLocaleDateString('en-IN', { weekday: 'short' });
       const dateLabel = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
       
       const liveScale = Math.max(0.6, liveUsersCount / 18);
-      
-      const baseDauVal = baseDAU[(d.getDay() + idx) % baseDAU.length];
-      const baseChatsVal = baseChats[(d.getDay() + idx) % baseChats.length];
-      
-      const noise = 1 + Math.sin(idx * 0.4) * 0.1;
-      const activeUsers = Math.round(baseDauVal * liveScale * noise);
-      const chats = Math.round(baseChatsVal * (chatLogs.length / 3) * liveScale * noise);
+      const activeUsers = Math.round(baseDAU[idx] * liveScale);
+      const chats = Math.round(baseChats[idx] * (chatLogs.length / 3) * liveScale);
       
       return {
         name: `${dayLabel} (${dateLabel})`,
@@ -740,10 +639,9 @@ export default function AdminPanel({
       { name: 'Aviation Drone Pilot', Approved: 9, Pending: 5, Rejected: 1 },
     ];
     
-    const filteredApps = getFilteredApplications();
-    if (filteredApps && filteredApps.length > 0) {
+    if (applications && applications.length > 0) {
       const postingsMap: Record<string, { Approved: number; Pending: number; Rejected: number }> = {};
-      filteredApps.forEach(app => {
+      applications.forEach(app => {
         const title = app.postingTitle || 'Other Vacancy';
         const displayTitle = title.length > 22 ? title.substring(0, 20) + '...' : title;
         if (!postingsMap[displayTitle]) {
@@ -762,28 +660,16 @@ export default function AdminPanel({
       }));
     }
     
-    // Scale default baseline for realism if no actual applications filtered
-    const scale = getSelectedRangeScale();
-    return baseline.map(b => ({
-      name: b.name,
-      Approved: Math.round(b.Approved * scale),
-      Pending: Math.round(b.Pending * scale),
-      Rejected: Math.round(b.Rejected * scale),
-    }));
+    return baseline;
   };
 
   const getSubscriptionGrowthData = () => {
-    const { startDate, endDate } = getSelectedDateRangeDetails();
-    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-    const totalDays = Math.min(diffDays, 90);
-    
     const baselineMRR = [1596, 1995, 2394, 2793, 3192, 3591, 3990];
     const baselineSubscribers = [4, 5, 6, 7, 8, 9, 10];
     
-    return Array.from({ length: totalDays }).map((_, idx) => {
-      const d = new Date(startDate);
-      d.setDate(d.getDate() + idx);
+    return Array.from({ length: 7 }).map((_, idx) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - idx));
       
       const paymentsBeforeOrOn = payments.filter(p => {
         if (p.status !== 'Verified') return false;
@@ -799,8 +685,8 @@ export default function AdminPanel({
       const liveMRR = paymentsBeforeOrOn.reduce((acc, p) => acc + p.amount, 0);
       const subscriberCount = paymentsBeforeOrOn.length;
       
-      const displayMRR = liveMRR > 0 ? liveMRR : baselineMRR[idx % baselineMRR.length];
-      const displaySubs = subscriberCount > 0 ? subscriberCount : baselineSubscribers[idx % baselineSubscribers.length];
+      const displayMRR = liveMRR > 0 ? liveMRR : baselineMRR[idx];
+      const displaySubs = subscriberCount > 0 ? subscriberCount : baselineSubscribers[idx];
       
       return {
         date: d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
@@ -837,32 +723,6 @@ export default function AdminPanel({
       { name: 'Path 3: Udyam', value: 3, color: '#06b6d4' },
       { name: 'ATS Resume Builder', value: 2, color: '#10b981' }
     ];
-  };
-
-  const getVisitorTrafficData = () => {
-    const { startDate, endDate } = getSelectedDateRangeDetails();
-    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-    
-    const totalDays = Math.min(diffDays, 90);
-    const baseDailyVisitors = [11450, 12820, 13110, 15900, 14240, 16800, 18500];
-    
-    return Array.from({ length: totalDays }).map((_, idx) => {
-      const d = new Date(startDate);
-      d.setDate(d.getDate() + idx);
-      const dayLabel = d.toLocaleDateString('en-IN', { weekday: 'short' });
-      const dateLabel = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-      
-      const scale = cumulativeCounts.visit / 154820;
-      const baseVal = baseDailyVisitors[(d.getDay() + idx) % baseDailyVisitors.length];
-      const noise = 1 + Math.sin(idx * 0.5) * 0.12; // +/- 12% fluctuation
-      const visitors = Math.round(baseVal * (scale > 0 ? scale : 1) * noise);
-      
-      return {
-        name: `${dayLabel} (${dateLabel})`,
-        "Daily Visitors": visitors,
-      };
-    });
   };
 
   // LOGIN SCREEN
@@ -2682,101 +2542,17 @@ export default function AdminPanel({
                     Live telemetry tracking candidate engagement, verified recruitment successes, and visitor patterns.
                   </p>
                 </div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-[10px] bg-slate-900/80 border border-[#311f62] px-3 py-1.5 rounded-full text-slate-300 font-mono font-bold uppercase tracking-wider flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${isRefreshing ? 'bg-amber-400 animate-ping' : 'bg-[#00e676]'}`} />
-                    {isRefreshing ? 'REFRESHING METRICS...' : 'SYNC STATUS: LIVE SECURE'}
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] bg-slate-900/80 border border-[#311f62] px-3 py-1.5 rounded-full text-slate-300 font-mono font-bold uppercase tracking-wider">
+                    SYNC STATUS: LIVE SECURE
                   </span>
-                  {lastRefreshTime !== 'Never' && (
-                    <span className="text-[10px] text-slate-500 font-mono">
-                      Last: {lastRefreshTime}
-                    </span>
-                  )}
                   <button 
                     onClick={fetchRealData}
-                    disabled={isRefreshing}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-purple-900/30 hover:bg-purple-800/40 active:scale-95 disabled:opacity-50 disabled:scale-100 border border-purple-500/30 rounded-xl text-purple-300 hover:text-white transition-all cursor-pointer font-bold text-xs"
-                    title="Manual metrics re-fetch"
+                    className="p-2 bg-purple-950/40 hover:bg-purple-900/40 border border-purple-500/30 rounded-xl text-purple-300 transition-all cursor-pointer hover:rotate-180 duration-500"
+                    title="Refresh Live Data"
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-amber-400' : ''}`} />
-                    <span>{isRefreshing ? 'Syncing...' : 'Refresh Metrics'}</span>
+                    <RefreshCw className="w-4 h-4" />
                   </button>
-                </div>
-              </div>
-
-              {/* Date-Range Controller Segment */}
-              <div className="bg-[#120a2e]/65 border border-[#301b5c]/80 p-4 rounded-2xl relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="p-1.5 bg-purple-500/10 rounded-lg text-purple-300 border border-purple-500/20">
-                    <Sliders className="w-4 h-4 text-purple-400" />
-                  </span>
-                  <div>
-                    <span className="text-[10px] uppercase font-black tracking-widest text-slate-300 block">Analytical Period Filter</span>
-                    <span className="text-[9px] text-slate-500 font-mono">Select period range for all metrics and graphs</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-end">
-                  {/* Preset Options buttons */}
-                  <div className="bg-[#05030f] border border-[#2b1b54] p-1 rounded-xl flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setDateRangeOption('7days')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        dateRangeOption === '7days'
-                          ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
-                      }`}
-                    >
-                      7 Days
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDateRangeOption('30days')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        dateRangeOption === '30days'
-                          ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
-                      }`}
-                    >
-                      30 Days
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDateRangeOption('custom')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        dateRangeOption === 'custom'
-                          ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
-                      }`}
-                    >
-                      Custom Range
-                    </button>
-                  </div>
-
-                  {/* Custom Date Inputs */}
-                  {dateRangeOption === 'custom' && (
-                    <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-300">
-                      <div className="flex items-center gap-1 bg-[#05030f] border border-[#2b1b54] px-2 py-1 rounded-xl">
-                        <span className="text-[9px] uppercase font-black text-slate-500 font-mono">From:</span>
-                        <input
-                          type="date"
-                          value={customStartDate}
-                          onChange={(e) => setCustomStartDate(e.target.value)}
-                          className="bg-transparent border-none text-slate-200 text-xs font-bold outline-none cursor-pointer focus:ring-0 py-0.5"
-                        />
-                      </div>
-                      <div className="flex items-center gap-1 bg-[#05030f] border border-[#2b1b54] px-2 py-1 rounded-xl">
-                        <span className="text-[9px] uppercase font-black text-slate-500 font-mono">To:</span>
-                        <input
-                          type="date"
-                          value={customEndDate}
-                          onChange={(e) => setCustomEndDate(e.target.value)}
-                          className="bg-transparent border-none text-slate-200 text-xs font-bold outline-none cursor-pointer focus:ring-0 py-0.5"
-                        />
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -2788,7 +2564,7 @@ export default function AdminPanel({
                     <div className="space-y-1.5">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Visitor Counts</span>
                       <h4 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 tracking-tight">
-                        {getFilteredCumulativeCounts().visit.toLocaleString()}
+                        {cumulativeCounts.visit.toLocaleString()}
                       </h4>
                     </div>
                     <div className="p-3 bg-purple-500/10 rounded-xl text-purple-400 group-hover:bg-purple-500/20 group-hover:text-purple-300 transition-all">
@@ -2798,7 +2574,7 @@ export default function AdminPanel({
                   <div className="mt-4 pt-3 border-t border-[#1f1344] flex items-center justify-between text-[11px]">
                     <span className="text-emerald-400 font-bold flex items-center gap-1">
                       <span>↑ 18.2%</span>
-                      <span className="text-slate-500 font-normal">for selected period</span>
+                      <span className="text-slate-500 font-normal">this month</span>
                     </span>
                     <span className="text-slate-400 font-mono">Real-time ledger</span>
                   </div>
@@ -2810,12 +2586,7 @@ export default function AdminPanel({
                     <div className="space-y-1.5">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Successful Job Applications</span>
                       <h4 className="text-3xl font-black text-emerald-400 tracking-tight">
-                        {(() => {
-                          const fApps = getFilteredApplications();
-                          const approved = fApps.filter(a => a.status === 'Approved');
-                          const displayApproved = fApps.length > 0 ? approved.length : Math.round(76 * getSelectedRangeScale());
-                          return displayApproved.toLocaleString();
-                        })()}
+                        {(applications.filter(a => a.status === 'Approved').length || 76).toLocaleString()}
                       </h4>
                     </div>
                     <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-400 group-hover:bg-emerald-500/20 group-hover:text-emerald-300 transition-all">
@@ -2823,24 +2594,15 @@ export default function AdminPanel({
                     </div>
                   </div>
                   <div className="mt-4 pt-3 border-t border-[#1f1344] flex items-center justify-between text-[11px]">
-                    {(() => {
-                      const fApps = getFilteredApplications();
-                      const approved = fApps.filter(a => a.status === 'Approved');
-                      const displayApproved = fApps.length > 0 ? approved.length : Math.round(76 * getSelectedRangeScale());
-                      const displayTotal = fApps.length > 0 ? fApps.length : Math.round(118 * getSelectedRangeScale());
-                      const ratio = displayTotal > 0 ? Math.round((displayApproved / displayTotal) * 100) : 64;
-                      return (
-                        <>
-                          <span className="text-emerald-400 font-bold flex items-center gap-1">
-                            <span>{ratio}%</span>
-                            <span className="text-slate-500 font-normal">Approval Ratio</span>
-                          </span>
-                          <span className="text-slate-400 font-mono">
-                            {displayTotal} Total Filed
-                          </span>
-                        </>
-                      );
-                    })()}
+                    <span className="text-emerald-400 font-bold flex items-center gap-1">
+                      <span>{applications.length > 0 
+                        ? Math.round((applications.filter(a => a.status === 'Approved').length / applications.length) * 100) 
+                        : 64}%</span>
+                      <span className="text-slate-500 font-normal">Approval Ratio</span>
+                    </span>
+                    <span className="text-slate-400 font-mono">
+                      {applications.length || 118} Total Filed
+                    </span>
                   </div>
                 </div>
 
@@ -2850,7 +2612,7 @@ export default function AdminPanel({
                     <div className="space-y-1.5">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Daily Active Users</span>
                       <h4 className="text-3xl font-black text-cyan-400 tracking-tight">
-                        {Math.round(liveUsersCount * 4 * getSelectedRangeScale()).toLocaleString()}
+                        {(liveUsersCount * 4).toLocaleString()}
                       </h4>
                     </div>
                     <div className="p-3 bg-cyan-500/10 rounded-xl text-cyan-400 group-hover:bg-cyan-500/20 group-hover:text-cyan-300 transition-all">
@@ -2863,7 +2625,7 @@ export default function AdminPanel({
                       <span>{liveUsersCount} Live</span>
                       <span className="text-slate-500 font-normal">Active Now</span>
                     </span>
-                    <span className="text-slate-400 font-mono">Period scaled factor</span>
+                    <span className="text-slate-400 font-mono">Session factor: 4.0x</span>
                   </div>
                 </div>
               </div>
@@ -2946,7 +2708,7 @@ export default function AdminPanel({
                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Total Platform Visitors</span>
                   <div className="mt-2">
                     <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-                      {getFilteredCumulativeCounts().visit.toLocaleString()}
+                      {cumulativeCounts.visit.toLocaleString()}
                     </span>
                     <span className="text-[8px] text-purple-400 block mt-0.5 font-bold">↑ 100% Genuine Visits</span>
                   </div>
@@ -2956,7 +2718,7 @@ export default function AdminPanel({
                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">AI consultations</span>
                   <div className="mt-2">
                     <span className="text-2xl font-black text-slate-200">
-                      {getFilteredCumulativeCounts().chat.toLocaleString()}
+                      {cumulativeCounts.chat.toLocaleString()}
                     </span>
                     <span className="text-[8px] text-pink-400 block mt-0.5 font-bold">Arohi AI Dialogues</span>
                   </div>
@@ -2966,7 +2728,7 @@ export default function AdminPanel({
                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">ATS Resume Scans</span>
                   <div className="mt-2">
                     <span className="text-2xl font-black text-slate-200">
-                      {getFilteredCumulativeCounts().resume.toLocaleString()}
+                      {cumulativeCounts.resume.toLocaleString()}
                     </span>
                     <span className="text-[8px] text-amber-400 block mt-0.5 font-bold">Score Profiles Analyzed</span>
                   </div>
@@ -2976,7 +2738,7 @@ export default function AdminPanel({
                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Career Roadmaps</span>
                   <div className="mt-2">
                     <span className="text-2xl font-black text-slate-200">
-                      {getFilteredCumulativeCounts().roadmap.toLocaleString()}
+                      {cumulativeCounts.roadmap.toLocaleString()}
                     </span>
                     <span className="text-[8px] text-emerald-400 block mt-0.5 font-bold font-mono">Custom Syllabi Synced</span>
                   </div>
@@ -2986,7 +2748,7 @@ export default function AdminPanel({
                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Applications Filed</span>
                   <div className="mt-2">
                     <span className="text-2xl font-black text-slate-200">
-                      {getFilteredCumulativeCounts().apply.toLocaleString()}
+                      {cumulativeCounts.apply.toLocaleString()}
                     </span>
                     <span className="text-[8px] text-cyan-400 block mt-0.5 font-bold">Verified Registrations</span>
                   </div>
@@ -2996,7 +2758,7 @@ export default function AdminPanel({
                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Premium Enrollments</span>
                   <div className="mt-2">
                     <span className="text-2xl font-black text-slate-200">
-                      {getFilteredCumulativeCounts().enroll.toLocaleString()}
+                      {cumulativeCounts.enroll.toLocaleString()}
                     </span>
                     <span className="text-[8px] text-[#00e676] block mt-0.5 font-bold">Paid Career Upgrades</span>
                   </div>
@@ -3006,35 +2768,6 @@ export default function AdminPanel({
 
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-              {/* Chart 0: Daily Visitor Traffic Trend */}
-              <div className="backdrop-blur-xl bg-[#090715]/70 border border-[#2b1b54]/80 p-5 rounded-3xl shadow-xl space-y-4 col-span-1 lg:col-span-2">
-                <div className="flex justify-between items-center border-b border-[#25174e] pb-3">
-                  <div>
-                    <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-200">Daily Visitor Traffic Trend</h3>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Real-time persistent visitor session load counts across Recruit.org.in portal</p>
-                  </div>
-                  <span className="text-[8px] bg-purple-950/40 border border-purple-500/30 px-2 py-0.5 rounded text-purple-300 font-mono font-bold uppercase tracking-widest">
-                    Traffic Analytics
-                  </span>
-                </div>
-                <div className="h-[300px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={getVisitorTrafficData()} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1d1645" />
-                      <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickLine={false} />
-                      <YAxis stroke="#64748b" fontSize={10} tickLine={false} label={{ value: 'Daily Sessions', angle: -90, position: 'insideLeft', style: { fill: '#64748b', fontSize: 9 } }} />
-                      <Tooltip 
-                        contentStyle={{ backgroundColor: '#0d0a21', borderColor: '#3b2575', borderRadius: '12px' }}
-                        labelStyle={{ color: '#94a3b8', fontWeight: 'bold', fontSize: '11px' }}
-                        itemStyle={{ color: '#fff', fontSize: '11px' }}
-                      />
-                      <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
-                      <Line type="monotone" dataKey="Daily Visitors" stroke="#c084fc" strokeWidth={3} activeDot={{ r: 8 }} name="Daily Visitors" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
               
               {/* Chart 1: Daily Active Users & AI interactions */}
               <div className="backdrop-blur-xl bg-[#090715]/70 border border-[#2b1b54]/80 p-5 rounded-3xl shadow-xl space-y-4">

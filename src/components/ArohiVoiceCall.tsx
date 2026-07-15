@@ -18,16 +18,7 @@ interface ArohiVoiceCallProps {
 }
 
 export default function ArohiVoiceCall({ onClose, language = 'en', onNavigateTab, uid, onCallComplete }: ArohiVoiceCallProps) {
-  const [status, rawSetStatus] = useState<'connecting' | 'listening' | 'speaking' | 'muted' | 'error' | 'ended'>('connecting');
-  const statusRef = useRef<typeof status>('connecting');
-  
-  const setStatus = (newVal: typeof status | ((prev: typeof status) => typeof status)) => {
-    rawSetStatus(prev => {
-      const resolved = typeof newVal === 'function' ? (newVal as Function)(prev) : newVal;
-      statusRef.current = resolved;
-      return resolved;
-    });
-  };
+  const [status, setStatus] = useState<'connecting' | 'listening' | 'speaking' | 'muted' | 'error' | 'ended'>('connecting');
   const [errorMessage, setErrorMessage] = useState('');
   const [isMuted, setIsMuted] = useState(false);
   const [selectedVoice] = useState<'Zephyr'>('Zephyr');
@@ -304,14 +295,6 @@ export default function ArohiVoiceCall({ onClose, language = 'en', onNavigateTab
         const outputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
         outputAudioCtxRef.current = outputCtx;
 
-        // Explicitly resume contexts to bypass browser autoplay/interaction suspension
-        if (inputCtx.state === 'suspended') {
-          await inputCtx.resume();
-        }
-        if (outputCtx.state === 'suspended') {
-          await outputCtx.resume();
-        }
-
         const source = inputCtx.createMediaStreamSource(stream);
         const processor = inputCtx.createScriptProcessor(4096, 1, 1);
         scriptProcessorRef.current = processor;
@@ -321,12 +304,6 @@ export default function ArohiVoiceCall({ onClose, language = 'en', onNavigateTab
 
         processor.onaudioprocess = (e) => {
           if (!active || isMutedRef.current || ws.readyState !== WebSocket.OPEN) return;
-          
-          // Do not send mic input while Arohi is speaking to prevent self-interruption (barge-in) from speaker echo
-          if (statusRef.current === 'speaking') {
-            setUserVolume(0);
-            return;
-          }
           
           const float32Data = e.inputBuffer.getChannelData(0);
           
