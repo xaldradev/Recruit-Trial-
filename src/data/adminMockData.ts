@@ -36,6 +36,7 @@ export interface PaymentTransaction {
   method: 'UPI' | 'GooglePlay' | 'NetBanking';
   date: string;
   status: 'Verified' | 'Pending' | 'Refunded';
+  utr?: string;
 }
 
 export interface ArohiChatLog {

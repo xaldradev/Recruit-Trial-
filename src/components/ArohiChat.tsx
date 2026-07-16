@@ -314,7 +314,7 @@ ${discussionBullets}
         messages: [
           {
             id: 'welcome',
-            role: 'assistant',
+            role: 'assistant' as const,
             content: getWelcomeContent(language),
             timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
           },

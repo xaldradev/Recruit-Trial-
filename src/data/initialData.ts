@@ -1712,5 +1712,293 @@ export const initialPostings: Posting[] = [
       applyOnline: '#apply',
       officialWebsite: 'https://webscalemediadelhi.co.in'
     }
+  },
+  {
+    id: 'us-sf-ai-eng-2026',
+    title: 'Senior AI & Full-Stack Solutions Engineer',
+    organization: 'Antigravity AI Systems Inc, San Francisco',
+    postDate: '2026-06-24',
+    shortInfo: 'Join an elite AI research and development company in San Francisco, California. We are recruiting full-stack AI solutions developers to build context-aware web app infrastructures, large-scale TypeScript servers, and LLM orchestration agents.',
+    category: 'latest-jobs',
+    tags: ['AI', 'TypeScript', 'Next.js', 'San Francisco', 'Remote', 'Visa Sponsor'],
+    department: 'Private Sector',
+    country: 'US',
+    isNew: true,
+    state: 'California (Remote)',
+    jobType: 'private',
+    sector: 'IT & Software',
+    dates: {
+      applicationBegin: '2026-06-24',
+      lastDateApply: '2026-08-30',
+      lastDateFee: '$ 0 /-'
+    },
+    fees: {
+      generalOBC: '$ 0 /-',
+      scST: '$ 0 /-',
+      paymentMode: 'N/A'
+    },
+    ageLimit: {
+      asOnDate: '01/01/2026',
+      minAge: '21 Years',
+      maxAge: '45 Years',
+      relaxationInfo: 'N/A'
+    },
+    totalVacancies: 12,
+    vacancies: [
+      {
+        postName: 'Senior AI Developer',
+        totalPosts: 8,
+        eligibility: 'B.S./M.S. in Computer Science or equivalent. 3+ years experience with React, Node.js, and integrating LLMs.'
+      },
+      {
+        postName: 'Full-Stack Engineer',
+        totalPosts: 4,
+        eligibility: 'Expertise in TypeScript, Tailwind CSS, PostgreSQL, and state persistence engines.'
+      }
+    ],
+    links: {
+      applyOnline: '#apply',
+      officialWebsite: 'https://antigravity.ai'
+    }
+  },
+  {
+    id: 'uk-london-fintech-2026',
+    title: 'Quantitative Developer & FinTech Analyst',
+    organization: 'British Capital Analytics, London',
+    postDate: '2026-06-23',
+    shortInfo: 'Lead algorithmic trading structures and quant pipelines in the heart of London’s financial hub. This is a hybrid/remote-friendly role with comprehensive relocation packages for top-tier candidates worldwide.',
+    category: 'latest-jobs',
+    tags: ['FinTech', 'Python', 'Quant', 'London', 'Hybrid'],
+    department: 'Private Sector',
+    country: 'UK',
+    isNew: true,
+    state: 'London (Hybrid)',
+    jobType: 'private',
+    sector: 'Banking & Finance',
+    dates: {
+      applicationBegin: '2026-06-23',
+      lastDateApply: '2026-07-28',
+      lastDateFee: '£ 0 /-'
+    },
+    fees: {
+      generalOBC: '£ 0 /-',
+      scST: '£ 0 /-',
+      paymentMode: 'N/A'
+    },
+    ageLimit: {
+      asOnDate: '01/01/2026',
+      minAge: '22 Years',
+      maxAge: '40 Years',
+      relaxationInfo: 'N/A'
+    },
+    totalVacancies: 6,
+    vacancies: [
+      {
+        postName: 'Quant Systems Developer',
+        totalPosts: 4,
+        eligibility: 'Advanced proficiency in Python, C++, and time-series data modeling.'
+      },
+      {
+        postName: 'FinTech Data Analyst',
+        totalPosts: 2,
+        eligibility: 'Graduate in Math, Economics, or Computer Science with solid spreadsheet and SQL analytics skills.'
+      }
+    ],
+    links: {
+      applyOnline: '#apply',
+      officialWebsite: 'https://britishcapitalanalytics.co.uk'
+    }
+  },
+  {
+    id: 'ca-toronto-cloud-2026',
+    title: 'Cloud Solutions Architect & DevOps Lead',
+    organization: 'MapleScale Technologies, Toronto',
+    postDate: '2026-06-22',
+    shortInfo: 'Build secure cloud networks, infrastructure-as-code deployments, and automated scaling clusters using AWS, GCP, and Kubernetes for high-growth SaaS platforms.',
+    category: 'latest-jobs',
+    tags: ['Cloud', 'AWS', 'DevOps', 'Toronto', 'Kubernetes'],
+    department: 'Private Sector',
+    country: 'CA',
+    isNew: true,
+    state: 'Ontario',
+    jobType: 'private',
+    sector: 'IT & Software',
+    dates: {
+      applicationBegin: '2026-06-22',
+      lastDateApply: '2026-08-15',
+      lastDateFee: '$ 0 /-'
+    },
+    fees: {
+      generalOBC: 'CA$ 0 /-',
+      scST: 'CA$ 0 /-',
+      paymentMode: 'N/A'
+    },
+    ageLimit: {
+      asOnDate: '01/01/2026',
+      minAge: '21 Years',
+      maxAge: '45 Years',
+      relaxationInfo: 'N/A'
+    },
+    totalVacancies: 10,
+    vacancies: [
+      {
+        postName: 'Cloud Architect',
+        totalPosts: 4,
+        eligibility: 'AWS/GCP Certified Professional Solutions Architect. Strong experience with Terraform.'
+      },
+      {
+        postName: 'Site Reliability Engineer',
+        totalPosts: 6,
+        eligibility: 'B.S. in Computer Science or similar. Solid skill in Linux scripting, Docker, and Kubernetes.'
+      }
+    ],
+    links: {
+      applyOnline: '#apply',
+      officialWebsite: 'https://maplescaletech.ca'
+    }
+  },
+  {
+    id: 'sg-asia-ops-2026',
+    title: 'APAC Supply Chain & Operations Manager',
+    organization: 'Straits Commerce Group, Singapore',
+    postDate: '2026-06-24',
+    shortInfo: 'Coordinate shipping lanes, supplier partnerships, and custom clearings in Singapore, connecting logistics nodes between Southeast Asia, USA, and Europe.',
+    category: 'latest-jobs',
+    tags: ['Operations', 'Supply Chain', 'Singapore', 'APAC'],
+    department: 'Private Sector',
+    country: 'SG',
+    isNew: true,
+    state: 'Central Region',
+    jobType: 'private',
+    sector: 'Logistics & Supply Chain',
+    dates: {
+      applicationBegin: '2026-06-24',
+      lastDateApply: '2026-07-29',
+      lastDateFee: '$ 0 /-'
+    },
+    fees: {
+      generalOBC: 'SG$ 0 /-',
+      scST: 'SG$ 0 /-',
+      paymentMode: 'N/A'
+    },
+    ageLimit: {
+      asOnDate: '01/01/2026',
+      minAge: '22 Years',
+      maxAge: '45 Years',
+      relaxationInfo: 'N/A'
+    },
+    totalVacancies: 4,
+    vacancies: [
+      {
+        postName: 'Supply Chain Lead',
+        totalPosts: 2,
+        eligibility: 'Bachelor’s degree in Business Operations, Logistics, or engineering. 2+ years supplier negotiation experience.'
+      },
+      {
+        postName: 'Inventory Controller',
+        totalPosts: 2,
+        eligibility: 'High school graduate or similar with expertise in SAP, inventory counting, and digital logistics sheets.'
+      }
+    ],
+    links: {
+      applyOnline: '#apply',
+      officialWebsite: 'https://straitscommerce.com.sg'
+    }
+  },
+  {
+    id: 'au-sydney-healthcare-2026',
+    title: 'Allied Health Clinical Specialist & Nurse Lead',
+    organization: 'Southern Cross Healthcare, Sydney',
+    postDate: '2026-06-24',
+    shortInfo: 'Join Sydney’s premier healthcare group. We are recruiting accredited clinical nurses and therapy specialists to deliver world-class patient services and operations.',
+    category: 'latest-jobs',
+    tags: ['Healthcare', 'Nursing', 'Clinical', 'Sydney', 'Accredited'],
+    department: 'Private Sector',
+    country: 'AU',
+    isNew: true,
+    state: 'New South Wales',
+    jobType: 'private',
+    sector: 'Healthcare & Medical',
+    dates: {
+      applicationBegin: '2026-06-24',
+      lastDateApply: '2026-08-25',
+      lastDateFee: '$ 0 /-'
+    },
+    fees: {
+      generalOBC: 'AU$ 0 /-',
+      scST: 'AU$ 0 /-',
+      paymentMode: 'N/A'
+    },
+    ageLimit: {
+      asOnDate: '01/01/2026',
+      minAge: '18 Years',
+      maxAge: '45 Years',
+      relaxationInfo: 'N/A'
+    },
+    totalVacancies: 15,
+    vacancies: [
+      {
+        postName: 'Lead Care Specialist',
+        totalPosts: 5,
+        eligibility: 'Registered Nurse (RN) accreditation in Australia. Compassionate care background.'
+      },
+      {
+        postName: 'Rehabilitation Therapist',
+        totalPosts: 10,
+        eligibility: 'Degree in Physiotherapy or occupational therapy from a recognized clinical institution.'
+      }
+    ],
+    links: {
+      applyOnline: '#apply',
+      officialWebsite: 'https://southerncrosshealthcare.com.au'
+    }
+  },
+  {
+    id: 'de-berlin-product-2026',
+    title: 'Product Design Lead (Berlin Creative Labs)',
+    organization: 'Autobahn Digital Creative GmbH, Berlin',
+    postDate: '2026-06-24',
+    shortInfo: 'Shape the customer-centric frontend journeys and pixel-perfect design languages for our core mobility and transport solutions across Germany and mainland Europe.',
+    category: 'latest-jobs',
+    tags: ['Product Design', 'UI/UX', 'Figma', 'Berlin', 'English Speaking'],
+    department: 'Private Sector',
+    country: 'DE',
+    isNew: true,
+    state: 'Berlin (Hybrid)',
+    jobType: 'private',
+    sector: 'IT & Software',
+    dates: {
+      applicationBegin: '2026-06-24',
+      lastDateApply: '2026-08-30',
+      lastDateFee: '€ 0 /-'
+    },
+    fees: {
+      generalOBC: '€ 0 /-',
+      scST: '€ 0 /-',
+      paymentMode: 'N/A'
+    },
+    ageLimit: {
+      asOnDate: '01/01/2026',
+      minAge: '21 Years',
+      maxAge: '42 Years',
+      relaxationInfo: 'N/A'
+    },
+    totalVacancies: 5,
+    vacancies: [
+      {
+        postName: 'Principal Product Designer',
+        totalPosts: 2,
+        eligibility: '5+ years crafting enterprise interfaces in Figma/Sketch. Portfolio demonstrating deep user journey empathy.'
+      },
+      {
+        postName: 'UI Prototyper',
+        totalPosts: 3,
+        eligibility: 'Expertise in vector animations, interaction dynamics, and high-fidelity clickable mockups.'
+      }
+    ],
+    links: {
+      applyOnline: '#apply',
+      officialWebsite: 'https://autobahncreative.de'
+    }
   }
 ];

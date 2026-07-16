@@ -20,6 +20,7 @@ export interface Posting {
   state?: string; // e.g., "Odisha", "All India", "Bihar", "Uttar Pradesh", etc.
   jobType?: 'government' | 'private'; // default is 'government'
   sector?: string; // e.g., "IT & Software", "Logistics", "Manufacturing", "Hospitality", etc.
+  country?: string; // e.g., "US", "UK", "CA", "SG", "AU", "DE", "IN", "Global"
   
   // Important Dates
   dates: {

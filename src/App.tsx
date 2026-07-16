@@ -109,6 +109,15 @@ export default function App() {
     localStorage.setItem('recruit_language', lang);
   };
 
+  const [selectedCountry, setSelectedCountry] = useState<string>(() => {
+    return localStorage.getItem('recruit_country') || 'Global';
+  });
+
+  const changeCountry = (country: string) => {
+    setSelectedCountry(country);
+    localStorage.setItem('recruit_country', country);
+  };
+
   const [userName, setUserName] = useState(() => {
     return localStorage.getItem('recruit_user_name') || 'Honored Guest';
   });
@@ -597,7 +606,7 @@ export default function App() {
       console.error('Failed to sync live postings:', err);
       // Fallback: merge static fallbacks locally to guarantee results
       const existingIds = new Set(postings.map(p => p.id));
-      const mockList = [
+      const mockList: Posting[] = [
         {
           id: 'rbi-assistant-2026',
           title: 'RBI Assistant Online Form 2026',
@@ -739,6 +748,11 @@ export default function App() {
     const matchesDepartment =
       activeDepartment === 'All' || post.department === activeDepartment;
 
+    const matchesCountry =
+      selectedCountry === 'Global' ||
+      (post.country && post.country.toLowerCase() === selectedCountry.toLowerCase()) ||
+      (selectedCountry.toLowerCase() === 'in' && (!post.country || post.country.toLowerCase() === 'in'));
+
     let matchesRegion = true;
     if (activeRegion === 'OdishaGovt') {
       matchesRegion = (post.state === 'Odisha' && (post.jobType === 'government' || !post.jobType));
@@ -755,7 +769,7 @@ export default function App() {
       matchesSector = post.sector === activeSector;
     }
 
-    return matchesSearch && matchesCategory && matchesDepartment && matchesRegion && matchesSector;
+    return matchesSearch && matchesCategory && matchesDepartment && matchesRegion && matchesSector && matchesCountry;
   }).sort((a, b) => {
     const dateA = new Date(a.postDate).getTime() || 0;
     const dateB = new Date(b.postDate).getTime() || 0;
@@ -1137,7 +1151,7 @@ export default function App() {
                 
                 <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-[11px] font-bold text-slate-400">
                   <span className="flex items-center gap-1.5 text-emerald-400">● Live Synchronization Active</span>
-                  <span className="flex items-center gap-1.5">★ {subscriptions && subscriptions.length > 0 ? `${subscriptions.length} Linked Subscriptions` : 'Free Tier Account'}</span>
+                  <span className="flex items-center gap-1.5">★ {subscriptions && Object.values(subscriptions).filter(Boolean).length > 0 ? `${Object.values(subscriptions).filter(Boolean).length} Linked Subscriptions` : 'Free Tier Account'}</span>
                   <span className="flex items-center gap-1.5 text-purple-400">👥 Access all features instantly</span>
                 </div>
               </div>
@@ -2387,9 +2401,9 @@ export default function App() {
                             Last Date: {item.dates.lastDateApply}
                           </span>
                         )}
-                        {item.qualification && (
-                          <span className="text-[9px] bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded font-black">
-                            🎓 {item.qualification}
+                        {item.vacancies?.[0]?.eligibility && (
+                          <span className="text-[9px] bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded font-black max-w-[200px] truncate" title={item.vacancies[0].eligibility}>
+                            🎓 {item.vacancies[0].eligibility}
                           </span>
                         )}
                       </div>
@@ -2739,6 +2753,8 @@ export default function App() {
         language={language}
         onLanguageChange={changeLanguage}
         onShare={() => handleOpenShare()}
+        selectedCountry={selectedCountry}
+        onCountryChange={changeCountry}
       />
 
       {/* Security Auth Modal overlay */}

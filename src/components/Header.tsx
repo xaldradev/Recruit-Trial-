@@ -16,7 +16,20 @@ interface HeaderProps {
   language: Language;
   onLanguageChange: (lang: Language) => void;
   onShare?: () => void;
+  selectedCountry: string;
+  onCountryChange: (country: string) => void;
 }
+
+export const COUNTRIES_LIST = [
+  { code: 'Global', name: 'Global Opportunities', flag: '🌐' },
+  { code: 'IN', name: 'India', flag: '🇮🇳' },
+  { code: 'US', name: 'United States', flag: '🇺🇸' },
+  { code: 'UK', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+  { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
+  { code: 'AU', name: 'Australia', flag: '🇦🇺' },
+  { code: 'DE', name: 'Germany', flag: '🇩🇪' }
+] as const;
 
 export const LANGUAGES_LIST = [
   { code: 'en', native: 'English', symbol: 'AA', english: '' },
@@ -34,21 +47,27 @@ export const LANGUAGES_LIST = [
   { code: 'as', native: 'অসমীয়া', english: 'Assamese', symbol: 'অ' }
 ] as const;
 
-export default function Header({ activeTab, onTabChange, onSearchChange, searchQuery, onOpenAuth, onRevisitWelcome, onStartTour, language, onLanguageChange, onShare }: HeaderProps) {
+export default function Header({ activeTab, onTabChange, onSearchChange, searchQuery, onOpenAuth, onRevisitWelcome, onStartTour, language, onLanguageChange, onShare, selectedCountry, onCountryChange }: HeaderProps) {
   const { user, userData, signOutUser } = useAuth();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [countdown, setCountdown] = useState({ hours: 23, minutes: 45, seconds: 20 });
   const [isHeaderLangOpen, setIsHeaderLangOpen] = useState(false);
   const [isMobileLangOpen, setIsMobileLangOpen] = useState(false);
+  const [isHeaderRegionOpen, setIsHeaderRegionOpen] = useState(false);
+  const [isMobileRegionOpen, setIsMobileRegionOpen] = useState(false);
   const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
   const headerLangRef = useRef<HTMLDivElement>(null);
+  const headerRegionRef = useRef<HTMLDivElement>(null);
   const moreDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (headerLangRef.current && !headerLangRef.current.contains(event.target as Node)) {
         setIsHeaderLangOpen(false);
+      }
+      if (headerRegionRef.current && !headerRegionRef.current.contains(event.target as Node)) {
+        setIsHeaderRegionOpen(false);
       }
       if (moreDropdownRef.current && !moreDropdownRef.current.contains(event.target as Node)) {
         setIsMoreDropdownOpen(false);
@@ -283,6 +302,53 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
                     <span>{lang.native} {lang.english ? `(${lang.english})` : ''}</span>
                   </div>
                   {language === lang.code && <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Sleek Globe Region Selector */}
+          <div className="relative" ref={headerRegionRef}>
+            <button
+              onClick={() => setIsHeaderRegionOpen(!isHeaderRegionOpen)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#0f0e1a]/80 border border-slate-800 rounded-xl hover:bg-[#161427]/80 hover:border-purple-500/40 transition-all shadow-sm cursor-pointer min-w-[70px] justify-between"
+              title="Select Region / Country"
+            >
+              <div className="flex items-center gap-1">
+                <span className="text-xs">{COUNTRIES_LIST.find(c => c.code === selectedCountry)?.flag || '🌐'}</span>
+                <span className="text-purple-200 hover:text-white text-[11px] font-extrabold font-sans tracking-wide">
+                  {selectedCountry}
+                </span>
+              </div>
+              <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform duration-300 ${isHeaderRegionOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            <div
+              className={`absolute right-0 mt-2 w-48 max-h-80 overflow-y-auto bg-[#07060f]/95 border border-slate-800 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all duration-300 scrollbar-thin scrollbar-thumb-purple-900/50 scrollbar-track-transparent ${
+                isHeaderRegionOpen
+                  ? 'opacity-100 scale-100 pointer-events-auto'
+                  : 'opacity-0 scale-95 pointer-events-none'
+              } z-[60]`}
+            >
+              <div className="px-3.5 py-2 border-b border-slate-800/40 text-[10px] text-slate-400 font-bold uppercase tracking-wider sticky top-0 bg-[#07060f] z-10">
+                Select Country / Region
+              </div>
+              {COUNTRIES_LIST.map((c) => (
+                <button
+                  key={c.code}
+                  onClick={() => {
+                    onCountryChange(c.code);
+                    setIsHeaderRegionOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-xs font-semibold transition-all flex items-center justify-between cursor-pointer hover:bg-white/5 ${
+                    selectedCountry === c.code ? 'bg-[#7c3aed]/25 text-purple-200 font-bold' : 'text-slate-300 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">{c.flag}</span>
+                    <span>{c.name}</span>
+                  </div>
+                  {selectedCountry === c.code && <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />}
                 </button>
               ))}
             </div>
@@ -558,6 +624,46 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
                               title={`${lang.native} ${lang.english ? `(${lang.english})` : ''}`}
                             >
                               {lang.native}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Mobile Region Selector */}
+                    <div className="mb-2.5 px-3 py-1.5 bg-[#120a28]/60 border border-purple-950/40 rounded-xl flex flex-col gap-1 transition-all">
+                      <button
+                        onClick={() => setIsMobileRegionOpen(!isMobileRegionOpen)}
+                        className="flex items-center justify-between w-full text-left cursor-pointer py-1"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs">🗺️</span>
+                          <span className="text-xs text-slate-300 font-bold">
+                            Select Region: <span className="text-emerald-400 font-extrabold ml-1">
+                              {COUNTRIES_LIST.find(c => c.code === selectedCountry)?.name || 'Global'}
+                            </span>
+                          </span>
+                        </div>
+                        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-300 ${isMobileRegionOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      
+                      {isMobileRegionOpen && (
+                        <div className="grid grid-cols-2 gap-1 mt-1 max-h-32 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-purple-900/60 scrollbar-track-transparent animate-in fade-in slide-in-from-top-1.5 duration-200">
+                          {COUNTRIES_LIST.map((c) => (
+                            <button
+                              key={c.code}
+                              onClick={() => {
+                                onCountryChange(c.code);
+                                setIsMobileRegionOpen(false);
+                              }}
+                              className={`px-1.5 py-1.5 rounded-lg text-[9px] font-black cursor-pointer transition-all text-center truncate flex items-center justify-center gap-1.5 ${
+                                selectedCountry === c.code
+                                  ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white border border-purple-400/45 shadow-md'
+                                  : 'bg-purple-950/35 hover:bg-purple-900/30 text-slate-300 border border-purple-950/40'
+                              }`}
+                            >
+                              <span>{c.flag}</span>
+                              <span>{c.code}</span>
                             </button>
                           ))}
                         </div>
