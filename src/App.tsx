@@ -293,20 +293,81 @@ export default function App() {
     // Localized language adjustments to maximize search engine indexing in India
     let titleStr = seo.title;
     let descStr = seo.desc;
+    let keywordsStr = seo.keywords;
 
-    if (language === 'hi') {
-      titleStr = `[हिंदी] ${titleStr.replace("Recruit.org.in", "करियर पोर्टल Recruit.org.in")}`;
-      descStr = `भारत का अग्रणी करियर और रोजगार मंच: ${descStr}`;
-    } else if (language === 'or') {
-      titleStr = `[ଓଡ଼ିଆ] ${titleStr.replace("Recruit.org.in", "ଓଡ଼ିଶା କ୍ୟାରିୟର ପୋର୍ଟାଲ୍ Recruit.org.in")}`;
-      descStr = `ଓଡ଼ିଶା ଓ ଭାରତର ସରକାରୀ ଓ ବେସରକାରୀ ଚାକିରି, ସିଲାବସ୍ ଏବଂ ଏମଏସଏମଇ ଗାଇଡ୍: ${descStr}`;
-    } else if (language !== 'en') {
-      const langNames: Record<string, string> = {
-        bn: 'বাংলা', te: 'తెలుగు', mr: 'मराठी', ta: 'தமிழ்', gu: 'ગુજરાતી', ur: 'اردو', kn: 'ಕನ್ನಡ', ml: 'മലയാളം', pa: 'ਪੰਜਾਬੀ', as: 'অসমীয়া'
-      };
-      const langLabel = langNames[language] || language;
-      titleStr = `[${langLabel}] ${titleStr}`;
-    }
+    // Define native-optimized prefix strings and localized descriptions to boost indexing across 13 major Indian languages
+    const seoLocalizationMap: Record<string, { titlePrefix: string; descPrefix: string; keywords: string }> = {
+      en: {
+        titlePrefix: "Recruit.org.in",
+        descPrefix: "India's premier career & government scheme registry: ",
+        keywords: "sarkari job, government exams 2026, career guidance, resume templates"
+      },
+      hi: {
+        titlePrefix: "करियर पोर्टल Recruit.org.in",
+        descPrefix: "भारत का अग्रणी करियर और रोजगार मंच: ",
+        keywords: "सरकारी नौकरी 2026, करियर गाइड, रेज़्यूमे मेकर, परीक्षा सिलेबस, सरकारी योजनाएं, रोजगार समाचार"
+      },
+      or: {
+        titlePrefix: "ଓଡ଼ିଶା କ୍ୟାରିୟର ପୋର୍ଟାଲ୍ Recruit.org.in",
+        descPrefix: "ଓଡ଼ିଶା ଓ ଭାରତର ସରକାରୀ ଓ ବେସରକାରୀ ଚାକିରି, ସିଲାବସ୍ ଏବଂ ଏମଏସଏମଇ ଗାଇଡ୍: ",
+        keywords: "ଓଡ଼ିଶା ସରକାରୀ ଚାକିରି, କ୍ୟାରିୟର ଗାଇଡ୍, ରେଜୁମେ ମେକର, ପରୀକ୍ষা ସିଲାବସ୍, ସରକାରୀ ଯୋଜନା, ନିଯୁକ୍ତି ଖବର"
+      },
+      bn: {
+        titlePrefix: "কেরিয়ার পোর্টাল Recruit.org.in",
+        descPrefix: "পশ্চিমবঙ্গ ও ভারতের শীর্ষস্থানীয় ক্যারিয়ার এবং চাকরি পোর্টাল: ",
+        keywords: "পশ্চিমবঙ্গ সরকারি চাকরি, ক্যারিয়ার গাইড, জীবনবৃত্তান্ত নির্মাতা, পরীক্ষার সিলেবাস, সরকারি প্রকল্প, কর্মসংস্থান"
+      },
+      te: {
+        titlePrefix: "కెరీర్ పోర్టల్ Recruit.org.in",
+        descPrefix: "ఆంధ్రప్రదేశ్ & భారతదేశపు అగ్రగామి కెరీర్ మరియు ఉద్యోగ వేదిక: ",
+        keywords: "ప్రభుత్వ ఉద్యోగాలు 2026, కెరీర్ గైడ్, రెజ్యూమె మేకర్, పరీక్ష సిలబస్, ప్రభుత్వ పథకాలు, ఉద్యోగ వార్తలు"
+      },
+      mr: {
+        titlePrefix: "करिअर पोर्टल Recruit.org.in",
+        descPrefix: "महाराष्ट्र आणि भारतातील अग्रगण्य करिअर आणि नोकरी मंच: ",
+        keywords: "सरकारी नोकरी 2026, करिअर मार्गदर्शक, रेझ्युमे मेकर, परीक्षा अभ्यासक्रम, शासकीय योजना, नोकरी माहिती"
+      },
+      ta: {
+        titlePrefix: "வேலைவாய்ப்பு போர்டல் Recruit.org.in",
+        descPrefix: "தமிழ்நாடு & இந்தியாவின் முன்னணி தொழில் மற்றும் வேலைவாய்ப்பு தளம்: ",
+        keywords: "அரசு வேலைகள் 2026, தொழில் வழிகாட்டி, ரெஸ்யூம் மேக்கர், தேர்வு பாடத்திட்டம், அரசு திட்டங்கள், வேலைவாய்ப்பு செய்திகள்"
+      },
+      gu: {
+        titlePrefix: "કરિયર પોર્ટલ Recruit.org.in",
+        descPrefix: "ગુજરાત અને ભારતનું അഗ്രണീ કરિયર અને રોજગાર પ્લેટફોર્મ: ",
+        keywords: "સરકારી નોકરી 2026, કરિયર માર્ગદર્શક, રેઝ્યૂમે મેકર, પરીક્ષા અભ્યાસક્રમ, સરકારી યોજનાઓ, રોજગાર સમાચાર"
+      },
+      ur: {
+        titlePrefix: "کیرئیر پورٹل Recruit.org.in",
+        descPrefix: "ہندوستان کا معروف کیریئر اور ملازمت کا پورٹل: ",
+        keywords: "سرکاری ملازمتیں 2026، کیریئر گائیڈ، ریزیومے میکر، امتحانی نصاب، سرکاری اسکیمیں"
+      },
+      kn: {
+        titlePrefix: "ಕೆರಿಯರ್ ಪೋರ್ಟಲ್ Recruit.org.in",
+        descPrefix: "ಕರ್ನಾಟಕ ಮತ್ತು ಭಾರತದ ಪ್ರಮುಖ ವೃತ್ತಿಜೀವನ ಮತ್ತು ಉದ್ಯೋಗ ಪೋರ್ಟಲ್: ",
+        keywords: "ಸರ್ಕಾರಿ ಉದ್ಯೋಗಗಳು 2026, ವೃತ್ತಿ ಮಾರ್ಗದರ್ಶನ, ರೆಸ್ಯೂಮ್ ಮೇಕರ್, ಪರೀಕ್ಷಾ ಪಠ್ಯಕ್ರಮ, ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು"
+      },
+      ml: {
+        titlePrefix: "കരിയർ പോർട്ടൽ Recruit.org.in",
+        descPrefix: "കേരളത്തിലെയും ഇന്ത്യയിലെയും മുൻനിര കരിയർ, തൊഴിൽ പോർട്ടൽ: ",
+        keywords: "സർക്കാർ ജോലികൾ 2026, കരിയർ ഗൈഡ്, റെസ്യൂമെ മേക്കർ, പരീക്ഷാ സിലബസ്, സർക്കാർ പദ്ധതികൾ"
+      },
+      pa: {
+        titlePrefix: "ਕਰੀਅਰ ਪੋਰਟਲ Recruit.org.in",
+        descPrefix: "ਪੰਜਾਬ ਅਤੇ ਭਾਰਤ ਦਾ ਪ੍ਰਮੁੱਖ ਕਰੀਅਰ ਅਤੇ ਨੌਕਰੀ ਪੋਰਟਲ: ",
+        keywords: "ਸਰਕਾਰੀ ਨੌਕਰੀਆਂ 2026, ਕਰੀਅਰ ਗਾਈਡ, ਰੈਜ਼ਿਊਮੇ ਮੇਕਰ, ਪ੍ਰੀਖਿਆ ਸਿਲੇਬਸ, ਸਰਕਾਰੀ ਯੋਜਨਾਵਾਂ"
+      },
+      as: {
+        titlePrefix: "কেৰিয়াৰ প’ৰ্টেল Recruit.org.in",
+        descPrefix: "অসম আৰু ভাৰতৰ আগশাৰীৰ কেৰিয়াৰ আৰু চাকৰি প’ৰ্টেল: ",
+        keywords: "চৰকাৰী চাকৰি ২০২৬, কেৰিয়াৰ গাইড, ৰিজুমে নিৰ্মাতা, পৰীক্ষাৰ পাঠ্যক্ৰম, চৰকাৰী আঁচনি"
+      }
+    };
+
+    const currentLoc = seoLocalizationMap[language] || seoLocalizationMap.en;
+    titleStr = titleStr.replace("Recruit.org.in", currentLoc.titlePrefix);
+    descStr = `${currentLoc.descPrefix}${descStr}`;
+    keywordsStr = `${currentLoc.keywords}, ${keywordsStr}`;
 
     // Apply document level DOM updates
     document.title = titleStr;
@@ -318,7 +379,7 @@ export default function App() {
 
     const metaKeywords = document.querySelector('meta[name="keywords"]');
     if (metaKeywords) {
-      metaKeywords.setAttribute('content', seo.keywords);
+      metaKeywords.setAttribute('content', keywordsStr);
     }
 
     // Dynamic Social OpenGraph SEO updates
@@ -429,28 +490,33 @@ export default function App() {
       recognition.continuous = false;
       recognition.interimResults = false;
       
-      // Configure language based on user's active choice (English, Hindi, or Odia)
-      if (language === 'hi') {
-        recognition.lang = 'hi-IN';
-      } else if (language === 'or') {
-        recognition.lang = 'or-IN';
-      } else {
-        recognition.lang = 'en-IN';
-      }
+      // Configure language based on user's active choice (English, Hindi, Odia, or other 10 regional languages)
+      const langLocales: Record<string, string> = {
+        en: 'en-IN', hi: 'hi-IN', or: 'or-IN', bn: 'bn-IN', te: 'te-IN', mr: 'mr-IN',
+        ta: 'ta-IN', gu: 'gu-IN', ur: 'ur-IN', kn: 'kn-IN', ml: 'ml-IN', pa: 'pa-IN', as: 'as-IN'
+      };
+      recognition.lang = langLocales[language] || 'en-IN';
 
       // Dynamically load speech grammars for higher precision in each native tongue
       const SpeechGrammarList = (window as any).SpeechGrammarList || (window as any).webkitSpeechGrammarList;
       if (SpeechGrammarList) {
         const speechRecognitionList = new SpeechGrammarList();
-        let grammarText = '';
-        
-        if (language === 'hi') {
-          grammarText = '#JSGF V1.0; grammar hindiCommands; public <hindi_cmd> = नौकरी | पाठ्यक्रम | कौशल | फ्रेशर | सरकारी नौकरी | परीक्षा | रिज्यूमे | साक्षात्कार | गाइड;';
-        } else if (language === 'or') {
-          grammarText = '#JSGF V1.0; grammar odiaCommands; public <odia_cmd> = ଚାକିରି | ପାଠ୍ୟକ୍ରମ | କୌଶଳ | ଫ୍ରେସର୍ | ସରକାରୀ | ପରୀକ୍ଷା | ରିଜ୍ୟୁମେ | ସାକ୍ଷାତକାର | ଗାଇଡ୍;';
-        } else {
-          grammarText = '#JSGF V1.0; grammar enCommands; public <en_cmd> = jobs | syllabus | skills | fresher | exam | government | resume | interview | career | training;';
-        }
+        const grammarDict: Record<string, string> = {
+          en: '#JSGF V1.0; grammar enCommands; public <en_cmd> = jobs | syllabus | skills | fresher | exam | government | resume | interview | career | training;',
+          hi: '#JSGF V1.0; grammar hindiCommands; public <hindi_cmd> = नौकरी | पाठ्यक्रम | कौशल | फ्रेशर | सरकारी नौकरी | परीक्षा | रिज्यूमे | साक्षात्कार | गाइड;',
+          or: '#JSGF V1.0; grammar odiaCommands; public <odia_cmd> = ଚାକିରି | ପାଠ୍ୟକ୍ରମ | କୌଶଳ | ଫ୍ରେସର୍ | ସରକାରୀ | ପରୀକ୍ଷା | ରିଜ୍ୟୁମେ | ସାକ୍ଷାତକାର | ଗାଇଡ୍;',
+          bn: '#JSGF V1.0; grammar bnCommands; public <bn_cmd> = চাকরি | কোর্স | দক্ষতা | ফ্রেশার | সরকারি | পরীক্ষা | জীবনবৃত্তান্ত | ইন্টারভিউ | গাইড;',
+          te: '#JSGF V1.0; grammar teCommands; public <te_cmd> = ఉద్యోగాలు | సిలబస్ | నైపుణ్యాలు | ఫ్రెషర్ | పరీక్ష | ప్రభుత్వ | రెజ్యూమె | ఇంటర్వ్యూ | గైడ్;',
+          mr: '#JSGF V1.0; grammar mrCommands; public <mr_cmd> = नोकरी | अभ्यासक्रम | कौशल्य | फ्रेशर | सरकारी | परीक्षा | रेझ्युमे | मुलाखत | मार्गदर्शक;',
+          ta: '#JSGF V1.0; grammar taCommands; public <ta_cmd> = வேலைகள் | பாடத்திட்டம் | திறன்கள் | பிரெஷர் | தேர்வு | அரசு | ரெஸ்யூம் | நேர்காணல் | வழிகாட்டி;',
+          gu: '#JSGF V1.0; grammar guCommands; public <gu_cmd> = નોકરી | અભ્યાસક્રમ | કૌશલ્ય | ફ્રેશર | સરਕਾਰੀ | પરીક્ષા | રેઝ્યૂમે | ઇન્ટરવ્યુ | માર્ગદર્શક;',
+          ur: '#JSGF V1.0; grammar urCommands; public <ur_cmd> = ملازمت | نصاب | مہارت | فریشر | سرکاری | امتحان | ریزیومے | انٹرویو | گائیڈ;',
+          kn: '#JSGF V1.0; grammar knCommands; public <kn_cmd> = ಉದ್ಯೋಗಗಳು | ಪಠ್ಯಕ್ರಮ | ಕೌಶಲ್ಯಗಳು | ಫ್ರೆಶರ್ | ಪರೀಕ್ಷೆ | ಸರ್ಕಾರಿ | ರೆಸ್ಯೂಮ್ | ಸಂದರ್ಶನ | ಮಾರ್ಗದರ್ಶಿ;',
+          ml: '#JSGF V1.0; grammar mlCommands; public <ml_cmd> = ജോലികൾ | സിലബസ് | കഴിവുകൾ | ഫ്രഷർ | പരീക്ഷ | സർക്കാർ | റെസ്യൂമെ | അഭിമുഖം | ഗൈഡ്;',
+          pa: '#JSGF V1.0; grammar paCommands; public <pa_cmd> = ਨੌਕਰੀਆਂ | ਸਿਲੇਬਸ | ਹੁਨਰ | ਫਰੈਸ਼ਰ | ਪ੍ਰੀਖਿਆ | ਸਰਕਾਰੀ | ਰੈਜ਼ਿਊਮੇ | ਇੰਟਰਵਿਊ | ਗਾਈਡ;',
+          as: '#JSGF V1.0; grammar asCommands; public <as_cmd> = চাকৰি | পাঠ্যক্ৰম | দক্ষতা | ফ্ৰেছাৰ | চৰকাৰী | পৰীক্ষা | ৰিজুমে | সাক্ষাৎকাৰ | গাইড;'
+        };
+        const grammarText = grammarDict[language] || grammarDict.en;
         
         try {
           speechRecognitionList.addFromString(grammarText, 1);
