@@ -2904,17 +2904,12 @@ app.get(['/arohi.png', '/arohi.jpg', '/Arohi.jpg', '/Arohi.png', '/arohi.jpeg', 
       }
     };
     
-    // Parse the voice and language parameters safely from the query string
+    // Parse the voice parameter safely from the query string
     let selectedVoice = 'Zephyr';
-    let selectedLanguage = 'en';
     if (request.url) {
       const match = request.url.match(/[?&]voice=([^&]+)/);
       if (match) {
         selectedVoice = decodeURIComponent(match[1]);
-      }
-      const langMatch = request.url.match(/[?&]language=([^&]+)/);
-      if (langMatch) {
-        selectedLanguage = decodeURIComponent(langMatch[1]);
       }
     }
 
@@ -2928,34 +2923,8 @@ app.get(['/arohi.png', '/arohi.jpg', '/Arohi.jpg', '/Arohi.png', '/arohi.jpeg', 
       return;
     }
 
-    // Determine the dynamic voice system instruction based on the chosen language
-    const voiceLanguageNames: Record<string, string> = {
-      hi: 'HINDI (हिंदी)',
-      or: 'ODIA (ଓଡ଼ିଆ)',
-      bn: 'BENGALI (বাংলা)',
-      te: 'TELUGU (తెలుగు)',
-      mr: 'MARATHI (मराठी)',
-      ta: 'TAMIL (தமிழ்)',
-      gu: 'GUJARATI (ગુજરાતી)',
-      ur: 'URDU (اردו)',
-      kn: 'KANNADA (ಕನ್ನಡ)',
-      ml: 'MALAYALAM (മലയാളം)',
-      pa: 'PUNJABI (ਪੰਜਾਬੀ)',
-      as: 'ASSAMESE (অસમীয়া)'
-    };
-
-    let dynamicVoiceInstruction = AROHI_SYSTEM_INSTRUCTION;
-    if (selectedLanguage && voiceLanguageNames[selectedLanguage]) {
-      const langName = voiceLanguageNames[selectedLanguage];
-      dynamicVoiceInstruction += `\n\n[USER PREFERRED LANGUAGE: ${langName}. The user is speaking in ${langName.split(' ')[0]}. You MUST reply primarily in ${langName} language or in highly natural sounding regional accent depending on how the user communicates. If they speak in a transliterated/mix code like Hinglish, reply with a warm, natural transliterated style. Always match their chosen language perfectly and dynamically!]`;
-    } else {
-      dynamicVoiceInstruction += `\n\n[USER PREFERRED LANGUAGE: ENGLISH. The user prefers English. Respond in warm, concise English unless they speak to you in any Indian regional language or Hinglish, in which case match their language choice perfectly.]`;
-    }
-
-    dynamicVoiceInstruction += "\n\nCRITICAL CONTEXT: You are currently connected via real-time live voice link. Speak very concisely, dynamically, and warmly. Keep responses extremely brief (1-3 sentences maximum per turn) so they read nicely as speech without lagging.";
-
     try {
-      console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}, language: ${selectedLanguage}`);
+      console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}`);
       const session = await clientAi.live.connect({
         model: "gemini-3.1-flash-live-preview",
         config: {
@@ -2963,7 +2932,7 @@ app.get(['/arohi.png', '/arohi.jpg', '/Arohi.jpg', '/Arohi.png', '/arohi.jpeg', 
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
           },
-          systemInstruction: dynamicVoiceInstruction,
+          systemInstruction: AROHI_SYSTEM_INSTRUCTION + "\n\nCRITICAL CONTEXT: You are currently connected via real-time live voice link. Speak very concisely, dynamically, and warmly. Keep responses extremely brief (1-3 sentences maximum per turn) so they read nicely as speech without lagging.",
         },
         callbacks: {
           onmessage: (message: any) => {
