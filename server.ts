@@ -6,20 +6,9 @@ import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Modality } from '@google/genai';
 import dotenv from 'dotenv';
 import { createResumeDocx } from './server-resume.ts';
-import * as admin from 'firebase-admin';
+import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import { WebSocketServer, WebSocket } from 'ws';
-
-// CRITICAL: Process Crash Prevention & Live Telemetry Self-Healing Nodes
-process.on('uncaughtException', (err: any) => {
-  console.error('🔥 [Self-Healing Node] INTERCEPTED UNCAUGHT EXCEPTION:', err);
-  // Keep the server process alive to prevent any Railway 502/Application Failed to Respond error
-});
-
-process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
-  console.error('🔥 [Self-Healing Node] INTERCEPTED UNHANDLED REJECTION:', reason);
-  // Keep the server process alive to prevent any Railway 502/Application Failed to Respond error
-});
 
 dotenv.config();
 
@@ -27,51 +16,28 @@ dotenv.config();
 let adminApp: any = null;
 let adminDb: any = null;
 try {
-  const firebaseAdmin: any = admin && (admin as any).initializeApp ? admin : ((admin as any).default || admin);
-  const apps = firebaseAdmin?.apps || [];
   const serviceAccountVar = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (serviceAccountVar && serviceAccountVar.trim().startsWith('{')) {
+  if (serviceAccountVar) {
     try {
       const serviceAccount = JSON.parse(serviceAccountVar);
-      if (apps.length === 0) {
-        adminApp = firebaseAdmin.initializeApp({
-          credential: firebaseAdmin.credential.cert(serviceAccount),
-          projectId: 'recruit-auth-515f9',
-        });
-      } else {
-        adminApp = firebaseAdmin.app();
-      }
+      adminApp = admin.initializeApp({
+        credential: (admin as any).credential.cert(serviceAccount),
+        projectId: 'recruit-auth-515f9',
+      });
       console.log('Firebase Admin SDK initialized successfully with service account credential.');
     } catch (parseErr) {
       console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT env variable:', parseErr);
-      if (apps.length === 0) {
-        adminApp = firebaseAdmin.initializeApp({
-          projectId: 'recruit-auth-515f9',
-        });
-      } else {
-        adminApp = firebaseAdmin.app();
-      }
+      adminApp = admin.initializeApp({
+        projectId: 'recruit-auth-515f9',
+      });
     }
   } else {
-    if (serviceAccountVar) {
-      console.warn('Warning: FIREBASE_SERVICE_ACCOUNT env variable is set but does not appear to be a valid JSON credential string. Skipping JSON parsing.');
-    }
-    if (apps.length === 0) {
-      try {
-        adminApp = firebaseAdmin.initializeApp({
-          projectId: 'recruit-auth-515f9',
-        });
-        console.log('Firebase Admin SDK initialized with default credentials/projectId.');
-      } catch (initErr) {
-        console.warn('Could not initialize default Firebase Admin app (likely missing credentials on this environment). Skipping Admin DB.');
-      }
-    } else {
-      adminApp = firebaseAdmin.app();
-    }
+    adminApp = admin.initializeApp({
+      projectId: 'recruit-auth-515f9',
+    });
+    console.log('Firebase Admin SDK initialized with default credentials.');
   }
-  if (adminApp) {
-    adminDb = getFirestore(adminApp);
-  }
+  adminDb = getFirestore(adminApp);
 } catch (err) {
   console.error('Failed to initialize Firebase Admin SDK:', err);
 }
@@ -2736,282 +2702,20 @@ app.get(['/arohi.png', '/arohi.jpg', '/Arohi.jpg', '/Arohi.png', '/arohi.jpeg', 
 });
 
 // Vite middleware and asset delivery setup
-  // Google & Indian Search Engine SEO optimization nodes
-  app.get('/sitemap.xml', (req, res) => {
-    const baseUrl = 'https://recruit.org.in';
-    const tabs = ['home', 'jobs', 'career', 'resume', 'interview', 'business', 'schemes', 'courses', 'syllabus', 'franchise'];
-    const languages = ['en', 'hi', 'or', 'bn', 'te', 'mr', 'ta', 'gu', 'ur', 'kn', 'ml', 'pa', 'as'];
-
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n`;
-
-    // Generate entries for all tabs and languages with cross-referenced hreflang tags
-    for (const tab of tabs) {
-      const pathSuffix = tab === 'home' ? '' : `/${tab}`;
-      for (const lang of languages) {
-        const langParam = lang === 'en' ? '' : `?lang=${lang}`;
-        const url = `${baseUrl}${pathSuffix}${langParam}`;
-
-        xml += `  <url>\n`;
-        xml += `    <loc>${url}</loc>\n`;
-        xml += `    <changefreq>daily</changefreq>\n`;
-        xml += `    <priority>${tab === 'home' ? '1.0' : '0.8'}</priority>\n`;
-
-        // Add hreflang alternate declarations for other languages of the same tab
-        for (const altLang of languages) {
-          const altLangParam = altLang === 'en' ? '' : `?lang=${altLang}`;
-          const altUrl = `${baseUrl}${pathSuffix}${altLangParam}`;
-          xml += `    <xhtml:link rel="alternate" hreflang="${altLang}" href="${altUrl}" />\n`;
-        }
-
-        xml += `  </url>\n`;
-      }
-    }
-
-    xml += `</urlset>`;
-    res.header('Content-Type', 'application/xml');
-    res.send(xml);
-  });
-
-  app.get('/robots.txt', (req, res) => {
-    let robots = `User-agent: *\n`;
-    robots += `Allow: /\n`;
-    robots += `Disallow: /admin\n`;
-    robots += `Sitemap: https://recruit.org.in/sitemap.xml\n`;
-    res.header('Content-Type', 'text/plain');
-    res.send(robots);
-  });
-
-  // Dynamic Server-Side Meta Injector for Recruit.org.in World-Class SEO
-  function serveSEOOptimizedIndex(req: any, res: any, distPath: string) {
-    try {
-      const indexPath = path.join(distPath, 'index.html');
-      if (!fs.existsSync(indexPath)) {
-        return res.sendFile(indexPath);
-      }
-
-      let html = fs.readFileSync(indexPath, 'utf8');
-
-      // Parse requested tab and language
-      const pathname = req.path;
-      const tab = pathname.replace('/', '') || 'home';
-      const lang = (req.query.lang as string) || 'en';
-
-      const tabSEO: Record<string, { title: string; desc: string; keywords: string }> = {
-        home: {
-          title: "Recruit.org.in - India’s Next-Gen Career Registry, Jobs, & MSME Platform",
-          desc: "Empowering India's students, young professionals, and MSMEs. Get live career guidance from AI assistant Arohi, dynamic resume analysis, mock interviews, and regional job postings.",
-          keywords: "recruit.org.in, career guidance, AI career coach, resume score, mock interview, MSME registration, school syllabus, Odisha jobs"
-        },
-        jobs: {
-          title: "Verified Jobs & Vacancies in Odisha & All India - Recruit.org.in",
-          desc: "Explore over 24,500+ live government, public sector, corporate, and private vacancies. Filter by department, state, sector, and age limits with direct applying.",
-          keywords: "Odisha government jobs, OSSC vacancies, OSSSC junior assistant, central government jobs, private sector jobs India, live vacancies Odisha"
-        },
-        career: {
-          title: "Arohi AI Personal Career Coach & Career Roadmaps",
-          desc: "Interactive skill mapping, automated stream selections, and customized professional career roadmaps tailored for Indian students and professionals.",
-          keywords: "career path finder, AI career counselor, Indian stream selector, student career advice, personalized roadmap"
-        },
-        resume: {
-          title: "AI ATS Resume Builder & Scoring Suite - Recruit.org.in",
-          desc: "Build professional ATS-optimized resumes and get immediate AI evaluation reports on your scores, keywords, formatting, and structural issues.",
-          keywords: "ATS resume builder, resume scorer, free resume evaluator India, professional resume checker, resume keywords"
-        },
-        interview: {
-          title: "Live AI Mock Interview Simulator & Vocal Feedback Engine",
-          desc: "Simulate pressure-packed technical, HR, and government job interviews. Speak or type answers and get instant critical feedback on your response quality.",
-          keywords: "AI mock interview, virtual interview practice, speak response simulator, HR interview trainer, UPSC SSC viva preparation"
-        },
-        business: {
-          title: "MSME & Startup Setup Guides, Mudra Loans & PMEGP - Recruit.org.in",
-          desc: "Launch your business in India easily. Step-by-step guides on Udyam Registration, Mudra Loans, PMEGP subsidies, and business model validations.",
-          keywords: "Mudra loan eligibility, MSME Udyam register, startup funding India, business idea validation, startup scheme guide"
-        },
-        schemes: {
-          title: "Sarkari Yojana Directory - Central & Odisha State Welfare Schemes",
-          desc: "Verified guidelines for PMEGP, Startup India, Mukhyamantri Karma Tatpara Abhiyan (MUKTA), Odisha skill initiatives, and social support plans.",
-          keywords: "Sarkari yojana India, Odisha state government schemes, MUKTA abhiyan, skill development schemes Odisha"
-        },
-        courses: {
-          title: "Professional Certification Courses & Skills Academy",
-          desc: "Master high-demand skills in AI, Web Development, Cyber Security, Digital Marketing, and finance with verified certificates and career-pathing guides.",
-          keywords: "free skills academy India, certify software courses, learn web development, digital marketing certifications"
-        },
-        syllabus: {
-          title: "Odisha Board Class 1-10 Syllabus & CBSE Study Guides (Odia & English)",
-          desc: "Official school syllabus plans for Class 1 to 10 under Board of Secondary Education Odisha & CBSE. Free resources, notes, and curriculum structures.",
-          keywords: "BSE Odisha syllabus, class 1-10 syllabus Odia medium, CBSE school guides India, Odisha primary secondary curriculum"
-        },
-        franchise: {
-          title: "AECN Franchise Hub - Set Up Your Local Career & MSME Registration Centre",
-          desc: "Become an official Recruit.org.in partner. Establish an Authorized Employment Consultation Node (AECN) in your district, tehsil, or panchayat.",
-          keywords: "csc franchise Odisha, career hub center franchise, start business village"
-        }
-      };
-
-      const seo = tabSEO[tab] || tabSEO.home;
-
-      let titleStr = seo.title;
-      let descStr = seo.desc;
-
-      if (lang === 'hi') {
-        titleStr = `[हिंदी] ${titleStr.replace("Recruit.org.in", "करियर पोर्टल Recruit.org.in")}`;
-        descStr = `भारत का अग्रणी करियर और रोजगार मंच: ${descStr}`;
-      } else if (lang === 'or') {
-        titleStr = `[ଓଡ଼ିଆ] ${titleStr.replace("Recruit.org.in", "ଓଡ଼ିଶା କ୍ୟାରିୟର ପୋର୍ଟାଲ୍ Recruit.org.in")}`;
-        descStr = `ଓଡ଼ିଶା ଓ ଭାରତର ସରକାରୀ ଓ ବେସରକାରୀ ଚାକିରି, ସିଲାବସ୍ ଏବଂ ଏମଏସଏମଇ ଗାଇଡ୍: ${descStr}`;
-      } else if (lang !== 'en') {
-        const langNames: Record<string, string> = {
-          bn: 'বাংলা', te: 'తెలుగు', mr: 'मराठी', ta: 'தமிழ்', gu: 'ગુજરાતી', ur: 'اردو', kn: 'ಕನ್ನಡ', ml: 'മലയാളം', pa: 'ਪੰਜਾਬੀ', as: 'অસમীয়া'
-        };
-        const langLabel = langNames[lang] || lang;
-        titleStr = `[${langLabel}] ${titleStr}`;
-      }
-
-      // High performance HTML tag replacement
-      html = html.replace(/<title>.*?<\/title>/, `<title>${titleStr}</title>`);
-      html = html.replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${descStr}" />`);
-      html = html.replace(/<meta name="keywords" content=".*?" \/>/, `<meta name="keywords" content="${seo.keywords}" />`);
-
-      html = html.replace(/<meta property="og:title" content=".*?" \/>/, `<meta property="og:title" content="${titleStr}" />`);
-      html = html.replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${descStr}" />`);
-      html = html.replace(/<meta property="og:locale" content=".*?" \/>/, `<meta property="og:locale" content="${lang === 'en' ? 'en_IN' : lang + '_IN'}" />`);
-
-      res.header('Content-Type', 'text/html');
-      res.send(html);
-    } catch (err) {
-      console.error('Error with Server-Side Meta Injection:', err);
-      res.sendFile(path.join(distPath, 'index.html'));
-    }
-  }
-
-  async function startServer() {
-    const distPath = path.join(process.cwd(), 'dist');
-    const distExists = fs.existsSync(distPath);
-    const isDev = process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !distExists);
-
-    if (isDev) {
-      console.log('Vite dev server starting in middleware mode...');
-      const vite = await createViteServer({
-        server: { middlewareMode: true },
-        appType: 'spa',
-      });
-      app.use(vite.middlewares);
-    } else {
-      console.log('Serving production static assets from dist directory...');
-      app.use(express.static(distPath));
-      app.get('*', (req, res) => {
-        serveSEOOptimizedIndex(req, res, distPath);
-      });
-    }
-
-    // Global Express-level Error Handling Middleware (Self-Healing Interface)
-    app.use((err: any, req: any, res: any, next: any) => {
-      console.error('💥 [Express Self-Healing Node] Intercepted Router Error:', err);
-      
-      if (res.headersSent) {
-        return next(err);
-      }
-
-      // Check if client expects JSON or HTML
-      const acceptsHtml = req.accepts('html');
-      if (!acceptsHtml || req.path.startsWith('/api/')) {
-        return res.status(500).json({
-          error: 'An internal query error occurred, but the Recruit.org.in self-healing node successfully intercepted it to stay online.',
-          details: process.env.NODE_ENV !== 'production' ? err.message || String(err) : undefined,
-          status: 'self_healed'
-        });
-      }
-
-      // Render a gorgeous, creative self-healing maintenance/error screen instead of standard Express 500 dry page
-      const creativeErrorPage = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recruit.org.in - Dynamic Self-Healing Registry</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #0B0F17;
-    }
-    .mono {
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .glow-effect {
-      box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
-    }
-    @keyframes orbit {
-      0% { transform: rotate(0deg) translateX(40px) rotate(0deg); }
-      100% { transform: rotate(360deg) translateX(40px) rotate(-360deg); }
-    }
-    .orbiting-node {
-      animation: orbit 6s linear infinite;
-    }
-  </style>
-</head>
-<body class="text-gray-100 flex items-center justify-center min-h-screen px-4 overflow-hidden relative">
-  <!-- Glowing Background Orbs -->
-  <div class="absolute w-[500px] h-[500px] rounded-full bg-indigo-500/5 blur-[120px] -top-40 -left-40 pointer-events-none"></div>
-  <div class="absolute w-[500px] h-[500px] rounded-full bg-teal-500/5 blur-[120px] -bottom-40 -right-40 pointer-events-none"></div>
-
-  <div class="max-w-xl w-full text-center relative z-10">
-    <!-- Visual Self-Healing Node Loader -->
-    <div class="relative w-32 h-32 mx-auto mb-8 flex items-center justify-center">
-      <div class="absolute inset-0 rounded-full border border-indigo-500/20 glow-effect"></div>
-      <!-- Center Shield Icon -->
-      <div class="w-16 h-16 rounded-full bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-      </div>
-      <!-- Orbiting Pulse -->
-      <div class="orbiting-node absolute w-3 h-3 rounded-full bg-teal-400 shadow-[0_0_10px_#2dd4bf]"></div>
-    </div>
-
-    <!-- Title and Subtitle -->
-    <span class="px-3 py-1 text-xs font-semibold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 rounded-full border border-indigo-500/20 inline-block mb-4">
-      Self-Healing Node Active
-    </span>
-    <h1 class="text-3xl font-bold text-white tracking-tight mb-3">Recruit.org.in Resiliency</h1>
-    <p class="text-gray-400 text-sm leading-relaxed mb-6">
-      Our proactive crash prevention architecture detected a service query error. Rather than going offline or displaying a broken hosting screen, we successfully intercepted it to safeguard continuous platform availability.
-    </p>
-
-    <!-- Error Telemetry Details -->
-    <div class="bg-gray-950 border border-gray-800 rounded-lg p-4 mb-8 text-left mono text-xs text-gray-500 overflow-x-auto max-h-40">
-      <div class="text-indigo-400 font-semibold mb-1">// DYNAMIC SHIELD TELEMETRY REPORT</div>
-      <div>[STATUS] Live Process Maintained</div>
-      <div>[SERVICE] Node.js Express Gateway</div>
-      <div>[RESOURCE] \${req.method} \${req.path}</div>
-      <div class="text-red-400 mt-1">[DIAGNOSIS] \${err.message || String(err)}</div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
-      <button onclick="window.location.reload()" class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm rounded-lg transition-all shadow-[0_4px_12px_rgba(99,102,241,0.2)] focus:ring-2 focus:ring-indigo-500 focus:outline-none flex items-center justify-center gap-2 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18" />
-        </svg>
-        Re-initiate Connection
-      </button>
-      <a href="/" class="w-full sm:w-auto px-6 py-2.5 bg-gray-900 hover:bg-gray-800 border border-gray-800 text-gray-300 font-medium text-sm rounded-lg transition-all focus:outline-none text-center">
-        Return to Home Registry
-      </a>
-    </div>
-  </div>
-</body>
-</html>
-      `;
-
-      res.status(500).send(creativeErrorPage);
+async function startServer() {
+  if (process.env.NODE_ENV !== 'production') {
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: 'spa',
     });
+    app.use(vite.middlewares);
+  } else {
+    const distPath = path.join(process.cwd(), 'dist');
+    app.use(express.static(distPath));
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+  }
 
   const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Recruit.org.in Server running on http://localhost:${PORT}`);

@@ -29,8 +29,6 @@ import WelcomeLanding from './components/WelcomeLanding';
 import ArohiAvatar from './components/ArohiAvatar';
 import WalkthroughTour from './components/WalkthroughTour';
 import FranchisePage from './components/FranchisePage';
-import MultilingualSEOFooter from './components/MultilingualSEOFooter';
-import { getRegionalCareerAdvice } from './lib/seoContentManager';
 
 import { initialPostings } from './data/initialData';
 import { INITIAL_REVIEWS, Review } from './data/reviewsData';
@@ -217,157 +215,6 @@ export default function App() {
       }).catch(err => console.log('Telemetry offline:', err));
     }
   }, [activeTab]);
-
-  useEffect(() => {
-    // Dynamic client-side SEO engine for regional Indian and Odia search optimization
-    const tabSEO: Record<string, { title: string; desc: string; keywords: string }> = {
-      home: {
-        title: "Recruit.org.in - India’s Next-Gen Career Registry, Jobs, & MSME Platform",
-        desc: "Empowering India's students, young professionals, and MSMEs. Get live career guidance from AI assistant Arohi, dynamic resume analysis, mock interviews, and regional job postings.",
-        keywords: "recruit.org.in, career guidance, AI career coach, resume score, mock interview, MSME registration, school syllabus, Odisha jobs"
-      },
-      jobs: {
-        title: "Verified Jobs & Vacancies in Odisha & All India - Recruit.org.in",
-        desc: "Explore over 24,500+ live government, public sector, corporate, and private vacancies. Filter by department, state, sector, and age limits with direct applying.",
-        keywords: "Odisha government jobs, OSSC vacancies, OSSSC junior assistant, central government jobs, private sector jobs India, live vacancies Odisha"
-      },
-      career: {
-        title: "Arohi AI Personal Career Coach & Career Roadmaps",
-        desc: "Interactive skill mapping, automated stream selections, and customized professional career roadmaps tailored for Indian students and professionals.",
-        keywords: "career path finder, AI career counselor, Indian stream selector, student career advice, personalized roadmap"
-      },
-      resume: {
-        title: "AI ATS Resume Builder & Scoring Suite - Recruit.org.in",
-        desc: "Build professional ATS-optimized resumes and get immediate AI evaluation reports on your scores, keywords, formatting, and structural issues.",
-        keywords: "ATS resume builder, resume scorer, free resume evaluator India, professional resume checker, resume keywords"
-      },
-      interview: {
-        title: "Live AI Mock Interview Simulator & Vocal Feedback Engine",
-        desc: "Simulate pressure-packed technical, HR, and government job interviews. Speak or type answers and get instant critical feedback on your response quality.",
-        keywords: "AI mock interview, virtual interview practice, speak response simulator, HR interview trainer, UPSC SSC viva preparation"
-      },
-      business: {
-        title: "MSME & Startup Setup Guides, Mudra Loans & PMEGP - Recruit.org.in",
-        desc: "Launch your business in India easily. Step-by-step guides on Udyam Registration, Mudra Loans, PMEGP subsidies, and business model validations.",
-        keywords: "Mudra loan eligibility, MSME Udyam register, startup funding India, business idea validation, startup scheme guide"
-      },
-      schemes: {
-        title: "Sarkari Yojana Directory - Central & Odisha State Welfare Schemes",
-        desc: "Verified guidelines for PMEGP, Startup India, Mukhyamantri Karma Tatpara Abhiyan (MUKTA), Odisha skill initiatives, and social support plans.",
-        keywords: "Sarkari yojana India, Odisha state government schemes, MUKTA abhiyan, skill development schemes Odisha"
-      },
-      courses: {
-        title: "Professional Certification Courses & Skills Academy",
-        desc: "Master high-demand skills in AI, Web Development, Cyber Security, Digital Marketing, and finance with verified certificates and career-pathing guides.",
-        keywords: "free skills academy India, certify software courses, learn web development, digital marketing certifications"
-      },
-      syllabus: {
-        title: "Odisha Board Class 1-10 Syllabus & CBSE Study Guides (Odia & English)",
-        desc: "Official school syllabus plans for Class 1 to 10 under Board of Secondary Education Odisha & CBSE. Free resources, notes, and curriculum structures.",
-        keywords: "BSE Odisha syllabus, class 1-10 syllabus Odia medium, CBSE school guides India, Odisha primary secondary curriculum"
-      },
-      dashboard: {
-        title: "My Career Dashboard & Verified Profile Ledger",
-        desc: "Check your active job applications, review your resume assessment reports, track enrolled skill courses, and verify your subscription credentials.",
-        keywords: "career registry dashboard, active applications tracker, student career profile"
-      },
-      employer: {
-        title: "Employer Portal & Recruitment Console - Post Free Vacancies",
-        desc: "The professional hub for enterprises and SMEs. Post job descriptions, manage incoming candidate applications, and evaluate digital registration slips.",
-        keywords: "employer job posting portal, hire candidates India, post private sector jobs Odisha"
-      },
-      admin: {
-        title: "Commander Control Centre & Telemetry Node - Recruit.org.in",
-        desc: "Authorized administration console for Recruit.org.in. Unified database queries, visitor logs, financial MRR trackers, and transaction verified registers.",
-        keywords: "admin console, recruit telemetry, secure digital ledger"
-      },
-      franchise: {
-        title: "AECN Franchise Hub - Set Up Your Local Career & MSME Registration Centre",
-        desc: "Become an official Recruit.org.in partner. Establish an Authorized Employment Consultation Node (AECN) in your district, tehsil, or panchayat.",
-        keywords: "csc franchise Odisha, career hub center franchise, start business village"
-      }
-    };
-
-    const seo = tabSEO[activeTab] || tabSEO.home;
-
-    // Localized language adjustments to maximize search engine indexing in India
-    let titleStr = seo.title;
-    let descStr = seo.desc;
-
-    if (language === 'hi') {
-      titleStr = `[हिंदी] ${titleStr.replace("Recruit.org.in", "करियर पोर्टल Recruit.org.in")}`;
-      descStr = `भारत का अग्रणी करियर और रोजगार मंच: ${descStr}`;
-    } else if (language === 'or') {
-      titleStr = `[ଓଡ଼ିଆ] ${titleStr.replace("Recruit.org.in", "ଓଡ଼ିଶା କ୍ୟାରିୟର ପୋର୍ଟାଲ୍ Recruit.org.in")}`;
-      descStr = `ଓଡ଼ିଶା ଓ ଭାରତର ସରକାରୀ ଓ ବେସରକାରୀ ଚାକିରି, ସିଲାବସ୍ ଏବଂ ଏମଏସଏମଇ ଗାଇଡ୍: ${descStr}`;
-    } else if (language !== 'en') {
-      const langNames: Record<string, string> = {
-        bn: 'বাংলা', te: 'తెలుగు', mr: 'मराठी', ta: 'தமிழ்', gu: 'ગુજરાતી', ur: 'اردو', kn: 'ಕನ್ನಡ', ml: 'മലയാളം', pa: 'ਪੰਜਾਬੀ', as: 'অসমীয়া'
-      };
-      const langLabel = langNames[language] || language;
-      titleStr = `[${langLabel}] ${titleStr}`;
-    }
-
-    // Apply document level DOM updates
-    document.title = titleStr;
-
-    const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) {
-      metaDesc.setAttribute('content', descStr);
-    }
-
-    const metaKeywords = document.querySelector('meta[name="keywords"]');
-    if (metaKeywords) {
-      metaKeywords.setAttribute('content', seo.keywords);
-    }
-
-    // Dynamic Social OpenGraph SEO updates
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', titleStr);
-
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', descStr);
-
-    const ogLocale = document.querySelector('meta[property="og:locale"]');
-    if (ogLocale) {
-      const locales: Record<string, string> = {
-        en: 'en_IN', hi: 'hi_IN', or: 'or_IN', bn: 'bn_IN', te: 'te_IN', mr: 'mr_IN', ta: 'ta_IN', gu: 'gu_IN', ur: 'ur_IN', kn: 'kn_IN', ml: 'ml_IN', pa: 'pa_IN', as: 'as_IN'
-      };
-      ogLocale.setAttribute('content', locales[language] || 'en_IN');
-    }
-
-    // Inject Search Engine Structured JSON-LD Data schema
-    let jsonLdScript = document.getElementById('dynamic-seo-jsonld');
-    if (!jsonLdScript) {
-      jsonLdScript = document.createElement('script');
-      jsonLdScript.setAttribute('id', 'dynamic-seo-jsonld');
-      jsonLdScript.setAttribute('type', 'application/ld+json');
-      document.head.appendChild(jsonLdScript);
-    }
-
-    const dynamicSchema = {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": titleStr,
-      "description": descStr,
-      "url": window.location.href,
-      "inLanguage": language,
-      "isPartOf": {
-        "@type": "WebSite",
-        "name": "Recruit.org.in",
-        "url": "https://recruit.org.in"
-      },
-      "provider": {
-        "@type": "Organization",
-        "name": "Recruit.org.in",
-        "url": "https://recruit.org.in",
-        "logo": "https://recruit.org.in/assets/logo.png"
-      }
-    };
-
-    jsonLdScript.innerHTML = JSON.stringify(dynamicSchema);
-
-  }, [activeTab, language]);
 
   const [postings, setPostings] = useState<Posting[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
@@ -839,7 +686,7 @@ export default function App() {
         }
       ];
 
-      const newPostings = (mockList as Posting[]).filter((p: Posting) => !existingIds.has(p.id));
+      const newPostings = mockList.filter((p: any) => !existingIds.has(p.id));
       if (newPostings.length > 0) {
         const updated = [...newPostings, ...postings];
         setPostings(updated);
@@ -1290,7 +1137,7 @@ export default function App() {
                 
                 <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-[11px] font-bold text-slate-400">
                   <span className="flex items-center gap-1.5 text-emerald-400">● Live Synchronization Active</span>
-                  <span className="flex items-center gap-1.5">★ {subscriptions && Object.values(subscriptions).filter(Boolean).length > 0 ? `${Object.values(subscriptions).filter(Boolean).length} Linked Subscriptions` : 'Free Tier Account'}</span>
+                  <span className="flex items-center gap-1.5">★ {subscriptions && subscriptions.length > 0 ? `${subscriptions.length} Linked Subscriptions` : 'Free Tier Account'}</span>
                   <span className="flex items-center gap-1.5 text-purple-400">👥 Access all features instantly</span>
                 </div>
               </div>
@@ -2492,48 +2339,6 @@ export default function App() {
               </button>
             </div>
 
-            {(() => {
-              const advice = getRegionalCareerAdvice(activeRegion, language);
-              return (
-                <div className="bg-[#09061c] border border-purple-950/50 rounded-2xl p-4 md:p-5 space-y-4">
-                  <div className="flex items-center gap-1.5 text-xs text-purple-400 font-extrabold uppercase tracking-widest">
-                    <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-                    <span>State Advisor & Career Blueprint ({advice.nativeState})</span>
-                  </div>
-                  <div className="space-y-1">
-                    <h4 className="text-sm md:text-base font-black text-white">{advice.title}</h4>
-                    <p className="text-xs text-slate-300 leading-relaxed font-semibold">{advice.description}</p>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 text-xs">
-                    <div className="space-y-1.5 bg-[#100c28] p-3.5 rounded-xl border border-[#1f153f]">
-                      <span className="font-extrabold text-[#00f3ff] uppercase tracking-wide text-[10px]">🎓 General Eligibility</span>
-                      <p className="text-slate-400 font-medium leading-relaxed">{advice.eligibility}</p>
-                    </div>
-                    <div className="space-y-1.5 bg-[#100c28] p-3.5 rounded-xl border border-[#1f153f]">
-                      <span className="font-extrabold text-emerald-400 uppercase tracking-wide text-[10px]">📝 Smart Prep Strategy</span>
-                      <p className="text-slate-400 font-medium leading-relaxed">{advice.preparationStrategy}</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2 items-center text-[10px] sm:text-xs pt-1">
-                    <span className="text-slate-500 font-bold uppercase tracking-wider">Key Agencies:</span>
-                    {advice.keyAgencies.map((agency) => (
-                      <span key={agency} className="bg-[#140f35] border border-[#231a4f] text-slate-300 px-2 py-0.5 rounded-md font-bold">
-                        {agency}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 items-center text-[10px] pt-2 border-t border-[#1a1138]/60">
-                    <span className="text-slate-500 font-bold uppercase tracking-wider">Indexed Searches:</span>
-                    {advice.trendingKeywords.map((kw) => (
-                      <span key={kw} className="text-slate-400 bg-purple-950/20 px-1.5 py-0.5 rounded italic">
-                        #{kw}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
-
             {filteredPostings.length === 0 ? (
               <div className="py-12 text-center text-slate-400 font-medium bg-[#0a0715]/40 rounded-xl border border-dashed border-[#2d2163]">
                 <p className="text-sm font-bold">No active positions match your active filters.</p>
@@ -3208,14 +3013,6 @@ export default function App() {
 
       {/* Footer verified seal and info */}
       <footer className="max-w-7xl mx-auto px-4 mt-12 mb-8 space-y-6">
-        {/* Multilingual SEO Target Directory & Language Alternate Map */}
-        <MultilingualSEOFooter 
-          currentLanguage={language}
-          onChangeLanguage={changeLanguage}
-          onSelectRegion={setActiveRegion}
-          onNavigateTab={setActiveTab}
-        />
-
         {/* Expanded Footer Grid */}
         <div className="bg-[#120d2a]/80 rounded-2xl border border-[#211b3d] p-8 grid grid-cols-1 md:grid-cols-4 gap-8 text-left">
           {/* Col 1: Platform identity */}

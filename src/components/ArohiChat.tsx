@@ -307,7 +307,7 @@ ${discussionBullets}
     let currentSavedChats = [...savedChats];
     if (!targetChatId || currentSavedChats.length === 0) {
       targetChatId = 'chat-' + Date.now();
-      const newChatContainer: SavedChat = {
+      const newChatContainer = {
         id: targetChatId,
         title: analysis.topics.business ? 'Voice Business Session' : 'Voice Career Session',
         date: 'Today',
