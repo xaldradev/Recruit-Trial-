@@ -173,6 +173,13 @@ const safeUserDb = {
 };
 
 const app = express();
+
+// Request logger middleware to diagnose connection and routing issues
+app.use((req, res, next) => {
+  console.log(`[Request Log] ${req.method} ${req.originalUrl} - IP: ${req.ip} - Headers: ${JSON.stringify(req.headers)}`);
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -2728,9 +2735,23 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
+    const indexPath = path.join(distPath, 'index.html');
+    console.log(`[Production mode] Serving static files from: ${distPath}`);
+    if (fs.existsSync(indexPath)) {
+      console.log(`[Production mode] verified: index.html exists at: ${indexPath}`);
+    } else {
+      console.error(`[Production mode] CRITICAL ERROR: index.html NOT found at: ${indexPath}`);
+    }
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      res.sendFile(indexPath, (err) => {
+        if (err) {
+          console.error(`[Static Serve Error] failed to send index.html for ${req.originalUrl}:`, err);
+          if (!res.headersSent) {
+            res.status(500).send(`Server Error: Failed to render layout. (Error details: ${err.message})`);
+          }
+        }
+      });
     });
   }
 
