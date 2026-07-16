@@ -2755,9 +2755,20 @@ async function startServer() {
     });
   }
 
+  let backupServer: any = null;
   const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Recruit.org.in Server running on http://localhost:${PORT}`);
   });
+
+  if (PORT !== 3000) {
+    try {
+      backupServer = app.listen(3000, '0.0.0.0', () => {
+        console.log(`Recruit.org.in Backup Server listening on http://localhost:3000 to catch Railway port mapping.`);
+      });
+    } catch (err: any) {
+      console.warn(`Could not start backup server on port 3000: ${err.message || err}`);
+    }
+  }
 
   // Setup WebSocket server for Gemini Live Audio Bidirectional Streaming
   const wss = new WebSocketServer({ noServer: true });
@@ -2902,7 +2913,7 @@ async function startServer() {
     }
   });
 
-  server.on('upgrade', (request, socket, head) => {
+  const handleUpgrade = (request: any, socket: any, head: any) => {
     try {
       let pathname = '';
       if (request.url) {
@@ -2933,7 +2944,12 @@ async function startServer() {
     } catch (err) {
       console.error('Error in WebSocket upgrade handler:', err);
     }
-  });
+  };
+
+  server.on('upgrade', handleUpgrade);
+  if (backupServer) {
+    backupServer.on('upgrade', handleUpgrade);
+  }
 }
 
 startServer();
