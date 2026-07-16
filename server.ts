@@ -6,7 +6,7 @@ import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Modality } from '@google/genai';
 import dotenv from 'dotenv';
 import { createResumeDocx } from './server-resume.ts';
-import admin from 'firebase-admin';
+import * as admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import { WebSocketServer, WebSocket } from 'ws';
 
@@ -27,36 +27,38 @@ dotenv.config();
 let adminApp: any = null;
 let adminDb: any = null;
 try {
+  const firebaseAdmin: any = admin && (admin as any).initializeApp ? admin : ((admin as any).default || admin);
+  const apps = firebaseAdmin?.apps || [];
   const serviceAccountVar = process.env.FIREBASE_SERVICE_ACCOUNT;
   if (serviceAccountVar && serviceAccountVar.trim().startsWith('{')) {
     try {
       const serviceAccount = JSON.parse(serviceAccountVar);
-      if (admin.apps.length === 0) {
-        adminApp = admin.initializeApp({
-          credential: (admin as any).credential.cert(serviceAccount),
+      if (apps.length === 0) {
+        adminApp = firebaseAdmin.initializeApp({
+          credential: firebaseAdmin.credential.cert(serviceAccount),
           projectId: 'recruit-auth-515f9',
         });
       } else {
-        adminApp = admin.app();
+        adminApp = firebaseAdmin.app();
       }
       console.log('Firebase Admin SDK initialized successfully with service account credential.');
     } catch (parseErr) {
       console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT env variable:', parseErr);
-      if (admin.apps.length === 0) {
-        adminApp = admin.initializeApp({
+      if (apps.length === 0) {
+        adminApp = firebaseAdmin.initializeApp({
           projectId: 'recruit-auth-515f9',
         });
       } else {
-        adminApp = admin.app();
+        adminApp = firebaseAdmin.app();
       }
     }
   } else {
     if (serviceAccountVar) {
       console.warn('Warning: FIREBASE_SERVICE_ACCOUNT env variable is set but does not appear to be a valid JSON credential string. Skipping JSON parsing.');
     }
-    if (admin.apps.length === 0) {
+    if (apps.length === 0) {
       try {
-        adminApp = admin.initializeApp({
+        adminApp = firebaseAdmin.initializeApp({
           projectId: 'recruit-auth-515f9',
         });
         console.log('Firebase Admin SDK initialized with default credentials/projectId.');
@@ -64,7 +66,7 @@ try {
         console.warn('Could not initialize default Firebase Admin app (likely missing credentials on this environment). Skipping Admin DB.');
       }
     } else {
-      adminApp = admin.app();
+      adminApp = firebaseAdmin.app();
     }
   }
   if (adminApp) {
