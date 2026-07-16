@@ -2702,20 +2702,170 @@ app.get(['/arohi.png', '/arohi.jpg', '/Arohi.jpg', '/Arohi.png', '/arohi.jpeg', 
 });
 
 // Vite middleware and asset delivery setup
-async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+  // Google & Indian Search Engine SEO optimization nodes
+  app.get('/sitemap.xml', (req, res) => {
+    const baseUrl = 'https://recruit.org.in';
+    const tabs = ['home', 'jobs', 'career', 'resume', 'interview', 'business', 'schemes', 'courses', 'syllabus', 'franchise'];
+    const languages = ['en', 'hi', 'or', 'bn', 'te', 'mr', 'ta', 'gu', 'ur', 'kn', 'ml', 'pa', 'as'];
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n`;
+
+    // Generate entries for all tabs and languages with cross-referenced hreflang tags
+    for (const tab of tabs) {
+      const pathSuffix = tab === 'home' ? '' : `/${tab}`;
+      for (const lang of languages) {
+        const langParam = lang === 'en' ? '' : `?lang=${lang}`;
+        const url = `${baseUrl}${pathSuffix}${langParam}`;
+
+        xml += `  <url>\n`;
+        xml += `    <loc>${url}</loc>\n`;
+        xml += `    <changefreq>daily</changefreq>\n`;
+        xml += `    <priority>${tab === 'home' ? '1.0' : '0.8'}</priority>\n`;
+
+        // Add hreflang alternate declarations for other languages of the same tab
+        for (const altLang of languages) {
+          const altLangParam = altLang === 'en' ? '' : `?lang=${altLang}`;
+          const altUrl = `${baseUrl}${pathSuffix}${altLangParam}`;
+          xml += `    <xhtml:link rel="alternate" hreflang="${altLang}" href="${altUrl}" />\n`;
+        }
+
+        xml += `  </url>\n`;
+      }
+    }
+
+    xml += `</urlset>`;
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+  });
+
+  app.get('/robots.txt', (req, res) => {
+    let robots = `User-agent: *\n`;
+    robots += `Allow: /\n`;
+    robots += `Disallow: /admin\n`;
+    robots += `Sitemap: https://recruit.org.in/sitemap.xml\n`;
+    res.header('Content-Type', 'text/plain');
+    res.send(robots);
+  });
+
+  // Dynamic Server-Side Meta Injector for Recruit.org.in World-Class SEO
+  function serveSEOOptimizedIndex(req: any, res: any, distPath: string) {
+    try {
+      const indexPath = path.join(distPath, 'index.html');
+      if (!fs.existsSync(indexPath)) {
+        return res.sendFile(indexPath);
+      }
+
+      let html = fs.readFileSync(indexPath, 'utf8');
+
+      // Parse requested tab and language
+      const pathname = req.path;
+      const tab = pathname.replace('/', '') || 'home';
+      const lang = (req.query.lang as string) || 'en';
+
+      const tabSEO: Record<string, { title: string; desc: string; keywords: string }> = {
+        home: {
+          title: "Recruit.org.in - India’s Next-Gen Career Registry, Jobs, & MSME Platform",
+          desc: "Empowering India's students, young professionals, and MSMEs. Get live career guidance from AI assistant Arohi, dynamic resume analysis, mock interviews, and regional job postings.",
+          keywords: "recruit.org.in, career guidance, AI career coach, resume score, mock interview, MSME registration, school syllabus, Odisha jobs"
+        },
+        jobs: {
+          title: "Verified Jobs & Vacancies in Odisha & All India - Recruit.org.in",
+          desc: "Explore over 24,500+ live government, public sector, corporate, and private vacancies. Filter by department, state, sector, and age limits with direct applying.",
+          keywords: "Odisha government jobs, OSSC vacancies, OSSSC junior assistant, central government jobs, private sector jobs India, live vacancies Odisha"
+        },
+        career: {
+          title: "Arohi AI Personal Career Coach & Career Roadmaps",
+          desc: "Interactive skill mapping, automated stream selections, and customized professional career roadmaps tailored for Indian students and professionals.",
+          keywords: "career path finder, AI career counselor, Indian stream selector, student career advice, personalized roadmap"
+        },
+        resume: {
+          title: "AI ATS Resume Builder & Scoring Suite - Recruit.org.in",
+          desc: "Build professional ATS-optimized resumes and get immediate AI evaluation reports on your scores, keywords, formatting, and structural issues.",
+          keywords: "ATS resume builder, resume scorer, free resume evaluator India, professional resume checker, resume keywords"
+        },
+        interview: {
+          title: "Live AI Mock Interview Simulator & Vocal Feedback Engine",
+          desc: "Simulate pressure-packed technical, HR, and government job interviews. Speak or type answers and get instant critical feedback on your response quality.",
+          keywords: "AI mock interview, virtual interview practice, speak response simulator, HR interview trainer, UPSC SSC viva preparation"
+        },
+        business: {
+          title: "MSME & Startup Setup Guides, Mudra Loans & PMEGP - Recruit.org.in",
+          desc: "Launch your business in India easily. Step-by-step guides on Udyam Registration, Mudra Loans, PMEGP subsidies, and business model validations.",
+          keywords: "Mudra loan eligibility, MSME Udyam register, startup funding India, business idea validation, startup scheme guide"
+        },
+        schemes: {
+          title: "Sarkari Yojana Directory - Central & Odisha State Welfare Schemes",
+          desc: "Verified guidelines for PMEGP, Startup India, Mukhyamantri Karma Tatpara Abhiyan (MUKTA), Odisha skill initiatives, and social support plans.",
+          keywords: "Sarkari yojana India, Odisha state government schemes, MUKTA abhiyan, skill development schemes Odisha"
+        },
+        courses: {
+          title: "Professional Certification Courses & Skills Academy",
+          desc: "Master high-demand skills in AI, Web Development, Cyber Security, Digital Marketing, and finance with verified certificates and career-pathing guides.",
+          keywords: "free skills academy India, certify software courses, learn web development, digital marketing certifications"
+        },
+        syllabus: {
+          title: "Odisha Board Class 1-10 Syllabus & CBSE Study Guides (Odia & English)",
+          desc: "Official school syllabus plans for Class 1 to 10 under Board of Secondary Education Odisha & CBSE. Free resources, notes, and curriculum structures.",
+          keywords: "BSE Odisha syllabus, class 1-10 syllabus Odia medium, CBSE school guides India, Odisha primary secondary curriculum"
+        },
+        franchise: {
+          title: "AECN Franchise Hub - Set Up Your Local Career & MSME Registration Centre",
+          desc: "Become an official Recruit.org.in partner. Establish an Authorized Employment Consultation Node (AECN) in your district, tehsil, or panchayat.",
+          keywords: "csc franchise Odisha, career hub center franchise, start business village"
+        }
+      };
+
+      const seo = tabSEO[tab] || tabSEO.home;
+
+      let titleStr = seo.title;
+      let descStr = seo.desc;
+
+      if (lang === 'hi') {
+        titleStr = `[हिंदी] ${titleStr.replace("Recruit.org.in", "करियर पोर्टल Recruit.org.in")}`;
+        descStr = `भारत का अग्रणी करियर और रोजगार मंच: ${descStr}`;
+      } else if (lang === 'or') {
+        titleStr = `[ଓଡ଼ିଆ] ${titleStr.replace("Recruit.org.in", "ଓଡ଼ିଶା କ୍ୟାରିୟର ପୋର୍ଟାଲ୍ Recruit.org.in")}`;
+        descStr = `ଓଡ଼ିଶା ଓ ଭାରତର ସରକାରୀ ଓ ବେସରକାରୀ ଚାକିରି, ସିଲାବସ୍ ଏବଂ ଏମଏସଏମଇ ଗାଇଡ୍: ${descStr}`;
+      } else if (lang !== 'en') {
+        const langNames: Record<string, string> = {
+          bn: 'বাংলা', te: 'తెలుగు', mr: 'मराठी', ta: 'தமிழ்', gu: 'ગુજરાતી', ur: 'اردو', kn: 'ಕನ್ನಡ', ml: 'മലയാളം', pa: 'ਪੰਜਾਬੀ', as: 'অસમীয়া'
+        };
+        const langLabel = langNames[lang] || lang;
+        titleStr = `[${langLabel}] ${titleStr}`;
+      }
+
+      // High performance HTML tag replacement
+      html = html.replace(/<title>.*?<\/title>/, `<title>${titleStr}</title>`);
+      html = html.replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${descStr}" />`);
+      html = html.replace(/<meta name="keywords" content=".*?" \/>/, `<meta name="keywords" content="${seo.keywords}" />`);
+
+      html = html.replace(/<meta property="og:title" content=".*?" \/>/, `<meta property="og:title" content="${titleStr}" />`);
+      html = html.replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${descStr}" />`);
+      html = html.replace(/<meta property="og:locale" content=".*?" \/>/, `<meta property="og:locale" content="${lang === 'en' ? 'en_IN' : lang + '_IN'}" />`);
+
+      res.header('Content-Type', 'text/html');
+      res.send(html);
+    } catch (err) {
+      console.error('Error with Server-Side Meta Injection:', err);
       res.sendFile(path.join(distPath, 'index.html'));
-    });
+    }
   }
+
+  async function startServer() {
+    if (process.env.NODE_ENV !== 'production') {
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: 'spa',
+      });
+      app.use(vite.middlewares);
+    } else {
+      const distPath = path.join(process.cwd(), 'dist');
+      app.use(express.static(distPath));
+      app.get('*', (req, res) => {
+        serveSEOOptimizedIndex(req, res, distPath);
+      });
+    }
 
   const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Recruit.org.in Server running on http://localhost:${PORT}`);
@@ -2754,12 +2904,17 @@ async function startServer() {
       }
     };
     
-    // Parse the voice parameter safely from the query string
+    // Parse the voice and language parameters safely from the query string
     let selectedVoice = 'Zephyr';
+    let selectedLanguage = 'en';
     if (request.url) {
       const match = request.url.match(/[?&]voice=([^&]+)/);
       if (match) {
         selectedVoice = decodeURIComponent(match[1]);
+      }
+      const langMatch = request.url.match(/[?&]language=([^&]+)/);
+      if (langMatch) {
+        selectedLanguage = decodeURIComponent(langMatch[1]);
       }
     }
 
@@ -2773,8 +2928,34 @@ async function startServer() {
       return;
     }
 
+    // Determine the dynamic voice system instruction based on the chosen language
+    const voiceLanguageNames: Record<string, string> = {
+      hi: 'HINDI (हिंदी)',
+      or: 'ODIA (ଓଡ଼ିଆ)',
+      bn: 'BENGALI (বাংলা)',
+      te: 'TELUGU (తెలుగు)',
+      mr: 'MARATHI (मराठी)',
+      ta: 'TAMIL (தமிழ்)',
+      gu: 'GUJARATI (ગુજરાતી)',
+      ur: 'URDU (اردו)',
+      kn: 'KANNADA (ಕನ್ನಡ)',
+      ml: 'MALAYALAM (മലയാളം)',
+      pa: 'PUNJABI (ਪੰਜਾਬੀ)',
+      as: 'ASSAMESE (অસમীয়া)'
+    };
+
+    let dynamicVoiceInstruction = AROHI_SYSTEM_INSTRUCTION;
+    if (selectedLanguage && voiceLanguageNames[selectedLanguage]) {
+      const langName = voiceLanguageNames[selectedLanguage];
+      dynamicVoiceInstruction += `\n\n[USER PREFERRED LANGUAGE: ${langName}. The user is speaking in ${langName.split(' ')[0]}. You MUST reply primarily in ${langName} language or in highly natural sounding regional accent depending on how the user communicates. If they speak in a transliterated/mix code like Hinglish, reply with a warm, natural transliterated style. Always match their chosen language perfectly and dynamically!]`;
+    } else {
+      dynamicVoiceInstruction += `\n\n[USER PREFERRED LANGUAGE: ENGLISH. The user prefers English. Respond in warm, concise English unless they speak to you in any Indian regional language or Hinglish, in which case match their language choice perfectly.]`;
+    }
+
+    dynamicVoiceInstruction += "\n\nCRITICAL CONTEXT: You are currently connected via real-time live voice link. Speak very concisely, dynamically, and warmly. Keep responses extremely brief (1-3 sentences maximum per turn) so they read nicely as speech without lagging.";
+
     try {
-      console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}`);
+      console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}, language: ${selectedLanguage}`);
       const session = await clientAi.live.connect({
         model: "gemini-3.1-flash-live-preview",
         config: {
@@ -2782,7 +2963,7 @@ async function startServer() {
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
           },
-          systemInstruction: AROHI_SYSTEM_INSTRUCTION + "\n\nCRITICAL CONTEXT: You are currently connected via real-time live voice link. Speak very concisely, dynamically, and warmly. Keep responses extremely brief (1-3 sentences maximum per turn) so they read nicely as speech without lagging.",
+          systemInstruction: dynamicVoiceInstruction,
         },
         callbacks: {
           onmessage: (message: any) => {

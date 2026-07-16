@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { PhoneOff, Mic, MicOff, Volume2, VolumeX, Sparkles, Radio, AlertCircle, X, CheckCircle, RefreshCw, Briefcase, ArrowRight } from 'lucide-react';
 import ArohiAvatar from './ArohiAvatar';
 import { generateCallSummaryPDF, generateResumePDF, formatDuration, SpeechTurn, analyzeTurns } from '../lib/pdfGenerator';
+import { LANGUAGES_LIST } from './Header';
 
 interface ArohiVoiceCallProps {
   onClose: () => void;
@@ -184,7 +185,7 @@ export default function ArohiVoiceCall({ onClose, language = 'en', onNavigateTab
 
         // 1. Establish the secure full-duplex WebSocket connection to our Express backend
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//${window.location.host}/api/live-ws?voice=${selectedVoice}`;
+        const wsUrl = `${protocol}//${window.location.host}/api/live-ws?voice=${selectedVoice}&language=${language}`;
         const ws = new WebSocket(wsUrl);
         wsRef.current = ws;
 
@@ -836,9 +837,26 @@ export default function ArohiVoiceCall({ onClose, language = 'en', onNavigateTab
           )}
 
           {status === 'listening' && (
-            <div>
+            <div className="flex flex-col items-center gap-2">
               <p className="text-lg font-black tracking-wide text-emerald-400">AROHI is Listening...</p>
-              <p className="text-xs text-slate-300 font-bold mt-1">Speak in Hindi, English, Odia, or Hinglish</p>
+              <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">Active Voice Channel & Supported Languages</p>
+              <div className="flex flex-wrap justify-center gap-1.5 max-w-sm pt-1">
+                {LANGUAGES_LIST.map((lang) => {
+                  const isSelected = lang.code === language;
+                  return (
+                    <span 
+                      key={lang.code} 
+                      className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded transition-all border ${
+                        isSelected 
+                          ? 'bg-purple-500/20 text-purple-300 border-purple-500/50 shadow-[0_0_8px_rgba(168,85,247,0.3)]' 
+                          : 'bg-slate-950/40 text-slate-400 border-slate-900/40'
+                      }`}
+                    >
+                      {lang.native} {lang.english ? `(${lang.english})` : ''}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           )}
 
