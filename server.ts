@@ -28,27 +28,48 @@ let adminApp: any = null;
 let adminDb: any = null;
 try {
   const serviceAccountVar = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (serviceAccountVar) {
+  if (serviceAccountVar && serviceAccountVar.trim().startsWith('{')) {
     try {
       const serviceAccount = JSON.parse(serviceAccountVar);
-      adminApp = admin.initializeApp({
-        credential: (admin as any).credential.cert(serviceAccount),
-        projectId: 'recruit-auth-515f9',
-      });
+      if (admin.apps.length === 0) {
+        adminApp = admin.initializeApp({
+          credential: (admin as any).credential.cert(serviceAccount),
+          projectId: 'recruit-auth-515f9',
+        });
+      } else {
+        adminApp = admin.app();
+      }
       console.log('Firebase Admin SDK initialized successfully with service account credential.');
     } catch (parseErr) {
       console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT env variable:', parseErr);
-      adminApp = admin.initializeApp({
-        projectId: 'recruit-auth-515f9',
-      });
+      if (admin.apps.length === 0) {
+        adminApp = admin.initializeApp({
+          projectId: 'recruit-auth-515f9',
+        });
+      } else {
+        adminApp = admin.app();
+      }
     }
   } else {
-    adminApp = admin.initializeApp({
-      projectId: 'recruit-auth-515f9',
-    });
-    console.log('Firebase Admin SDK initialized with default credentials.');
+    if (serviceAccountVar) {
+      console.warn('Warning: FIREBASE_SERVICE_ACCOUNT env variable is set but does not appear to be a valid JSON credential string. Skipping JSON parsing.');
+    }
+    if (admin.apps.length === 0) {
+      try {
+        adminApp = admin.initializeApp({
+          projectId: 'recruit-auth-515f9',
+        });
+        console.log('Firebase Admin SDK initialized with default credentials/projectId.');
+      } catch (initErr) {
+        console.warn('Could not initialize default Firebase Admin app (likely missing credentials on this environment). Skipping Admin DB.');
+      }
+    } else {
+      adminApp = admin.app();
+    }
   }
-  adminDb = getFirestore(adminApp);
+  if (adminApp) {
+    adminDb = getFirestore(adminApp);
+  }
 } catch (err) {
   console.error('Failed to initialize Firebase Admin SDK:', err);
 }
@@ -2864,14 +2885,19 @@ app.get(['/arohi.png', '/arohi.jpg', '/Arohi.jpg', '/Arohi.png', '/arohi.jpeg', 
   }
 
   async function startServer() {
-    if (process.env.NODE_ENV !== 'production') {
+    const distPath = path.join(process.cwd(), 'dist');
+    const distExists = fs.existsSync(distPath);
+    const isDev = process.env.NODE_ENV === 'development' || (process.env.NODE_ENV !== 'production' && !distExists);
+
+    if (isDev) {
+      console.log('Vite dev server starting in middleware mode...');
       const vite = await createViteServer({
         server: { middlewareMode: true },
         appType: 'spa',
       });
       app.use(vite.middlewares);
     } else {
-      const distPath = path.join(process.cwd(), 'dist');
+      console.log('Serving production static assets from dist directory...');
       app.use(express.static(distPath));
       app.get('*', (req, res) => {
         serveSEOOptimizedIndex(req, res, distPath);
