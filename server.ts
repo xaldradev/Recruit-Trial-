@@ -6,7 +6,7 @@ import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Modality } from '@google/genai';
 import dotenv from 'dotenv';
 import { createResumeDocx } from './server-resume.ts';
-import admin from 'firebase-admin';
+import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { WebSocketServer, WebSocket } from 'ws';
 
@@ -17,29 +17,46 @@ let adminApp: any = null;
 let adminDb: any = null;
 try {
   const serviceAccountVar = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (serviceAccountVar) {
-    try {
-      const serviceAccount = JSON.parse(serviceAccountVar);
-      adminApp = admin.initializeApp({
-        credential: (admin as any).credential.cert(serviceAccount),
-        projectId: 'recruit-auth-515f9',
-      });
-      console.log('Firebase Admin SDK initialized successfully with service account credential.');
-    } catch (parseErr) {
-      console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT env variable:', parseErr);
-      adminApp = admin.initializeApp({
+  if (serviceAccountVar && serviceAccountVar.trim()) {
+    const trimmed = serviceAccountVar.trim();
+    if (trimmed.startsWith('{')) {
+      try {
+        const serviceAccount = JSON.parse(trimmed);
+        adminApp = initializeApp({
+          credential: cert(serviceAccount),
+          projectId: 'recruit-auth-515f9',
+        });
+        console.log('Firebase Admin SDK initialized successfully with service account credential.');
+      } catch (parseErr: any) {
+        console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT JSON:', parseErr.message || parseErr);
+        console.warn('Initializing Firebase Admin SDK without credentials as a fallback...');
+        adminApp = initializeApp({
+          projectId: 'recruit-auth-515f9',
+        });
+      }
+    } else {
+      console.warn('=========================================');
+      console.warn('WARNING: FIREBASE_SERVICE_ACCOUNT environment variable is set but does not look like a JSON service account private key.');
+      if (trimmed.startsWith('AIzaSy')) {
+        console.warn('It appears you have pasted a Firebase client/Web API Key ("AIzaSy...") into FIREBASE_SERVICE_ACCOUNT instead of a Service Account key.');
+        console.warn('A Firebase Service Account must be a full JSON object starting with "{" and ending with "}".');
+        console.warn('To get one: Go to Firebase Console -> Project Settings -> Service Accounts -> "Generate new private key".');
+      }
+      console.warn('Initializing Firebase Admin SDK without credentials as a fallback...');
+      console.warn('=========================================');
+      adminApp = initializeApp({
         projectId: 'recruit-auth-515f9',
       });
     }
   } else {
-    adminApp = admin.initializeApp({
+    adminApp = initializeApp({
       projectId: 'recruit-auth-515f9',
     });
     console.log('Firebase Admin SDK initialized with default credentials.');
   }
   adminDb = getFirestore(adminApp);
-} catch (err) {
-  console.error('Failed to initialize Firebase Admin SDK:', err);
+} catch (err: any) {
+  console.error('Failed to initialize Firebase Admin SDK:', err.message || err);
 }
 
 // Resilient persistent local database fallback for users
