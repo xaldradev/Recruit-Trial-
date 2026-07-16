@@ -839,7 +839,7 @@ export default function App() {
         }
       ];
 
-      const newPostings = mockList.filter((p: any) => !existingIds.has(p.id));
+      const newPostings = (mockList as Posting[]).filter((p: Posting) => !existingIds.has(p.id));
       if (newPostings.length > 0) {
         const updated = [...newPostings, ...postings];
         setPostings(updated);
@@ -1290,7 +1290,7 @@ export default function App() {
                 
                 <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-[11px] font-bold text-slate-400">
                   <span className="flex items-center gap-1.5 text-emerald-400">● Live Synchronization Active</span>
-                  <span className="flex items-center gap-1.5">★ {subscriptions && subscriptions.length > 0 ? `${subscriptions.length} Linked Subscriptions` : 'Free Tier Account'}</span>
+                  <span className="flex items-center gap-1.5">★ {subscriptions && Object.values(subscriptions).filter(Boolean).length > 0 ? `${Object.values(subscriptions).filter(Boolean).length} Linked Subscriptions` : 'Free Tier Account'}</span>
                   <span className="flex items-center gap-1.5 text-purple-400">👥 Access all features instantly</span>
                 </div>
               </div>
