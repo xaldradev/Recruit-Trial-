@@ -19,6 +19,7 @@ import SchemesPage from './components/SchemesPage';
 import CoursesPage from './components/CoursesPage';
 import SchoolSyllabusPage from './components/SchoolSyllabusPage';
 import UserDashboard from './components/UserDashboard';
+import TierSelectorGrid from './components/TierSelectorGrid';
 import EmployerPortal from './components/EmployerPortal';
 import LegalPages from './components/LegalPages';
 import NavigationHub from './components/NavigationHub';
@@ -29,11 +30,13 @@ import WelcomeLanding from './components/WelcomeLanding';
 import ArohiAvatar from './components/ArohiAvatar';
 import WalkthroughTour from './components/WalkthroughTour';
 import FranchisePage from './components/FranchisePage';
+import { PRICING_TIERS, PATH_DETAILS, getTokenLimitForPrice } from './data/pricingData';
+import TokenWarningToastContainer from './components/TokenWarningToastContainer';
 
 import { initialPostings } from './data/initialData';
 import { INITIAL_REVIEWS, Review } from './data/reviewsData';
 import { Posting, Application, CategoryType } from './types';
-import { Award, Crown, CheckCircle, Landmark, Bell, ArrowUpRight, ShieldCheck, Sparkles, Bot, GraduationCap, Briefcase, ChevronRight, Mic, MicOff, ArrowLeft, Home, Compass, Map, RotateCcw, Star, Users, MapPin, RefreshCw, Quote, Plus, MessageSquare, MessageCircle, Zap, Coins, User, Share2, Copy } from 'lucide-react';
+import { Award, Crown, CheckCircle, Landmark, Bell, ArrowUpRight, ShieldCheck, Sparkles, Bot, GraduationCap, Briefcase, ChevronRight, Mic, MicOff, ArrowLeft, Home, Compass, Map, RotateCcw, Star, Users, MapPin, RefreshCw, Quote, Plus, MessageSquare, MessageCircle, Zap, Coins, User, Share2, Copy, X } from 'lucide-react';
 
 const INITIAL_MOCK_APPLICATIONS: Application[] = [
   {
@@ -370,6 +373,70 @@ export default function App() {
     return { path1: false, path2: false, path3: false, path4: false };
   });
 
+  const [subscriptionDetails, setSubscriptionDetails] = useState<Record<string, { tierName: string; price: number; margin: number }>>(() => {
+    const saved = localStorage.getItem('recruit_subscription_details');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        // Fallback
+      }
+    }
+    return {};
+  });
+
+  const [tokenUsage, setTokenUsage] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem('recruit_token_usage');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return { path1: 450, path2: 1200, path3: 850, path4: 150 };
+  });
+
+  const [warningEnabled, setWarningEnabled] = useState<boolean>(() => {
+    const saved = localStorage.getItem('recruit_warning_enabled');
+    return saved !== 'false';
+  });
+
+  const [warningInterval, setWarningInterval] = useState<number>(() => {
+    const saved = localStorage.getItem('recruit_warning_interval');
+    return saved ? parseInt(saved, 10) : 15;
+  });
+
+  const [nextReminderIn, setNextReminderIn] = useState<number>(15);
+
+  const [warningToasts, setWarningToasts] = useState<Array<{
+    id: string;
+    pathId: string;
+    title: string;
+    usage: number;
+    limit: number;
+    percentage: number;
+    timestamp: string;
+    count: number;
+    lastTriggered: string;
+    pulse: boolean;
+  }>>([]);
+
+  const [warningHistoryLog, setWarningHistoryLog] = useState<Array<{
+    id: string;
+    pathId: string;
+    pathTitle: string;
+    message: string;
+    timestamp: string;
+  }>>([]);
+
+  const [tierSelectPathId, setTierSelectPathId] = useState<string | null>(null);
+  const [selectedTiers, setSelectedTiers] = useState<Record<string, number>>({
+    path1: 0,
+    path2: 0,
+    path3: 0,
+    path4: 0,
+  });
+  const [pendingSubscriptionDetail, setPendingSubscriptionDetail] = useState<{ tierName: string; price: number; margin: number } | null>(null);
+
   const [checkoutPath, setCheckoutPath] = useState<{ id: string; title: string; price: string } | null>(null);
   const [selectedPaymentGateway, setSelectedPaymentGateway] = useState<'upi' | 'googleplay'>('upi');
   const [isProcessingPlayStore, setIsProcessingPlayStore] = useState<boolean>(false);
@@ -406,11 +473,27 @@ export default function App() {
 
   const handleSubscribe = (pathId: string, planName?: string, paymentMethod?: string) => {
     const isSubscribed = !subscriptions[pathId];
+    
+    // Intercept subscription start to prompt for tier selection
+    if (isSubscribed && !planName) {
+      setTierSelectPathId(pathId);
+      return;
+    }
+
     const updated = { ...subscriptions, [pathId]: isSubscribed };
     setSubscriptions(updated);
     localStorage.setItem('recruit_subscriptions', JSON.stringify(updated));
 
+    // Update detailed description
+    const updatedDetails = { ...subscriptionDetails };
     if (isSubscribed) {
+      if (pendingSubscriptionDetail) {
+        updatedDetails[pathId] = pendingSubscriptionDetail;
+      } else {
+        // Fallback default starter tier
+        updatedDetails[pathId] = { tierName: 'Starter Plan', price: 399, margin: 199.5 };
+      }
+      
       // Trace this subscription event
       fetch('/api/track-event', {
         method: 'POST',
@@ -422,6 +505,8 @@ export default function App() {
         })
       }).catch(err => console.log('Telemetry offline:', err));
     } else {
+      delete updatedDetails[pathId];
+      
       fetch('/api/track-event', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -432,7 +517,335 @@ export default function App() {
         })
       }).catch(err => console.log('Telemetry offline:', err));
     }
+    
+    setSubscriptionDetails(updatedDetails);
+    localStorage.setItem('recruit_subscription_details', JSON.stringify(updatedDetails));
   };
+
+  // --- TOKEN LIMIT REPEATED WARNING & TIMER SYSTEM ---
+  const checkAndTriggerInstantWarning = (pathId: string, usage: number, limit: number) => {
+    if ((usage / limit) >= 0.8) {
+      setWarningToasts(currToasts => {
+        const existingIdx = currToasts.findIndex(t => t.pathId === pathId);
+        if (existingIdx > -1) {
+          const updated = [...currToasts];
+          const pct = Math.round((usage / limit) * 100);
+          updated[existingIdx] = {
+            ...updated[existingIdx],
+            usage,
+            limit,
+            percentage: pct,
+            pulse: true
+          };
+          return updated;
+        }
+
+        const pathMeta = PATH_DETAILS[pathId as 'path1' | 'path2' | 'path3' | 'path4'];
+        const pct = Math.round((usage / limit) * 100);
+        const pathTitle = pathMeta?.shortTitle || 'Roadmap Path';
+        const nowStr = new Date().toLocaleTimeString();
+
+        // Add to history log
+        setWarningHistoryLog(log => [
+          {
+            id: `log-${Date.now()}-${Math.random()}`,
+            pathId,
+            pathTitle,
+            message: `First Warning: Usage crossed 80% limit (${pct}% consumed - ${usage}/${limit} tokens).`,
+            timestamp: nowStr
+          },
+          ...log
+        ]);
+
+        return [
+          ...currToasts,
+          {
+            id: `${pathId}-${Date.now()}`,
+            pathId,
+            title: pathTitle,
+            usage,
+            limit,
+            percentage: pct,
+            timestamp: nowStr,
+            count: 1,
+            lastTriggered: nowStr,
+            pulse: true
+          }
+        ];
+      });
+
+      setNextReminderIn(warningInterval);
+    } else {
+      setWarningToasts(curr => curr.filter(t => t.pathId !== pathId));
+    }
+  };
+
+  const handleIncrementTokenUsage = (pathId: string) => {
+    const price = subscriptionDetails[pathId]?.price || 399;
+    const limit = getTokenLimitForPrice(price);
+    const step = Math.round(limit * 0.10);
+    setTokenUsage(prev => {
+      const currentVal = prev[pathId] || 0;
+      const nextVal = Math.min(limit, currentVal + step);
+      const updated = { ...prev, [pathId]: nextVal };
+      localStorage.setItem('recruit_token_usage', JSON.stringify(updated));
+      checkAndTriggerInstantWarning(pathId, nextVal, limit);
+      return updated;
+    });
+  };
+
+  const handleSetTokenUsage = (pathId: string, value: number) => {
+    const price = subscriptionDetails[pathId]?.price || 399;
+    const limit = getTokenLimitForPrice(price);
+    const finalVal = Math.min(limit, Math.max(0, value));
+    setTokenUsage(prev => {
+      const updated = { ...prev, [pathId]: finalVal };
+      localStorage.setItem('recruit_token_usage', JSON.stringify(updated));
+      checkAndTriggerInstantWarning(pathId, finalVal, limit);
+      return updated;
+    });
+  };
+
+  const handleResetTokenUsage = (pathId: string) => {
+    setTokenUsage(prev => {
+      const updated = { ...prev, [pathId]: 0 };
+      localStorage.setItem('recruit_token_usage', JSON.stringify(updated));
+      setWarningToasts(curr => curr.filter(t => t.pathId !== pathId));
+      return updated;
+    });
+  };
+
+  const handleToggleWarningEnabled = () => {
+    setWarningEnabled(prev => {
+      const next = !prev;
+      localStorage.setItem('recruit_warning_enabled', String(next));
+      if (!next) {
+        setWarningToasts([]);
+      } else {
+        setTimeout(() => {
+          Object.keys(subscriptions).forEach(pathId => {
+            if (subscriptions[pathId]) {
+              const price = subscriptionDetails[pathId]?.price || 399;
+              const limit = getTokenLimitForPrice(price);
+              const usage = tokenUsage[pathId] || 0;
+              if ((usage / limit) >= 0.8) {
+                checkAndTriggerInstantWarning(pathId, usage, limit);
+              }
+            }
+          });
+        }, 100);
+      }
+      return next;
+    });
+  };
+
+  const handleSetWarningInterval = (val: number) => {
+    setWarningInterval(val);
+    setNextReminderIn(val);
+    localStorage.setItem('recruit_warning_interval', String(val));
+  };
+
+  const handleClearWarningHistory = () => {
+    setWarningHistoryLog([]);
+  };
+
+  const handleCloseWarningToast = (pathId: string) => {
+    setWarningToasts(curr => curr.filter(t => t.pathId !== pathId));
+  };
+
+  const handleUpgradeWarning = (pathId: string) => {
+    setActiveTab('dashboard');
+    setWarningToasts(curr => curr.filter(t => t.pathId !== pathId));
+    
+    setTimeout(() => {
+      const el = document.getElementById('monthly-subscriptions-anchor');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 200);
+  };
+
+  const handleTriggerTestLimitWarning = () => {
+    const updatedSub = { ...subscriptions, path1: true };
+    setSubscriptions(updatedSub);
+    localStorage.setItem('recruit_subscriptions', JSON.stringify(updatedSub));
+
+    const updatedDetails = { 
+      ...subscriptionDetails, 
+      path1: { tierName: 'Starter Plan', price: 399, margin: 199.5 } 
+    };
+    setSubscriptionDetails(updatedDetails);
+    localStorage.setItem('recruit_subscription_details', JSON.stringify(updatedDetails));
+
+    setTokenUsage(prev => {
+      const updatedUsage = { ...prev, path1: 820 };
+      localStorage.setItem('recruit_token_usage', JSON.stringify(updatedUsage));
+      
+      const limit = 1000;
+      const usage = 820;
+      const pct = 82;
+      const pathTitle = 'Public Roadmap';
+      const nowStr = new Date().toLocaleTimeString();
+
+      setWarningToasts(currToasts => {
+        const existingIdx = currToasts.findIndex(t => t.pathId === 'path1');
+        if (existingIdx > -1) {
+          const updated = [...currToasts];
+          updated[existingIdx] = {
+            ...updated[existingIdx],
+            usage,
+            limit,
+            percentage: pct,
+            pulse: true
+          };
+          return updated;
+        }
+
+        return [
+          ...currToasts,
+          {
+            id: `path1-${Date.now()}`,
+            pathId: 'path1',
+            title: pathTitle,
+            usage,
+            limit,
+            percentage: pct,
+            timestamp: nowStr,
+            count: 1,
+            lastTriggered: nowStr,
+            pulse: true
+          }
+        ];
+      });
+
+      setWarningHistoryLog(log => [
+        {
+          id: `log-forced-${Date.now()}`,
+          pathId: 'path1',
+          pathTitle,
+          message: `Manual simulation triggered: Path 1 usage set to 82% (${usage}/${limit} tokens).`,
+          timestamp: nowStr
+        },
+        ...log
+      ]);
+
+      return updatedUsage;
+    });
+
+    setActiveTab('dashboard');
+    setNextReminderIn(warningInterval);
+  };
+
+  useEffect(() => {
+    if (!warningEnabled) {
+      setNextReminderIn(warningInterval);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setNextReminderIn(prev => {
+        if (prev <= 1) {
+          const activeOver80 = Object.keys(subscriptions).filter(pathId => {
+            if (!subscriptions[pathId]) return false;
+            const price = subscriptionDetails[pathId]?.price || 399;
+            const limit = getTokenLimitForPrice(price);
+            const usage = tokenUsage[pathId] || 0;
+            return (usage / limit) >= 0.8;
+          });
+
+          if (activeOver80.length > 0) {
+            try {
+              const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+              const oscillator = audioCtx.createOscillator();
+              const gainNode = audioCtx.createGain();
+              oscillator.connect(gainNode);
+              gainNode.connect(audioCtx.destination);
+              oscillator.type = 'sine';
+              oscillator.frequency.setValueAtTime(480, audioCtx.currentTime);
+              gainNode.gain.setValueAtTime(0.04, audioCtx.currentTime);
+              oscillator.start();
+              oscillator.stop(audioCtx.currentTime + 0.12);
+            } catch (e) {}
+
+            setWarningToasts(currToasts => {
+              const updatedToasts = [...currToasts];
+              
+              activeOver80.forEach(pathId => {
+                const pathMeta = PATH_DETAILS[pathId as 'path1' | 'path2' | 'path3' | 'path4'];
+                const price = subscriptionDetails[pathId]?.price || 399;
+                const limit = getTokenLimitForPrice(price);
+                const usage = tokenUsage[pathId] || 0;
+                const pct = Math.round((usage / limit) * 100);
+                const pathTitle = pathMeta?.shortTitle || 'Roadmap Path';
+
+                const existingIdx = updatedToasts.findIndex(t => t.pathId === pathId);
+                const nowStr = new Date().toLocaleTimeString();
+
+                if (existingIdx > -1) {
+                  const newCount = updatedToasts[existingIdx].count + 1;
+                  updatedToasts[existingIdx] = {
+                    ...updatedToasts[existingIdx],
+                    usage,
+                    limit,
+                    percentage: pct,
+                    count: newCount,
+                    lastTriggered: nowStr,
+                    pulse: true
+                  };
+
+                  setWarningHistoryLog(log => [
+                    {
+                      id: `log-${Date.now()}-${Math.random()}`,
+                      pathId,
+                      pathTitle,
+                      message: `Reminder #${newCount} triggered: Usage remains at ${pct}% (${usage}/${limit} tokens).`,
+                      timestamp: nowStr
+                    },
+                    ...log.slice(0, 49)
+                  ]);
+                } else {
+                  updatedToasts.push({
+                    id: `${pathId}-${Date.now()}`,
+                    pathId,
+                    title: pathTitle,
+                    usage,
+                    limit,
+                    percentage: pct,
+                    timestamp: nowStr,
+                    count: 1,
+                    lastTriggered: nowStr,
+                    pulse: true
+                  });
+
+                  setWarningHistoryLog(log => [
+                    {
+                      id: `log-${Date.now()}-${Math.random()}`,
+                      pathId,
+                      pathTitle,
+                      message: `Initial Warning: Usage crossed 80% limit (${pct}% consumed - ${usage}/${limit} tokens).`,
+                      timestamp: nowStr
+                    },
+                    ...log.slice(0, 49)
+                  ]);
+                }
+              });
+
+              return updatedToasts;
+            });
+
+            setTimeout(() => {
+              setWarningToasts(curr => curr.map(t => ({ ...t, pulse: false })));
+            }, 1000);
+          }
+
+          return warningInterval;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [subscriptions, tokenUsage, subscriptionDetails, warningEnabled, warningInterval]);
 
   const handleSubmitReview = (e: any) => {
     e.preventDefault();
@@ -813,10 +1226,23 @@ export default function App() {
         return (
           <UserDashboard 
             subscriptions={subscriptions} 
+            subscriptionDetails={subscriptionDetails}
             onSubscribe={handleSubscribe} 
             onNavigateTab={(tab) => setActiveTab(tab)} 
             onOpenAuth={() => setIsAuthModalOpen(true)}
             onShare={() => handleOpenShare('My Career Dashboard', 'Check out Recruit.org.in - India\'s Futuristic National Career Registry, Jobs, Resume Builder & Courses Platform!', 'https://recruit.org.in')}
+            tokenUsage={tokenUsage}
+            onIncrementTokenUsage={handleIncrementTokenUsage}
+            onSetTokenUsage={handleSetTokenUsage}
+            onResetTokenUsage={handleResetTokenUsage}
+            warningEnabled={warningEnabled}
+            onToggleWarningEnabled={handleToggleWarningEnabled}
+            warningInterval={warningInterval}
+            onSetWarningInterval={handleSetWarningInterval}
+            nextReminderIn={nextReminderIn}
+            onTriggerTestLimitWarning={handleTriggerTestLimitWarning}
+            warningHistoryLog={warningHistoryLog}
+            onClearWarningHistory={handleClearWarningHistory}
           />
         );
       case 'employer':
@@ -1233,11 +1659,73 @@ export default function App() {
               </div>
 
               <div className="pt-6 border-t border-slate-800/60 mt-6 space-y-3.5">
+                {/* 5-Tier Selector Pills */}
+                {!subscriptions.path1 && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Select Plan Tier:</span>
+                    <div className="grid grid-cols-5 gap-1 bg-slate-950/65 p-1 rounded-2xl border border-slate-800/80">
+                      {PRICING_TIERS.map((tier, idx) => {
+                        const isSelected = selectedTiers.path1 === idx;
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              setSelectedTiers(prev => ({ ...prev, path1: idx }));
+                            }}
+                            className={`py-2 text-[10px] font-black rounded-xl transition-all cursor-pointer text-center ${
+                              isSelected
+                                ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-[0_4px_12px_rgba(124,58,237,0.35)] border border-violet-400/20'
+                                : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                            }`}
+                          >
+                            ₹{tier.price}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Assistance Fee</span>
                   <div className="text-right">
-                    <span className="text-2xl font-black text-white tracking-tight">₹399</span>
-                    <span className="text-xs font-semibold text-slate-400"> / month</span>
+                    {subscriptions.path1 && subscriptionDetails.path1 ? (
+                      <div>
+                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5">
+                          {subscriptionDetails.path1.tierName}
+                        </span>
+                        <span className="text-2xl font-black text-white tracking-tight">₹{subscriptionDetails.path1.price}</span>
+                        <span className="text-xs font-semibold text-slate-400">/mo</span>
+                      </div>
+                    ) : (
+                      <div>
+                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5 text-right">
+                          {PRICING_TIERS[selectedTiers.path1].name}
+                        </span>
+                        <span className="text-2xl font-black text-white tracking-tight">₹{PRICING_TIERS[selectedTiers.path1].price}</span>
+                        <span className="text-xs font-semibold text-slate-400">/mo</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Call hours and AI Token usage indicators */}
+                <div className="grid grid-cols-2 gap-2 text-[10px] bg-slate-950/40 border border-slate-800/50 p-2.5 rounded-xl font-bold mt-2.5">
+                  <div className="flex items-center gap-1.5 justify-center text-slate-300">
+                    <span>📞</span>
+                    <span>
+                      {subscriptions.path1 && subscriptionDetails.path1
+                        ? PRICING_TIERS.find(t => t.price === subscriptionDetails.path1?.price)?.callHoursText || "2 Hours Calls"
+                        : PRICING_TIERS[selectedTiers.path1].callHoursText}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 justify-center text-slate-300 border-l border-slate-800/60">
+                    <span>🪙</span>
+                    <span>
+                      {subscriptions.path1 && subscriptionDetails.path1
+                        ? (PRICING_TIERS.find(t => t.price === subscriptionDetails.path1?.price)?.tokenUsageText || "1,000 AI Tokens") + " Limit"
+                        : PRICING_TIERS[selectedTiers.path1].tokenUsageText + " Limit"}
+                    </span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -1252,16 +1740,26 @@ export default function App() {
                       if (subscriptions.path1) {
                         handleSubscribe('path1');
                       } else {
-                        setCheckoutPath({ id: 'path1', title: 'Path 1: Career, Jobs & Resume Assistance Plan', price: '₹399/Month' });
+                        const tier = PRICING_TIERS[selectedTiers.path1];
+                        setPendingSubscriptionDetail({
+                          tierName: tier.name,
+                          price: tier.price,
+                          margin: tier.margin
+                        });
+                        setCheckoutPath({
+                          id: 'path1',
+                          title: `${PATH_DETAILS.path1.title} (${tier.name})`,
+                          price: `₹${tier.price}/Month`
+                        });
                       }
                     }}
                     className={`font-black text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all cursor-pointer text-center active:scale-95 ${
                       subscriptions.path1 
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
+                        ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30' 
                         : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-[0_4px_15px_rgba(37,99,235,0.4)] border border-blue-400/20'
                     }`}
                   >
-                    {subscriptions.path1 ? 'Subscribed ✓' : 'Subscribe'}
+                    {subscriptions.path1 ? 'Cancel Subscription' : 'Subscribe'}
                   </button>
                 </div>
               </div>
@@ -1309,11 +1807,73 @@ export default function App() {
               </div>
 
               <div className="pt-6 border-t border-slate-800/60 mt-6 space-y-3.5">
+                {/* 5-Tier Selector Pills */}
+                {!subscriptions.path2 && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Select Plan Tier:</span>
+                    <div className="grid grid-cols-5 gap-1 bg-slate-950/65 p-1 rounded-2xl border border-slate-800/80">
+                      {PRICING_TIERS.map((tier, idx) => {
+                        const isSelected = selectedTiers.path2 === idx;
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              setSelectedTiers(prev => ({ ...prev, path2: idx }));
+                            }}
+                            className={`py-2 text-[10px] font-black rounded-xl transition-all cursor-pointer text-center ${
+                              isSelected
+                                ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-[0_4px_12px_rgba(124,58,237,0.35)] border border-violet-400/20'
+                                : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                            }`}
+                          >
+                            ₹{tier.price}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Assistance Fee</span>
                   <div className="text-right">
-                    <span className="text-2xl font-black text-[#00e676] tracking-tight">FREE</span>
-                    <span className="text-xs font-semibold text-slate-400"> (with Course)</span>
+                    {subscriptions.path2 && subscriptionDetails.path2 ? (
+                      <div>
+                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5">
+                          {subscriptionDetails.path2.tierName}
+                        </span>
+                        <span className="text-2xl font-black text-white tracking-tight">₹{subscriptionDetails.path2.price}</span>
+                        <span className="text-xs font-semibold text-slate-400">/mo</span>
+                      </div>
+                    ) : (
+                      <div>
+                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5 text-right">
+                          {PRICING_TIERS[selectedTiers.path2].name}
+                        </span>
+                        <span className="text-2xl font-black text-white tracking-tight">₹{PRICING_TIERS[selectedTiers.path2].price}</span>
+                        <span className="text-xs font-semibold text-slate-400">/mo</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Call hours and AI Token usage indicators */}
+                <div className="grid grid-cols-2 gap-2 text-[10px] bg-slate-950/40 border border-slate-800/50 p-2.5 rounded-xl font-bold mt-2.5">
+                  <div className="flex items-center gap-1.5 justify-center text-slate-300">
+                    <span>📞</span>
+                    <span>
+                      {subscriptions.path2 && subscriptionDetails.path2
+                        ? PRICING_TIERS.find(t => t.price === subscriptionDetails.path2?.price)?.callHoursText || "2 Hours Calls"
+                        : PRICING_TIERS[selectedTiers.path2].callHoursText}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 justify-center text-slate-300 border-l border-slate-800/60">
+                    <span>🪙</span>
+                    <span>
+                      {subscriptions.path2 && subscriptionDetails.path2
+                        ? (PRICING_TIERS.find(t => t.price === subscriptionDetails.path2?.price)?.tokenUsageText || "1,000 AI Tokens") + " Limit"
+                        : PRICING_TIERS[selectedTiers.path2].tokenUsageText + " Limit"}
+                    </span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -1328,16 +1888,26 @@ export default function App() {
                       if (subscriptions.path2) {
                         handleSubscribe('path2');
                       } else {
-                        setCheckoutPath({ id: 'path2', title: 'Path 2: Economical Skill Upgradation Plan', price: 'FREE (Arohi Included with Course)' });
+                        const tier = PRICING_TIERS[selectedTiers.path2];
+                        setPendingSubscriptionDetail({
+                          tierName: tier.name,
+                          price: tier.price,
+                          margin: tier.margin
+                        });
+                        setCheckoutPath({
+                          id: 'path2',
+                          title: `${PATH_DETAILS.path2.title} (${tier.name})`,
+                          price: `₹${tier.price}/Month`
+                        });
                       }
                     }}
                     className={`font-black text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all cursor-pointer text-center active:scale-95 ${
                       subscriptions.path2 
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
+                        ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30' 
                         : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-[0_4px_15px_rgba(168,85,247,0.4)] border border-purple-400/20'
                     }`}
                   >
-                    {subscriptions.path2 ? 'Subscribed ✓' : 'Subscribe (Free)'}
+                    {subscriptions.path2 ? 'Cancel Subscription' : 'Subscribe'}
                   </button>
                 </div>
               </div>
@@ -1385,11 +1955,73 @@ export default function App() {
               </div>
 
               <div className="pt-6 border-t border-slate-800/60 mt-6 space-y-3.5">
+                {/* 5-Tier Selector Pills */}
+                {!subscriptions.path3 && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Select Plan Tier:</span>
+                    <div className="grid grid-cols-5 gap-1 bg-slate-950/65 p-1 rounded-2xl border border-slate-800/80">
+                      {PRICING_TIERS.map((tier, idx) => {
+                        const isSelected = selectedTiers.path3 === idx;
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              setSelectedTiers(prev => ({ ...prev, path3: idx }));
+                            }}
+                            className={`py-2 text-[10px] font-black rounded-xl transition-all cursor-pointer text-center ${
+                              isSelected
+                                ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-[0_4px_12px_rgba(124,58,237,0.35)] border border-violet-400/20'
+                                : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                            }`}
+                          >
+                            ₹{tier.price}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Assistance Fee</span>
                   <div className="text-right">
-                    <span className="text-2xl font-black text-white tracking-tight">₹399</span>
-                    <span className="text-xs font-semibold text-slate-400"> / month</span>
+                    {subscriptions.path3 && subscriptionDetails.path3 ? (
+                      <div>
+                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5">
+                          {subscriptionDetails.path3.tierName}
+                        </span>
+                        <span className="text-2xl font-black text-white tracking-tight">₹{subscriptionDetails.path3.price}</span>
+                        <span className="text-xs font-semibold text-slate-400">/mo</span>
+                      </div>
+                    ) : (
+                      <div>
+                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5 text-right">
+                          {PRICING_TIERS[selectedTiers.path3].name}
+                        </span>
+                        <span className="text-2xl font-black text-white tracking-tight">₹{PRICING_TIERS[selectedTiers.path3].price}</span>
+                        <span className="text-xs font-semibold text-slate-400">/mo</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Call hours and AI Token usage indicators */}
+                <div className="grid grid-cols-2 gap-2 text-[10px] bg-slate-950/40 border border-slate-800/50 p-2.5 rounded-xl font-bold mt-2.5">
+                  <div className="flex items-center gap-1.5 justify-center text-slate-300">
+                    <span>📞</span>
+                    <span>
+                      {subscriptions.path3 && subscriptionDetails.path3
+                        ? PRICING_TIERS.find(t => t.price === subscriptionDetails.path3?.price)?.callHoursText || "2 Hours Calls"
+                        : PRICING_TIERS[selectedTiers.path3].callHoursText}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 justify-center text-slate-300 border-l border-slate-800/60">
+                    <span>🪙</span>
+                    <span>
+                      {subscriptions.path3 && subscriptionDetails.path3
+                        ? (PRICING_TIERS.find(t => t.price === subscriptionDetails.path3?.price)?.tokenUsageText || "1,000 AI Tokens") + " Limit"
+                        : PRICING_TIERS[selectedTiers.path3].tokenUsageText + " Limit"}
+                    </span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -1404,16 +2036,26 @@ export default function App() {
                       if (subscriptions.path3) {
                         handleSubscribe('path3');
                       } else {
-                        setCheckoutPath({ id: 'path3', title: 'Path 3: Udyam Business Assistance Plan', price: '₹399/Month' });
+                        const tier = PRICING_TIERS[selectedTiers.path3];
+                        setPendingSubscriptionDetail({
+                          tierName: tier.name,
+                          price: tier.price,
+                          margin: tier.margin
+                        });
+                        setCheckoutPath({
+                          id: 'path3',
+                          title: `${PATH_DETAILS.path3.title} (${tier.name})`,
+                          price: `₹${tier.price}/Month`
+                        });
                       }
                     }}
                     className={`font-black text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all cursor-pointer text-center active:scale-95 ${
                       subscriptions.path3 
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
+                        ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30' 
                         : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-[0_4px_15px_rgba(16,185,129,0.4)] border border-emerald-400/20'
                     }`}
                   >
-                    {subscriptions.path3 ? 'Subscribed ✓' : 'Subscribe'}
+                    {subscriptions.path3 ? 'Cancel Subscription' : 'Subscribe'}
                   </button>
                 </div>
               </div>
@@ -1461,11 +2103,73 @@ export default function App() {
               </div>
 
               <div className="pt-6 border-t border-slate-800/60 mt-6 space-y-3.5">
+                {/* 5-Tier Selector Pills */}
+                {!subscriptions.path4 && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Select Plan Tier:</span>
+                    <div className="grid grid-cols-5 gap-1 bg-slate-950/65 p-1 rounded-2xl border border-slate-800/80">
+                      {PRICING_TIERS.map((tier, idx) => {
+                        const isSelected = selectedTiers.path4 === idx;
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              setSelectedTiers(prev => ({ ...prev, path4: idx }));
+                            }}
+                            className={`py-2 text-[10px] font-black rounded-xl transition-all cursor-pointer text-center ${
+                              isSelected
+                                ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-[0_4px_12px_rgba(124,58,237,0.35)] border border-violet-400/20'
+                                : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                            }`}
+                          >
+                            ₹{tier.price}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Assistance Fee</span>
                   <div className="text-right">
-                    <span className="text-2xl font-black text-white tracking-tight">₹399</span>
-                    <span className="text-xs font-semibold text-slate-400"> / month</span>
+                    {subscriptions.path4 && subscriptionDetails.path4 ? (
+                      <div>
+                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5">
+                          {subscriptionDetails.path4.tierName}
+                        </span>
+                        <span className="text-2xl font-black text-white tracking-tight">₹{subscriptionDetails.path4.price}</span>
+                        <span className="text-xs font-semibold text-slate-400">/mo</span>
+                      </div>
+                    ) : (
+                      <div>
+                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5 text-right">
+                          {PRICING_TIERS[selectedTiers.path4].name}
+                        </span>
+                        <span className="text-2xl font-black text-white tracking-tight">₹{PRICING_TIERS[selectedTiers.path4].price}</span>
+                        <span className="text-xs font-semibold text-slate-400">/mo</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Call hours and AI Token usage indicators */}
+                <div className="grid grid-cols-2 gap-2 text-[10px] bg-slate-950/40 border border-slate-800/50 p-2.5 rounded-xl font-bold mt-2.5">
+                  <div className="flex items-center gap-1.5 justify-center text-slate-300">
+                    <span>📞</span>
+                    <span>
+                      {subscriptions.path4 && subscriptionDetails.path4
+                        ? PRICING_TIERS.find(t => t.price === subscriptionDetails.path4?.price)?.callHoursText || "2 Hours Calls"
+                        : PRICING_TIERS[selectedTiers.path4].callHoursText}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 justify-center text-slate-300 border-l border-slate-800/60">
+                    <span>🪙</span>
+                    <span>
+                      {subscriptions.path4 && subscriptionDetails.path4
+                        ? (PRICING_TIERS.find(t => t.price === subscriptionDetails.path4?.price)?.tokenUsageText || "1,000 AI Tokens") + " Limit"
+                        : PRICING_TIERS[selectedTiers.path4].tokenUsageText + " Limit"}
+                    </span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -1480,16 +2184,26 @@ export default function App() {
                       if (subscriptions.path4) {
                         handleSubscribe('path4');
                       } else {
-                        setCheckoutPath({ id: 'path4', title: 'Path 4: Class 1-10 Student Support Plan', price: '₹399/Month' });
+                        const tier = PRICING_TIERS[selectedTiers.path4];
+                        setPendingSubscriptionDetail({
+                          tierName: tier.name,
+                          price: tier.price,
+                          margin: tier.margin
+                        });
+                        setCheckoutPath({
+                          id: 'path4',
+                          title: `${PATH_DETAILS.path4.title} (${tier.name})`,
+                          price: `₹${tier.price}/Month`
+                        });
                       }
                     }}
                     className={`font-black text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all cursor-pointer text-center active:scale-95 ${
                       subscriptions.path4 
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
+                        ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30' 
                         : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-[0_4px_15px_rgba(99,102,241,0.4)] border border-indigo-400/20'
                     }`}
                   >
-                    {subscriptions.path4 ? 'Subscribed ✓' : 'Subscribe'}
+                    {subscriptions.path4 ? 'Cancel Subscription' : 'Subscribe'}
                   </button>
                 </div>
               </div>
@@ -3281,6 +3995,54 @@ export default function App() {
         </motion.div>
       )}
 
+      {/* TIER SELECTION OVERLAY MODAL */}
+      {tierSelectPathId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-[#0c0822]/98 border-2 border-[#5b21b6]/60 text-white rounded-[2.5rem] max-w-6xl w-full p-6 sm:p-8 space-y-6 shadow-[0_0_60px_rgba(124,58,237,0.4)] relative my-8 animate-in zoom-in-95 duration-200">
+            {/* Background glows */}
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-start gap-4 border-b border-[#211b4d] pb-5 relative z-10">
+              <div className="space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#a855f7] bg-[#a855f7]/10 px-3 py-1 rounded-full border border-[#a855f7]/20">
+                  ASSISTANCE ROADMAP PLAN SELECTOR
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2 mt-2">
+                  <Sparkles className="w-5 h-5 text-yellow-300 animate-pulse" />
+                  Select Subscription Tier for {PATH_DETAILS[tierSelectPathId as 'path1' | 'path2' | 'path3' | 'path4']?.shortTitle || 'Your Roadmap'}
+                </h3>
+                <p className="text-xs text-slate-300 font-semibold leading-relaxed max-w-3xl">
+                  Every tier unlocks 100% of our premium AI capabilities and counselor guidelines. Simply select the tier that matches your monthly usage requirements.
+                </p>
+              </div>
+              <button
+                onClick={() => setTierSelectPathId(null)}
+                className="p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-slate-400 hover:text-white transition-all cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Selected Tier State Selector Grid */}
+            {(() => {
+              const pathId = tierSelectPathId;
+              const pathMeta = PATH_DETAILS[pathId as 'path1' | 'path2' | 'path3' | 'path4'];
+              return (
+                <TierSelectorGrid 
+                  pathId={pathId} 
+                  pathMeta={pathMeta} 
+                  onClose={() => setTierSelectPathId(null)}
+                  setCheckoutPath={setCheckoutPath}
+                  setPendingSubscriptionDetail={setPendingSubscriptionDetail}
+                />
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
       {/* Simulated Premium Checkout Modal */}
       {checkoutPath && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
@@ -3936,6 +4698,16 @@ export default function App() {
         setActiveTab={setActiveTab}
         isOpen={isWalkthroughOpen}
         onClose={() => setIsWalkthroughOpen(false)}
+      />
+
+      {/* Floating 80% Token Limit Warning Toasts */}
+      <TokenWarningToastContainer
+        toasts={warningToasts}
+        onCloseToast={handleCloseWarningToast}
+        onUpgrade={handleUpgradeWarning}
+        nextReminderIn={nextReminderIn}
+        warningInterval={warningInterval}
+        warningEnabled={warningEnabled}
       />
 
     </div>

@@ -4,29 +4,61 @@ import {
   Bot, Briefcase, Landmark, ExternalLink, Sparkles, AlertCircle, 
   ShieldCheck, Edit3, Save, LogIn, Trash2, X, ChevronRight, 
   Download, RefreshCw, Trophy, Calendar, Check, Play, GraduationCap, Map, Clock, Share2,
-  Fingerprint
+  Fingerprint, AlertTriangle, ToggleLeft, ToggleRight, Settings, Volume2, VolumeX
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { initialCourses } from '../data/coursesData';
 import { isBiometricSupported, registerBiometricDevice, authenticateBiometricDevice } from '../lib/webauthn';
+import { PATH_DETAILS, PRICING_TIERS, getTokenLimitForPrice } from '../data/pricingData';
 
 interface UserDashboardProps {
   subscriptions?: Record<string, boolean>;
+  subscriptionDetails?: Record<string, { tierName: string; price: number; margin: number }>;
   onSubscribe?: (pathId: string) => void;
   onNavigateTab?: (tab: string) => void;
   onOpenAuth?: () => void;
   onShare?: () => void;
+  tokenUsage?: Record<string, number>;
+  onIncrementTokenUsage?: (pathId: string) => void;
+  onSetTokenUsage?: (pathId: string, value: number) => void;
+  onResetTokenUsage?: (pathId: string) => void;
+  warningEnabled?: boolean;
+  onToggleWarningEnabled?: () => void;
+  warningInterval?: number;
+  onSetWarningInterval?: (val: number) => void;
+  nextReminderIn?: number;
+  onTriggerTestLimitWarning?: () => void;
+  warningHistoryLog?: Array<{ id: string; pathId: string; pathTitle: string; message: string; timestamp: string }>;
+  onClearWarningHistory?: () => void;
 }
 
 export default function UserDashboard({ 
-  subscriptions = { path1: false, path2: false, path3: false }, 
+  subscriptions = { path1: false, path2: false, path3: false, path4: false }, 
+  subscriptionDetails = {},
   onSubscribe, 
   onNavigateTab, 
   onOpenAuth,
-  onShare
+  onShare,
+  tokenUsage = {},
+  onIncrementTokenUsage,
+  onSetTokenUsage,
+  onResetTokenUsage,
+  warningEnabled = true,
+  onToggleWarningEnabled,
+  warningInterval = 15,
+  onSetWarningInterval,
+  nextReminderIn = 15,
+  onTriggerTestLimitWarning,
+  warningHistoryLog = [],
+  onClearWarningHistory
 }: UserDashboardProps) {
   
   const { user, userData, updateUserProfile, updateBookmarks, updateDiagnostics, updateActivities } = useAuth();
+
+  const [showSandboxControls, setShowSandboxControls] = useState<boolean>(() => {
+    if (user?.email === 'elitetraderjunoon@gmail.com') return true;
+    return localStorage.getItem('recruit_show_dev_sandbox') === 'true';
+  });
 
   // Basic profile state
   const [profile, setProfile] = useState({
@@ -673,7 +705,15 @@ export default function UserDashboard({
           
           {/* Avatar and Info panel */}
           <div className="flex flex-col md:flex-row gap-6 items-start lg:items-center flex-1">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-[#7c3aed] to-[#a855f7] text-white flex items-center justify-center font-black text-2xl shadow-xl border border-purple-400/30 shrink-0 relative">
+            <div 
+              onDoubleClick={() => {
+                const next = !showSandboxControls;
+                setShowSandboxControls(next);
+                localStorage.setItem('recruit_show_dev_sandbox', String(next));
+              }}
+              title="Double-click to toggle developer sandbox controls"
+              className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-[#7c3aed] to-[#a855f7] text-white flex items-center justify-center font-black text-2xl shadow-xl border border-purple-400/30 shrink-0 relative cursor-pointer select-none"
+            >
               {profile.name ? profile.name.slice(0, 2).toUpperCase() : 'IN'}
               <div className="absolute -bottom-1 -right-1 bg-emerald-500 border-2 border-slate-950 w-5 h-5 rounded-full flex items-center justify-center" title="Online profile active">
                 <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
@@ -893,67 +933,402 @@ export default function UserDashboard({
         </div>
       </div>
 
+      {/* ⚠️ TOKEN QUOTA WARNING & REPEATED REMINDER CONTROL CENTER */}
+      {showSandboxControls && (
+        <div className="bg-[#1a1138]/85 border-2 border-[#5c21b6]/60 rounded-[2.5rem] p-6 text-left text-white shadow-2xl space-y-6 relative overflow-hidden backdrop-blur-md">
+          {/* Neon Glow decoration */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-pink-600/5 rounded-full blur-3xl pointer-events-none"></div>
+
+          {/* Header Block */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#311b5e]/50 pb-5 relative z-10">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="bg-amber-500/10 text-amber-300 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-amber-500/20">
+                  ⚠️ Fair-Trade Policy
+                </span>
+                <span className="bg-purple-500/10 text-purple-300 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-purple-500/20">
+                  Odisha Compute Server Sync
+                </span>
+              </div>
+              <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2 mt-1">
+                <AlertTriangle className="w-5.5 h-5.5 text-amber-400 animate-pulse" />
+                Token Warning System & Repeated Reminders Control
+              </h3>
+              <p className="text-xs text-slate-300 leading-relaxed font-semibold max-w-3xl">
+                Monitors active roadmap subscription usage against designated monthly computational limits. Once a path consumes 80% or more of its token quota, the system triggers repeated overlay toast warnings at precise time intervals to prevent sudden service halts.
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3 self-start md:self-center shrink-0">
+              {/* Quick simulator trigger */}
+              <button
+                onClick={onTriggerTestLimitWarning}
+                className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black text-[11px] uppercase tracking-wider rounded-xl shadow-lg transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
+                title="Instantly activates Path 1 and sets token usage to 82% to fire alerts."
+              >
+                <Sparkles className="w-3.5 h-3.5" /> Force 82% Usage Warning
+              </button>
+            </div>
+          </div>
+
+          {/* Dashboard Control Panel Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 relative z-10">
+            {/* Settings Section (Left) */}
+            <div className="md:col-span-5 space-y-4 bg-black/40 border border-[#3e1b7c]/45 p-5 rounded-[2rem]">
+              <h4 className="text-xs font-black text-violet-300 uppercase tracking-widest flex items-center gap-1.5 pb-2 border-b border-white/5">
+                <Settings className="w-4 h-4" /> System Settings
+              </h4>
+
+              {/* Toggle reminders */}
+              <div className="flex items-center justify-between gap-4 py-1.5">
+                <div className="space-y-0.5 text-left">
+                  <span className="text-xs font-bold text-slate-100 block">Repeated Warning Toasts</span>
+                  <span className="text-[10px] text-slate-400 font-semibold leading-normal block">
+                    Toggle repeated reminder toasts on/off.
+                  </span>
+                </div>
+                <button
+                  onClick={onToggleWarningEnabled}
+                  className="focus:outline-none cursor-pointer transition-transform active:scale-95 border-0 bg-transparent"
+                >
+                  {warningEnabled ? (
+                    <ToggleRight className="w-12 h-12 text-[#a855f7]" />
+                  ) : (
+                    <ToggleLeft className="w-12 h-12 text-slate-600" />
+                  )}
+                </button>
+              </div>
+
+              {/* Time interval selection */}
+              <div className="space-y-2 text-left pt-2">
+                <div className="flex justify-between items-baseline">
+                  <span className="text-xs font-bold text-slate-100">Reminder Time Interval</span>
+                  <span className="text-[10px] text-amber-300 font-mono font-black uppercase tracking-wider bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                    Every {warningInterval} seconds
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-400 font-semibold leading-snug">
+                  Configure the interval for repeated toast reminders when usage is at or above 80%.
+                </p>
+                
+                <div className="grid grid-cols-5 gap-1.5 pt-1.5">
+                  {[5, 10, 15, 30, 60].map((sec) => (
+                    <button
+                      key={sec}
+                      onClick={() => onSetWarningInterval && onSetWarningInterval(sec)}
+                      className={`py-2 text-[10px] font-black rounded-lg transition-all cursor-pointer ${
+                        warningInterval === sec
+                          ? 'bg-violet-600 text-white shadow-md border border-violet-400/30 font-mono'
+                          : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5'
+                      }`}
+                    >
+                      {sec}s
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Active sweep countdown visualizer */}
+              <div className="p-3 rounded-2xl bg-violet-950/30 border border-[#52299d]/30 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-violet-400 shrink-0" />
+                  <span className="text-[10px] text-slate-300 font-extrabold">Active Reminder Timer:</span>
+                </div>
+                {warningEnabled ? (
+                  <span className="text-[10px] font-mono font-black text-emerald-400 animate-pulse">
+                    Sweeping in {nextReminderIn}s...
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-mono font-black text-rose-400 uppercase tracking-wider">
+                    System Muted 🔇
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Realtime Warning Events Log (Right) */}
+            <div className="md:col-span-7 flex flex-col justify-between bg-black/40 border border-[#3e1b7c]/45 p-5 rounded-[2rem] min-h-[220px]">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center pb-2 border-b border-white/5">
+                  <h4 className="text-xs font-black text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <Clock className="w-4 h-4" /> Live Repeated Reminders Log ({warningHistoryLog.length})
+                  </h4>
+                  {warningHistoryLog.length > 0 && (
+                    <button
+                      onClick={onClearWarningHistory}
+                      className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-400 transition-all cursor-pointer bg-white/5 px-2.5 py-1 rounded-lg border border-white/10"
+                    >
+                      Clear Log
+                    </button>
+                  )}
+                </div>
+
+                {/* Console logs */}
+                <div className="h-36 overflow-y-auto pr-1 text-left font-mono text-[10px] leading-relaxed space-y-1.5 custom-scrollbar">
+                  {warningHistoryLog.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center text-slate-500 py-6 space-y-1">
+                      <span>No alerts triggered yet.</span>
+                      <span className="text-[9px] text-center max-w-xs font-sans">
+                        (Adjust any active path quota past 80% or click the "Force 82% Usage Warning" simulator above to begin recording logs).
+                      </span>
+                    </div>
+                  ) : (
+                    warningHistoryLog.map((log) => (
+                      <div key={log.id} className="border-b border-white/5 pb-1 flex gap-2 items-start animate-in fade-in slide-in-from-left-2 duration-150">
+                        <span className="text-violet-400 font-black font-sans shrink-0">[{log.timestamp}]</span>
+                        <div className="space-y-0.5">
+                          <span className="text-amber-300 font-bold font-sans">[{log.pathTitle}] </span>
+                          <span className="text-slate-200">{log.message}</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div className="text-[9px] text-slate-500 font-semibold border-t border-white/5 pt-2 mt-2">
+                💡 Repeated toast reminders alert users to upgrade before their limits are reached. Our 50% gross business margin provides sustainable computing power.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MONTHLY SUBSCRIPTIONS CONTROL AREA */}
-      <div className="bg-[#120e2b] border border-[#2d2163] p-6 rounded-[2rem] text-left text-white shadow-2xl space-y-5">
+      <div id="monthly-subscriptions-anchor" className="bg-[#120e2b] border border-[#2d2163] p-6 rounded-[2rem] text-left text-white shadow-2xl space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#211b4d] pb-4">
           <div>
             <h3 className="text-sm font-black uppercase tracking-wider text-slate-200 flex items-center gap-2">
-              <Sparkles className="w-4.5 h-4.5 text-yellow-300 animate-pulse" /> My Assistance Subscription Plans (₹399/Month)
+              <Sparkles className="w-4.5 h-4.5 text-yellow-300 animate-pulse" /> My Assistance Subscription Plans & Tiers
             </h3>
             <p className="text-[11px] text-slate-400 font-semibold mt-1">
-              Active subscription holders receive continuous real-time support, priority application routing, and counselor guidelines.
+              Active subscription holders receive continuous real-time support, 50% clear development margin contribution, and customized usage limits.
             </p>
           </div>
           <div className="bg-[#1c183a] px-3.5 py-1.5 rounded-xl border border-[#3b2a80] text-xs font-extrabold text-[#c084fc] flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            Budget Plan: ₹399/mo each
+            5 Flexible Plans: ₹399 to ₹4999/mo
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {pathsDetail.map((path) => {
             const isActive = subscriptions[path.id];
+            const details = subscriptionDetails[path.id];
+            
+            // Look up limits based on details or default to Starter
+            const selectedTierPrice = details?.price || 399;
+            const activeTier = PRICING_TIERS.find(t => t.price === selectedTierPrice) || PRICING_TIERS[0];
+            const limits = activeTier.limits[path.id as 'path1' | 'path2' | 'path3' | 'path4'] as any;
+
             return (
               <div 
                 key={path.id} 
-                className={`p-5 rounded-2xl border flex flex-col justify-between transition-all duration-300 ${
+                className={`p-5 rounded-3xl border flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${
                   isActive 
-                    ? 'bg-[#1e1545] border-[#a78bfa] shadow-[0_0_15px_rgba(167,139,250,0.25)]' 
+                    ? 'bg-gradient-to-br from-[#1d164d] to-[#0e0a29] border-[#a78bfa] shadow-[0_0_25px_rgba(167,139,250,0.25)]' 
                     : 'bg-[#0f0b24] border-[#221a4f] hover:border-[#382b7c]'
                 }`}
               >
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex justify-between items-start gap-2">
                     <span className="text-xs font-black text-white leading-snug">{path.title}</span>
-                    <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shrink-0 ${
-                      isActive ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'
+                    <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full shrink-0 ${
+                      isActive ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-md animate-pulse' : 'bg-slate-800 text-slate-400'
                     }`}>
                       {isActive ? 'Active' : 'Inactive'}
                     </span>
                   </div>
+                  
                   <p className="text-[11px] text-slate-300 leading-normal font-semibold">{path.desc}</p>
                   
-                  <div className="space-y-1.5 pt-1.5">
-                    {path.perks.map((p, i) => (
-                      <div key={i} className="flex items-center gap-1.5 text-[10px] text-slate-400 font-semibold">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981] shrink-0" />
-                        <span className="truncate">{p}</span>
+                  {isActive ? (
+                    <div className="space-y-3">
+                      {/* Active Tier Info */}
+                      <div className="bg-[#120d2c] border border-violet-500/30 p-3 rounded-2xl space-y-1">
+                        <span className="text-[9px] text-violet-300 uppercase font-black tracking-widest block">Active Subscription</span>
+                        <div className="flex justify-between items-baseline">
+                          <span className="text-xs font-black text-white">{details?.tierName || 'Starter Plan'}</span>
+                          <span className="text-xs font-bold text-emerald-400">₹{details?.price || 399}/mo</span>
+                        </div>
                       </div>
-                    ))}
-                  </div>
+
+                      {/* Transparent 50% Margin display */}
+                      <div className="p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 space-y-1">
+                        <div className="flex justify-between items-center text-[9px] font-black text-emerald-400">
+                          <span>⚖️ 50% Platform Margin</span>
+                          <span className="font-mono bg-emerald-500/10 px-2 py-0.5 rounded-md">₹{(details?.price ? details.price * 0.5 : 199.50).toFixed(2)}</span>
+                        </div>
+                        <p className="text-[9px] text-slate-400 leading-relaxed font-semibold">
+                          50% of your payment is allocated directly to server resources, AROHI neural processing, and Indian MSME advisory support.
+                        </p>
+                      </div>
+
+                      {/* Dynamic Usage Limits list */}
+                      <div className="space-y-2.5 pt-2 border-t border-[#231a4d]">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block">Your Tier Usage Limits:</span>
+                        <div className="space-y-2 text-[10px] font-bold text-slate-200">
+                          {path.id === 'path1' && (
+                            <>
+                              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> <span>ATS Scans: {limits.atsScans}</span></div>
+                              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> <span>Mock Interviews: {limits.mockInterviews}</span></div>
+                              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> <span>Job Matches: {limits.jobMatches}</span></div>
+                            </>
+                          )}
+                          {path.id === 'path2' && (
+                            <>
+                              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> <span>Active Courses: {limits.activeCourses}</span></div>
+                              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> <span>Mentor AI: {limits.mentorHours}</span></div>
+                              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> <span>Certificates: {limits.certificates}</span></div>
+                            </>
+                          )}
+                          {path.id === 'path3' && (
+                            <>
+                              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> <span>MSME Filings: {limits.msmeFilings}</span></div>
+                              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> <span>Mudra Checks: {limits.mudraChecks}</span></div>
+                              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> <span>Startup Roadmaps: {limits.startupReports}</span></div>
+                            </>
+                          )}
+                          {path.id === 'path4' && (
+                            <>
+                              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> <span>Chapter Downloads: {limits.chapterDownloads}</span></div>
+                              <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> <span>AI Helper Queries: {limits.aiQueries}</span></div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* AI Token Quota Simulator */}
+                      <div className="bg-[#150f38] border border-violet-500/25 rounded-2xl p-3.5 space-y-2 mt-3 text-left">
+                        <div className="flex justify-between items-center text-[10px]">
+                          <span className="text-violet-300 font-extrabold uppercase tracking-widest">AI Token Quota:</span>
+                          <span className="text-slate-300 font-black font-mono">
+                            {tokenUsage[path.id] || 0} / {getTokenLimitForPrice(selectedTierPrice)}
+                          </span>
+                        </div>
+
+                        {showSandboxControls ? (
+                          <>
+                            {/* Interactive Slide control */}
+                            <div className="space-y-1">
+                              <input 
+                                type="range"
+                                min="0"
+                                max={getTokenLimitForPrice(selectedTierPrice)}
+                                value={tokenUsage[path.id] || 0}
+                                onChange={(e) => onSetTokenUsage && onSetTokenUsage(path.id, parseInt(e.target.value, 10))}
+                                className="w-full h-1.5 bg-[#251b54] rounded-lg appearance-none cursor-pointer accent-violet-500"
+                              />
+                            </div>
+
+                            {/* Progress Bar & percentage */}
+                            <div className="flex items-center justify-between gap-2 pt-1">
+                              <span className={`text-[9px] font-black uppercase tracking-wider ${
+                                ((tokenUsage[path.id] || 0) / getTokenLimitForPrice(selectedTierPrice)) >= 0.8
+                                  ? 'text-rose-400 animate-pulse font-extrabold'
+                                  : 'text-slate-400 font-bold'
+                              }`}>
+                                {((tokenUsage[path.id] || 0) / getTokenLimitForPrice(selectedTierPrice)) >= 0.8
+                                  ? '⚠️ 80%+ Limit Warning'
+                                  : `${Math.round(((tokenUsage[path.id] || 0) / getTokenLimitForPrice(selectedTierPrice)) * 100)}% Consumed`
+                                }
+                              </span>
+                              
+                              <div className="flex gap-1.5 shrink-0">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onIncrementTokenUsage && onIncrementTokenUsage(path.id);
+                                  }}
+                                  className="text-[9px] bg-violet-500/15 hover:bg-violet-500/30 text-violet-300 font-extrabold px-1.5 py-0.5 rounded border border-violet-500/25 cursor-pointer active:scale-95 transition-all"
+                                  title="Consume +10% tokens"
+                                >
+                                  +10%
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onResetTokenUsage && onResetTokenUsage(path.id);
+                                  }}
+                                  className="text-[9px] bg-slate-800 hover:bg-slate-700 text-slate-300 font-extrabold px-1.5 py-0.5 rounded border border-slate-700 cursor-pointer active:scale-95 transition-all"
+                                  title="Reset usage"
+                                >
+                                  Reset
+                                </button>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {/* Read-only Progress Bar for General Public */}
+                            <div className="w-full bg-[#1b144a] rounded-full h-1.5 overflow-hidden">
+                              <div 
+                                className={`h-full rounded-full transition-all duration-500 ${
+                                  ((tokenUsage[path.id] || 0) / getTokenLimitForPrice(selectedTierPrice)) >= 0.8
+                                    ? 'bg-rose-500 animate-pulse'
+                                    : 'bg-violet-500'
+                                }`}
+                                style={{ width: `${Math.min(100, Math.round(((tokenUsage[path.id] || 0) / getTokenLimitForPrice(selectedTierPrice)) * 100))}%` }}
+                              />
+                            </div>
+
+                            <div className="flex items-center justify-between gap-2 pt-0.5">
+                              <span className={`text-[9px] font-black uppercase tracking-wider ${
+                                ((tokenUsage[path.id] || 0) / getTokenLimitForPrice(selectedTierPrice)) >= 0.8
+                                  ? 'text-rose-400 animate-pulse font-extrabold'
+                                  : 'text-slate-400 font-bold'
+                              }`}>
+                                {((tokenUsage[path.id] || 0) / getTokenLimitForPrice(selectedTierPrice)) >= 0.8
+                                  ? '⚠️ 80%+ Limit Warning'
+                                  : `${Math.round(((tokenUsage[path.id] || 0) / getTokenLimitForPrice(selectedTierPrice)) * 100)}% Consumed`
+                                }
+                              </span>
+                              <span className="text-[8px] text-slate-500 font-bold uppercase">Arohi Engine</span>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* Pricing range preview */}
+                      <div className="text-[10px] bg-[#171234] border border-[#281f5e] px-3 py-2 rounded-xl flex justify-between items-center text-slate-300 font-bold">
+                        <span>Plan Price:</span>
+                        <span className="text-yellow-400 font-extrabold">₹399 - ₹4,999/mo</span>
+                      </div>
+
+                      {/* 50% transparent margin preview */}
+                      <p className="text-[10px] text-slate-400 font-semibold leading-relaxed">
+                        ⚖️ <span className="text-slate-300 font-bold">50% Transparent Gross Margin</span> goes back into Odisha technology development, PMEGP resources, and Arohi AI support.
+                      </p>
+
+                      <div className="space-y-1.5 pt-1 border-t border-[#231a4d]">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block">Starter Perks Preview:</span>
+                        {path.perks.slice(0, 3).map((p, i) => (
+                          <div key={i} className="flex items-center gap-1.5 text-[10px] text-slate-400 font-semibold">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981] shrink-0" />
+                            <span className="truncate">{p}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="pt-4 mt-3 border-t border-[#231a4d] flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-black text-violet-300">{path.price}</span>
+                <div className="pt-4 mt-4 border-t border-[#231a4d] flex items-center justify-between gap-2">
+                  <span className="text-[11px] font-black text-violet-300">
+                    {isActive ? `₹${details?.price || 399}/mo` : '5 Plans Available'}
+                  </span>
                   <button
                     onClick={() => onSubscribe && onSubscribe(path.id)}
-                    className={`text-[9px] font-black uppercase tracking-wider px-3.5 py-2 rounded-xl cursor-pointer transition-all ${
+                    className={`text-[9px] font-black uppercase tracking-wider px-3.5 py-2.5 rounded-xl cursor-pointer transition-all active:scale-95 ${
                       isActive 
                         ? 'bg-rose-500/15 text-rose-300 hover:bg-rose-500/25 border border-rose-500/30' 
-                        : 'bg-gradient-to-r from-[#7c3aed] to-[#a855f7] text-white hover:from-[#6d28d9] shadow-sm'
+                        : 'bg-gradient-to-r from-[#7c3aed] to-[#a855f7] text-white hover:from-[#6d28d9] shadow-md border border-[#a78bfa]/20'
                     }`}
                   >
-                    {isActive ? 'Cancel Plan' : 'Subscribe'}
+                    {isActive ? 'Cancel Plan' : 'View Tiers'}
                   </button>
                 </div>
               </div>
@@ -989,7 +1364,7 @@ export default function UserDashboard({
             <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
             <div className="text-xs">
               <p className="font-bold">No Active Assistance Subscription</p>
-              <p className="text-[10px] text-slate-400 mt-0.5">Please subscribe to any strategic path above or on the homepage to unlock unlimited continuous support guidelines for ₹399/month.</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Please subscribe to any strategic path above or on the homepage to unlock unlimited continuous support guidelines starting from ₹399/month.</p>
             </div>
           </div>
         )}
