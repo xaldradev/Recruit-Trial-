@@ -831,7 +831,8 @@ Here is your customized learning journey:
           message: text,
           history: messages.map(m => ({ role: m.role, content: m.content })),
           file: fileToSend,
-          language: language
+          language: language,
+          uid: user?.uid
         })
       });
 

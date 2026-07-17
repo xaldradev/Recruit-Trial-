@@ -1914,7 +1914,7 @@ Always speak as AROHI. Introduce yourself proudly and offer helpful, positive ad
 
 // 1. Chat with AROHI Endpoint
 app.post('/api/chat', async (req, res) => {
-  const { message, history, file, language } = req.body;
+  const { message, history, file, language, uid } = req.body;
 
   if (!message && !file) {
     return res.status(400).json({ error: 'Message or File is required' });
@@ -1946,6 +1946,59 @@ app.post('/api/chat', async (req, res) => {
 
       // Build dynamic system instruction based on chosen interface language
       let dynamicInstruction = AROHI_SYSTEM_INSTRUCTION;
+
+      // Load user memory context if uid is provided
+      if (uid) {
+        try {
+          const userSnap = await safeUserDb.get(uid);
+          if (userSnap.exists) {
+            const userData = userSnap.data();
+            const displayName = userData.displayName || '';
+            const profile = userData.profile || {};
+            const activeGoal = profile.activeGoal || '';
+            const education = profile.education || '';
+            
+            let memoryContext = `\n\n=== USER IDENTITY & PERSONALIZED PROFILE MEMORY ===`;
+            memoryContext += `\n* Name: ${displayName || 'Honored Guest'}`;
+            if (userData.email) memoryContext += `\n* Email: ${userData.email}`;
+            if (activeGoal) memoryContext += `\n* Active Career/MSME Goal: ${activeGoal}`;
+            if (education) memoryContext += `\n* Education Background: ${education}`;
+            if (profile.location) memoryContext += `\n* Location: ${profile.location}`;
+            if (profile.phone) memoryContext += `\n* Contact Phone: ${profile.phone}`;
+            
+            // Summarize past chats
+            if (userData.arohiChats && userData.arohiChats.length > 0) {
+              memoryContext += `\n\n=== PAST TEXT CHAT CONVERSATIONS RECORDED ===`;
+              userData.arohiChats.slice(0, 5).forEach((chat: any) => {
+                memoryContext += `\n* Conversation [ID: ${chat.id}, Title: "${chat.title}"]:`;
+                if (chat.messages && chat.messages.length > 0) {
+                  const firstMsg = chat.messages[0]?.content || '';
+                  const lastMsg = chat.messages[chat.messages.length - 1]?.content || '';
+                  memoryContext += `\n  - Started with: "${firstMsg.slice(0, 100).replace(/\n/g, ' ')}..."`;
+                  memoryContext += `\n  - Ended with: "${lastMsg.slice(0, 100).replace(/\n/g, ' ')}..."`;
+                }
+              });
+            }
+
+            // Summarize past voice calls
+            if (userData.arohiCalls && userData.arohiCalls.length > 0) {
+              memoryContext += `\n\n=== PAST VOICE CALLS RECORDED ===`;
+              userData.arohiCalls.slice(0, 5).forEach((call: any) => {
+                memoryContext += `\n* Voice Call [Date: ${call.date}, Duration: ${call.duration}s]:`;
+                if (call.summaryText) {
+                  memoryContext += `\n  - Summary: "${call.summaryText.slice(0, 200).replace(/\n/g, ' ')}..."`;
+                }
+              });
+            }
+
+            memoryContext += `\n\nAROHI's MEMORY INSTRUCTIONS: You have perfect recall of the user's past chats and voice calls listed above. Any time they mention or refer to a past call or chat, warmly reference your memory, confirm your recollection, and offer continuity. Use their name and personalized goals naturally during chat or calls to make them feel heard and remembered!`;
+            
+            dynamicInstruction += memoryContext;
+          }
+        } catch (memErr) {
+          console.error("Error loading user memory context in /api/chat:", memErr);
+        }
+      }
       const languageNames: Record<string, string> = {
         hi: 'HINDI (हिंदी)',
         or: 'ODIA (ଓଡ଼ିଆ)',
@@ -3264,12 +3317,17 @@ async function startServer() {
       }
     };
     
-    // Parse the voice parameter safely from the query string
+    // Parse the voice and uid parameters safely from the query string
     let selectedVoice = 'Zephyr';
+    let uid = '';
     if (request.url) {
       const match = request.url.match(/[?&]voice=([^&]+)/);
       if (match) {
         selectedVoice = decodeURIComponent(match[1]);
+      }
+      const uidMatch = request.url.match(/[?&]uid=([^&]+)/);
+      if (uidMatch) {
+        uid = decodeURIComponent(uidMatch[1]);
       }
     }
 
@@ -3284,7 +3342,53 @@ async function startServer() {
     }
 
     try {
-      console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}`);
+      console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}, uid: ${uid}`);
+
+      let voiceSystemInstruction = AROHI_SYSTEM_INSTRUCTION + "\n\nCRITICAL CONTEXT: You are currently connected via real-time live voice link. Speak very concisely, dynamically, and warmly. Keep responses extremely brief (1-3 sentences maximum per turn) so they read nicely as speech without lagging.";
+
+      if (uid) {
+        try {
+          const userSnap = await safeUserDb.get(uid);
+          if (userSnap.exists) {
+            const userData = userSnap.data();
+            const displayName = userData.displayName || '';
+            const profile = userData.profile || {};
+            const activeGoal = profile.activeGoal || '';
+            const education = profile.education || '';
+            
+            let voiceMemory = `\n\n=== USER IDENTITY & PERSONALIZED PROFILE MEMORY ===`;
+            voiceMemory += `\n* Name: ${displayName || 'Honored Guest'}`;
+            if (activeGoal) voiceMemory += `\n* Active Career/MSME Goal: ${activeGoal}`;
+            if (education) voiceMemory += `\n* Education Background: ${education}`;
+            if (profile.location) voiceMemory += `\n* Location: ${profile.location}`;
+            
+            // Summarize past chats
+            if (userData.arohiChats && userData.arohiChats.length > 0) {
+              voiceMemory += `\n\n=== PAST CHAT HIGHLIGHTS ===`;
+              userData.arohiChats.slice(0, 3).forEach((chat: any) => {
+                voiceMemory += `\n* Chat "${chat.title}" is saved in their history.`;
+              });
+            }
+            
+            // Summarize past voice calls
+            if (userData.arohiCalls && userData.arohiCalls.length > 0) {
+              voiceMemory += `\n\n=== PAST VOICE CALL SUMMARIES ===`;
+              userData.arohiCalls.slice(0, 3).forEach((call: any) => {
+                if (call.summaryText) {
+                  voiceMemory += `\n* Call [${call.date}]: ${call.summaryText.slice(0, 150).replace(/\n/g, ' ')}`;
+                }
+              });
+            }
+
+            voiceMemory += `\n\nAROHI VOICE MEMORY DIRECTIONS: Warmly recall and use the user's name ("${displayName}") and active goal ("${activeGoal}") in the conversation when appropriate. If they refer to past chats or voice calls listed above, confirm your recollection beautifully and provide helpful continuity. Maintain a highly conversational, short, and positive tone.`;
+            
+            voiceSystemInstruction += voiceMemory;
+          }
+        } catch (memErr) {
+          console.error("Error loading voice call memory context in live-ws:", memErr);
+        }
+      }
+
       const session = await clientAi.live.connect({
         model: "gemini-3.1-flash-live-preview",
         config: {
@@ -3292,7 +3396,7 @@ async function startServer() {
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
           },
-          systemInstruction: AROHI_SYSTEM_INSTRUCTION + "\n\nCRITICAL CONTEXT: You are currently connected via real-time live voice link. Speak very concisely, dynamically, and warmly. Keep responses extremely brief (1-3 sentences maximum per turn) so they read nicely as speech without lagging.",
+          systemInstruction: voiceSystemInstruction,
           inputAudioTranscription: {},
           outputAudioTranscription: {},
         },

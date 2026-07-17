@@ -184,7 +184,7 @@ export default function ArohiVoiceCall({ onClose, language = 'en', onNavigateTab
 
         // 1. Establish the secure full-duplex WebSocket connection to our Express backend
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//${window.location.host}/api/live-ws?voice=${selectedVoice}`;
+        const wsUrl = `${protocol}//${window.location.host}/api/live-ws?voice=${selectedVoice}${uid ? `&uid=${encodeURIComponent(uid)}` : ''}`;
         const ws = new WebSocket(wsUrl);
         wsRef.current = ws;
 
