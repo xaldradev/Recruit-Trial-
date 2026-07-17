@@ -4,6 +4,7 @@ export interface AdminUser {
   name: string;
   role: string;
   status: 'Active' | 'Suspended' | 'VIP';
+  entrySource?: string; // App Entry Source (e.g., website, PWA)
   permissions: {
     canEditJobs: boolean;
     canApproveApps: boolean;
@@ -59,6 +60,7 @@ export const INITIAL_ADMIN_USERS: AdminUser[] = [
     name: 'Commander Junoon',
     role: 'Super Administrator',
     status: 'VIP',
+    entrySource: 'Installed PWA (Desktop)',
     permissions: {
       canEditJobs: true,
       canApproveApps: true,
@@ -88,6 +90,7 @@ export const INITIAL_ADMIN_USERS: AdminUser[] = [
     name: 'Rajesh Kumar Singh',
     role: 'Premium Candidate',
     status: 'Active',
+    entrySource: 'Installed PWA (Android Mobile)',
     permissions: {
       canEditJobs: false,
       canApproveApps: false,
@@ -117,6 +120,7 @@ export const INITIAL_ADMIN_USERS: AdminUser[] = [
     name: 'Amit Suresh Patil',
     role: 'Standard Applicant',
     status: 'Active',
+    entrySource: 'Mobile Safari (iOS)',
     permissions: {
       canEditJobs: false,
       canApproveApps: false,
@@ -146,6 +150,7 @@ export const INITIAL_ADMIN_USERS: AdminUser[] = [
     name: 'Subhasish Sen',
     role: 'MSME Entrepreneur',
     status: 'Active',
+    entrySource: 'Mobile Browser (Chrome Android)',
     permissions: {
       canEditJobs: false,
       canApproveApps: false,
@@ -175,6 +180,7 @@ export const INITIAL_ADMIN_USERS: AdminUser[] = [
     name: 'Meera Patnaik',
     role: 'VIP Member',
     status: 'VIP',
+    entrySource: 'Desktop Browser (macOS Safari/Chrome)',
     permissions: {
       canEditJobs: false,
       canApproveApps: true,

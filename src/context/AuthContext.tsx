@@ -75,6 +75,7 @@ interface UserData {
     description: string;
     timestamp: string;
   }>;
+  entrySource?: string;
   updatedAt?: string;
 }
 
@@ -162,6 +163,37 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
   throw new Error(JSON.stringify(errInfo));
 }
 
+export function getEntrySource(): string {
+  if (typeof window === 'undefined') return 'Unknown';
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone || document.referrer.includes('android-app://');
+  const ua = navigator.userAgent;
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  
+  if (isStandalone) {
+    if (isMobile) {
+      if (/iPhone|iPad|iPod/i.test(ua)) {
+        return "Installed PWA (iOS Mobile)";
+      }
+      return "Installed PWA (Android Mobile)";
+    }
+    return "Installed PWA (Desktop)";
+  }
+  
+  if (/iPhone|iPad|iPod/i.test(ua)) {
+    if (/FxiOS/i.test(ua)) return "Mobile Firefox (iOS)";
+    if (/CriOS/i.test(ua)) return "Mobile Chrome (iOS)";
+    return "Mobile Safari (iOS)";
+  }
+  if (/Android/i.test(ua)) {
+    if (/Firefox/i.test(ua)) return "Mobile Firefox (Android)";
+    return "Mobile Chrome (Android)";
+  }
+  if (/Macintosh/i.test(ua)) return "Desktop Safari/Chrome (macOS)";
+  if (/Windows/i.test(ua)) return "Desktop Chrome/Edge (Windows)";
+  if (/Linux/i.test(ua)) return "Desktop Chrome/Firefox (Linux)";
+  return "Website Browser";
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -174,13 +206,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const uid = firebaseUser.uid;
     const email = firebaseUser.email || '';
     const displayName = firebaseUser.displayName || 'Honored Guest';
+    const entrySource = getEntrySource();
 
     // Layer 1: Server-side API proxy (fast, server-to-server, 100% immune to iframe/browser WebSocket blocks)
     try {
       const response = await fetch('/api/auth/me', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid })
+        body: JSON.stringify({ uid, entrySource })
       });
       if (response.ok) {
         const resData = await response.json();
@@ -199,7 +232,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await fetch('/api/auth/google-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid, email, displayName, role })
+        body: JSON.stringify({ uid, email, displayName, role, entrySource })
       });
       if (response.ok) {
         const resData = await response.json();
@@ -219,6 +252,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const docSnap = await getDoc(docRef);
       if (docSnap && docSnap.exists()) {
         const uData = docSnap.data() as UserData;
+        
+        // If entrySource is different, update it client-side too
+        if (entrySource && uData.entrySource !== entrySource) {
+          uData.entrySource = entrySource;
+          try {
+            await setDoc(docRef, uData);
+          } catch (e) {
+            console.warn("Client-side direct entrySource update failed.", e);
+          }
+        }
+
         localStorage.setItem(`recruit_user_data_${uid}`, JSON.stringify(uData));
         return uData;
       } else {
@@ -228,6 +272,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email,
           displayName,
           role: role || 'candidate',
+          entrySource: entrySource,
           profile: {
             name: displayName,
             email: email,
@@ -364,7 +409,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const response = await fetch('/api/auth/signin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ email, password, entrySource: getEntrySource() })
         });
         
         const resData = await response.json();
@@ -406,6 +451,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: firebaseUser.email || '',
         displayName: name,
         role: role || 'candidate',
+        entrySource: getEntrySource(),
         profile: {
           name: name,
           email: firebaseUser.email || '',
@@ -441,7 +487,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: firebaseUser.email,
             displayName: name,
             role: role || 'candidate',
-            mobile: phone || ''
+            mobile: phone || '',
+            entrySource: getEntrySource()
           })
         });
         if (response.ok) {
@@ -480,7 +527,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, name, role: role || 'candidate', mobile: phone || '' })
+          body: JSON.stringify({ email, password, name, role: role || 'candidate', mobile: phone || '', entrySource: getEntrySource() })
         });
         
         const resData = await response.json();

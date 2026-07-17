@@ -1,0 +1,48 @@
+{
+  "name": "Recruit.org.in - India's AI Career Ecosystem",
+  "short_name": "Recruit",
+  "description": "India's next-generation employment engine helping students, professionals, and MSMEs achieve career and business milestones.",
+  "start_url": "/?pwa=true",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#030208",
+  "theme_color": "#7c3aed",
+  "categories": ["utilities", "education", "business"],
+  "icons": [
+    {
+      "src": "/arohi.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/arohi.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/arohi.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Arohi AI Advisor",
+      "url": "/?tab=arohi",
+      "description": "Chat with Arohi AI Career Advisor"
+    },
+    {
+      "name": "Jobs Board",
+      "url": "/?tab=jobs",
+      "description": "Explore private and sarkari jobs"
+    },
+    {
+      "name": "Business Startup",
+      "url": "/?tab=business",
+      "description": "Check MSME schemes & business plan tools"
+    }
+  ]
+}

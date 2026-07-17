@@ -30,6 +30,9 @@ import WelcomeLanding from './components/WelcomeLanding';
 import ArohiAvatar from './components/ArohiAvatar';
 import WalkthroughTour from './components/WalkthroughTour';
 import FranchisePage from './components/FranchisePage';
+import PWAInstaller from './components/PWAInstaller';
+import BottomNavBar from './components/BottomNavBar';
+import AppDownloadShowcase from './components/AppDownloadShowcase';
 import { PRICING_TIERS, PATH_DETAILS, getTokenLimitForPrice } from './data/pricingData';
 import TokenWarningToastContainer from './components/TokenWarningToastContainer';
 
@@ -3449,7 +3452,7 @@ export default function App() {
   }
 
   return (
-    <div key={language} className="bg-[#090714] min-h-screen flex flex-col font-sans antialiased text-slate-100 selection:bg-purple-500 selection:text-white pb-12">
+    <div key={language} className="bg-[#090714] min-h-screen flex flex-col font-sans antialiased text-slate-100 selection:bg-purple-500 selection:text-white pb-24 xl:pb-12">
       
       {/* 1. Brand Header */}
       <Header
@@ -3740,6 +3743,9 @@ export default function App() {
         )}
         {renderActiveContent()}
       </main>
+
+      {/* Futuristic Mobile App Download Visual Showcase */}
+      <AppDownloadShowcase />
 
       {/* Footer verified seal and info */}
       <footer className="max-w-7xl mx-auto px-4 mt-12 mb-8 space-y-6">
@@ -4708,6 +4714,19 @@ export default function App() {
         nextReminderIn={nextReminderIn}
         warningInterval={warningInterval}
         warningEnabled={warningEnabled}
+      />
+
+      {/* Progressive Web App Install Suggestion Widget */}
+      <PWAInstaller />
+
+      {/* Bottom docked navigation bar for mobile thumb access */}
+      <BottomNavBar
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          setSelectedPosting(null); // Clear selected posting
+        }}
+        language={language}
       />
 
     </div>

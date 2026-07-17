@@ -468,7 +468,7 @@ app.post('/api/save-arohi-avatar', (req, res) => {
 
 // API endpoints for Server-Side Auth Proxy
 app.post('/api/auth/signup', async (req, res) => {
-  const { email, password, name, role, mobile } = req.body;
+  const { email, password, name, role, mobile, entrySource } = req.body;
   try {
     // 1. Call Firebase Auth REST API to create user
     const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`, {
@@ -490,6 +490,7 @@ app.post('/api/auth/signup', async (req, res) => {
       email: email,
       displayName: name,
       role: role || 'candidate',
+      entrySource: entrySource || 'Website Browser',
       profile: {
         name: name,
         email: email,
@@ -535,7 +536,7 @@ app.post('/api/auth/signup', async (req, res) => {
 });
 
 app.post('/api/auth/signin', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, entrySource } = req.body;
   try {
     // 1. Call Firebase Auth REST API to sign in
     const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`, {
@@ -557,12 +558,17 @@ app.post('/api/auth/signin', async (req, res) => {
     
     if (docSnap.exists) {
       userData = docSnap.data();
+      if (entrySource && userData.entrySource !== entrySource) {
+        userData.entrySource = entrySource;
+        await safeUserDb.set(uid, userData);
+      }
     } else {
       // Create initial document if it didn't exist
       userData = {
         uid: uid,
         email: email,
         displayName: data.displayName || 'Honored Guest',
+        entrySource: entrySource || 'Website Browser',
         profile: {
           name: data.displayName || 'Honored Guest',
           email: email,
@@ -609,7 +615,7 @@ app.post('/api/auth/signin', async (req, res) => {
 });
 
 app.post('/api/auth/google-sync', async (req, res) => {
-  const { uid, email, displayName, role } = req.body;
+  const { uid, email, displayName, role, entrySource } = req.body;
   try {
     if (!uid) return res.status(400).json({ error: 'UID is required.' });
     const docSnap = await safeUserDb.get(uid);
@@ -617,6 +623,10 @@ app.post('/api/auth/google-sync', async (req, res) => {
 
     if (docSnap.exists) {
       userData = docSnap.data();
+      if (entrySource && userData.entrySource !== entrySource) {
+        userData.entrySource = entrySource;
+        await safeUserDb.set(uid, userData);
+      }
     } else {
       // Create initial document for Google signed-in user
       userData = {
@@ -624,6 +634,7 @@ app.post('/api/auth/google-sync', async (req, res) => {
         email: email || '',
         displayName: displayName || 'Honored Guest',
         role: role || 'candidate',
+        entrySource: entrySource || 'Website Browser',
         profile: {
           name: displayName || 'Honored Guest',
           email: email || '',
@@ -827,12 +838,17 @@ app.post('/api/auth/update-activities', async (req, res) => {
 });
 
 app.post('/api/auth/me', async (req, res) => {
-  const { uid } = req.body;
+  const { uid, entrySource } = req.body;
   try {
     if (!uid) return res.status(400).json({ error: 'UID is required.' });
     const docSnap = await safeUserDb.get(uid);
     if (docSnap.exists) {
-      res.json({ success: true, userData: docSnap.data() });
+      const userData = docSnap.data();
+      if (entrySource && userData.entrySource !== entrySource) {
+        userData.entrySource = entrySource;
+        await safeUserDb.set(uid, userData);
+      }
+      res.json({ success: true, userData });
     } else {
       res.status(404).json({ error: 'User not found' });
     }
@@ -919,6 +935,7 @@ let serverAdminUsers = [
     name: 'Commander Junoon',
     role: 'Super Administrator',
     status: 'VIP',
+    entrySource: 'Installed PWA (Desktop)',
     permissions: {
       canEditJobs: true,
       canApproveApps: true,
@@ -947,6 +964,7 @@ let serverAdminUsers = [
     name: 'Rajesh Kumar Singh',
     role: 'Premium Candidate',
     status: 'Active',
+    entrySource: 'Installed PWA (Android Mobile)',
     permissions: {
       canEditJobs: false,
       canApproveApps: false,
@@ -975,6 +993,7 @@ let serverAdminUsers = [
     name: 'Amit Suresh Patil',
     role: 'Standard Applicant',
     status: 'Active',
+    entrySource: 'Mobile Safari (iOS)',
     permissions: {
       canEditJobs: false,
       canApproveApps: false,
@@ -1003,6 +1022,7 @@ let serverAdminUsers = [
     name: 'Subhasish Sen',
     role: 'MSME Entrepreneur',
     status: 'Active',
+    entrySource: 'Mobile Browser (Chrome Android)',
     permissions: {
       canEditJobs: false,
       canApproveApps: false,
@@ -1031,6 +1051,7 @@ let serverAdminUsers = [
     name: 'Meera Patnaik',
     role: 'VIP Member',
     status: 'VIP',
+    entrySource: 'Desktop Browser (macOS Safari/Chrome)',
     permissions: {
       canEditJobs: false,
       canApproveApps: true,
@@ -1179,6 +1200,7 @@ app.get('/api/admin/users', async (req, res) => {
           name: data.displayName || data.profile?.name || email.split('@')[0],
           role: data.role === 'recruiter' ? 'Business Owner/Recruiter' : 'Premium Candidate',
           status: data.status || 'Active',
+          entrySource: data.entrySource || 'Website Browser',
           permissions: data.permissions || {
             canEditJobs: data.role === 'recruiter' || email === 'elitetraderjunoon@gmail.com',
             canApproveApps: data.role === 'recruiter' || email === 'elitetraderjunoon@gmail.com',
@@ -1249,6 +1271,7 @@ app.post('/api/admin/update-user', async (req, res) => {
       name: updatedUser.name || updatedUser.email.split('@')[0],
       role: updatedUser.role || 'Standard Applicant',
       status: updatedUser.status || 'Active',
+      entrySource: updatedUser.entrySource || 'Website Browser',
       permissions: updatedUser.permissions || { canEditJobs: false, canApproveApps: false, canViewFinance: false },
       services: updatedUser.services || { path1: false, path2: false, path3: false },
       takenCourses: updatedUser.takenCourses || [],
@@ -1464,6 +1487,7 @@ app.post('/api/admin/verify-payment', async (req, res) => {
       name: payment.userEmail.split('@')[0],
       role: 'Premium Candidate',
       status: 'Active',
+      entrySource: 'Website Browser',
       permissions: { canEditJobs: false, canApproveApps: false, canViewFinance: false },
       services,
       takenCourses: [],
@@ -1559,6 +1583,7 @@ app.post('/api/admin/add-payment', async (req, res) => {
       name: userEmail.split('@')[0],
       role: 'Premium Candidate',
       status: 'Active',
+      entrySource: 'Website Browser',
       permissions: { canEditJobs: false, canApproveApps: false, canViewFinance: false },
       services,
       takenCourses: [],

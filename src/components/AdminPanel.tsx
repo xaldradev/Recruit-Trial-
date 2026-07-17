@@ -834,6 +834,28 @@ export default function AdminPanel({
     ];
   };
 
+  const getEntrySourceDistributionData = () => {
+    const counts: Record<string, number> = {};
+    adminUsers.forEach(u => {
+      const src = u.entrySource || 'Website Browser';
+      counts[src] = (counts[src] || 0) + 1;
+    });
+
+    const colors = ['#06b6d4', '#a855f7', '#10b981', '#f59e0b', '#3b82f6', '#ec4899'];
+    if (Object.keys(counts).length > 0) {
+      return Object.entries(counts).map(([name, value], idx) => ({
+        name,
+        value,
+        color: colors[idx % colors.length]
+      }));
+    }
+    return [
+      { name: 'Website Browser', value: 5, color: '#06b6d4' },
+      { name: 'Installed PWA (Android Mobile)', value: 2, color: '#a855f7' },
+      { name: 'Installed PWA (Desktop)', value: 1, color: '#10b981' }
+    ];
+  };
+
   // LOGIN SCREEN
   if (!isLoggedIn) {
     return (
@@ -1629,6 +1651,7 @@ export default function AdminPanel({
                       <tr className="bg-slate-900/65 text-slate-400 border-b border-[#221644] uppercase tracking-wider text-[9px] font-black">
                         <th className="py-3 px-4">Aspirant Profile</th>
                         <th className="py-3 px-4">Role Classification</th>
+                        <th className="py-3 px-4">Access Source</th>
                         <th className="py-3 px-4">Plan Subscriptions</th>
                         <th className="py-3 px-4 text-center">Status</th>
                         <th className="py-3 px-4 text-center">Action</th>
@@ -1643,6 +1666,11 @@ export default function AdminPanel({
                           </td>
                           <td className="py-3 px-4">
                             <span className="text-slate-200">{user.role}</span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 bg-cyan-950/25 text-cyan-300 border border-cyan-500/20 rounded-lg inline-block whitespace-nowrap">
+                              {user.entrySource || 'Website Browser'}
+                            </span>
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex flex-wrap gap-1">
@@ -3233,6 +3261,55 @@ export default function AdminPanel({
                         <div className="min-w-0">
                           <span className="text-[10px] font-bold text-slate-200 block truncate">{entry.name}</span>
                           <span className="text-[9px] text-slate-400 font-mono font-black uppercase">{entry.value} premium sales</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Chart 5: App Entry Source & Environment Classification (Pie Chart) */}
+              <div className="backdrop-blur-xl bg-[#090715]/70 border border-[#2b1b54]/80 p-5 rounded-3xl shadow-xl space-y-4">
+                <div className="flex justify-between items-center border-b border-[#25174e] pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-200">App Entry Source & Channels</h3>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Distribution of user entry through Website vs installed PWA apps</p>
+                  </div>
+                  <span className="text-[8px] bg-cyan-950/40 border border-cyan-500/30 px-2 py-0.5 rounded text-cyan-300 font-mono font-bold uppercase tracking-widest">
+                    Acquisition Channels
+                  </span>
+                </div>
+                <div className="h-[300px] w-full flex flex-col sm:flex-row items-center justify-around gap-4">
+                  <div className="w-[180px] h-[180px] shrink-0">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={getEntrySourceDistributionData()}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={50}
+                          outerRadius={70}
+                          paddingAngle={4}
+                          dataKey="value"
+                        >
+                          {getEntrySourceDistributionData().map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{ backgroundColor: '#0d0a21', borderColor: '#3b2575', borderRadius: '12px' }}
+                          itemStyle={{ color: '#fff', fontSize: '11px' }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="space-y-2 shrink-0 max-w-[200px] text-left">
+                    {getEntrySourceDistributionData().map((entry, index) => (
+                      <div key={index} className="flex items-center gap-2.5">
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: entry.color }}></span>
+                        <div className="min-w-0">
+                          <span className="text-[10px] font-bold text-slate-200 block truncate">{entry.name}</span>
+                          <span className="text-[9px] text-slate-400 font-mono font-black uppercase">{entry.value} active users</span>
                         </div>
                       </div>
                     ))}
