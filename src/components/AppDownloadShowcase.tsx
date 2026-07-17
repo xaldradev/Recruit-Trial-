@@ -393,8 +393,12 @@ export default function AppDownloadShowcase() {
                 
                 {/* Simulated App Logo Header */}
                 <div className="flex items-center justify-between border-b border-[#211746] pb-1.5 mt-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-[10px]">🎓</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="bg-[#7c3aed] p-1 rounded-md border border-[#a78bfa]/40 flex items-center justify-center shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-2.5 h-2.5 text-white">
+                        <path d="M11.645 2.044a.75.75 0 0 1 .71 0l9.75 5.25a.75.75 0 0 1 0 1.312l-9.75 5.25a.75.75 0 0 1-.71 0L1.9 8.606a.75.75 0 0 1 0-1.312h.005l9.74-5.25ZM22 12.75a.75.75 0 0 1-.75-.75V9.11l-2 1.077v3.063c0 .385-.21.74-.55 1.13-1.256 1.436-3.708 2.62-7.2 2.62-3.492 0-5.944-1.184-7.2-2.62a1.5 1.5 0 0 1-.55-1.13V10.187L2.75 9.11v2.89a.75.75 0 0 1-1.5 0V8.534a.75.75 0 0 1 .373-.648l9.75-5.25a.75.75 0 0 1 .746 0l9.75 5.25a.75.75 0 0 1 .373.648v4.216a.75.75 0 0 1-.75.75Zm-10.25 2.5c2.975 0 4.968-.946 5.86-1.966a.25.25 0 0 0 .04-.154v-1.74l-5.63 3.03a.75.75 0 0 1-.74 0L5.65 11.39v1.74a.25.25 0 0 0 .04.154c.892 1.02 2.885 1.966 5.86 1.966Z" />
+                      </svg>
+                    </div>
                     <span className="text-[9px] font-black text-white uppercase tracking-tight">Recruit India</span>
                   </div>
                   <span className="text-[7px] font-black bg-[#00e676]/10 text-[#00e676] px-1 py-0.5 rounded border border-[#00e676]/25">LIVE v2.4</span>
@@ -462,8 +466,10 @@ export default function AppDownloadShowcase() {
                 <QrCode className="w-full h-full text-purple-400 stroke-[1.25]" />
                 
                 {/* Small central brand icon inside QR code */}
-                <div className="absolute w-8 h-8 rounded-lg bg-[#070417] border border-cyan-400 flex items-center justify-center shadow-lg">
-                  <span className="text-xs">🎓</span>
+                <div className="absolute w-8 h-8 rounded-lg bg-[#7c3aed] border border-[#a78bfa]/40 flex items-center justify-center shadow-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-white">
+                    <path d="M11.645 2.044a.75.75 0 0 1 .71 0l9.75 5.25a.75.75 0 0 1 0 1.312l-9.75 5.25a.75.75 0 0 1-.71 0L1.9 8.606a.75.75 0 0 1 0-1.312h.005l9.74-5.25ZM22 12.75a.75.75 0 0 1-.75-.75V9.11l-2 1.077v3.063c0 .385-.21.74-.55 1.13-1.256 1.436-3.708 2.62-7.2 2.62-3.492 0-5.944-1.184-7.2-2.62a1.5 1.5 0 0 1-.55-1.13V10.187L2.75 9.11v2.89a.75.75 0 0 1-1.5 0V8.534a.75.75 0 0 1 .373-.648l9.75-5.25a.75.75 0 0 1 .746 0l9.75 5.25a.75.75 0 0 1 .373.648v4.216a.75.75 0 0 1-.75.75Zm-10.25 2.5c2.975 0 4.968-.946 5.86-1.966a.25.25 0 0 0 .04-.154v-1.74l-5.63 3.03a.75.75 0 0 1-.74 0L5.65 11.39v1.74a.25.25 0 0 0 .04.154c.892 1.02 2.885 1.966 5.86 1.966Z" />
+                  </svg>
                 </div>
               </div>
 

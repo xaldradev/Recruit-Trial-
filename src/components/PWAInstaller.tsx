@@ -112,9 +112,11 @@ export default function PWAInstaller() {
           </button>
 
           <div className="flex gap-4">
-            {/* App Icon Circle */}
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-amber-500 flex items-center justify-center shrink-0 border border-purple-400/20 shadow-lg">
-              <Smartphone className="w-6 h-6 text-white" />
+            {/* App Icon Circle - Styled with the official Recruit Graduation Cap Logo */}
+            <div className="w-12 h-12 rounded-xl bg-[#7c3aed] flex items-center justify-center shrink-0 border border-[#a78bfa]/40 shadow-[0_0_15px_rgba(124,58,237,0.35)]">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 text-white">
+                <path d="M11.645 2.044a.75.75 0 0 1 .71 0l9.75 5.25a.75.75 0 0 1 0 1.312l-9.75 5.25a.75.75 0 0 1-.71 0L1.9 8.606a.75.75 0 0 1 0-1.312h.005l9.74-5.25ZM22 12.75a.75.75 0 0 1-.75-.75V9.11l-2 1.077v3.063c0 .385-.21.74-.55 1.13-1.256 1.436-3.708 2.62-7.2 2.62-3.492 0-5.944-1.184-7.2-2.62a1.5 1.5 0 0 1-.55-1.13V10.187L2.75 9.11v2.89a.75.75 0 0 1-1.5 0V8.534a.75.75 0 0 1 .373-.648l9.75-5.25a.75.75 0 0 1 .746 0l9.75 5.25a.75.75 0 0 1 .373.648v4.216a.75.75 0 0 1-.75.75Zm-10.25 2.5c2.975 0 4.968-.946 5.86-1.966a.25.25 0 0 0 .04-.154v-1.74l-5.63 3.03a.75.75 0 0 1-.74 0L5.65 11.39v1.74a.25.25 0 0 0 .04.154c.892 1.02 2.885 1.966 5.86 1.966Z" />
+              </svg>
             </div>
 
             <div className="flex-1 pr-6">
