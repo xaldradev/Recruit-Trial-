@@ -32,7 +32,6 @@ import WalkthroughTour from './components/WalkthroughTour';
 import FranchisePage from './components/FranchisePage';
 import PWAInstaller from './components/PWAInstaller';
 import BottomNavBar from './components/BottomNavBar';
-import AppDownloadShowcase from './components/AppDownloadShowcase';
 import { PRICING_TIERS, PATH_DETAILS, getTokenLimitForPrice } from './data/pricingData';
 import TokenWarningToastContainer from './components/TokenWarningToastContainer';
 
@@ -3743,9 +3742,6 @@ export default function App() {
         )}
         {renderActiveContent()}
       </main>
-
-      {/* Futuristic Mobile App Download Visual Showcase */}
-      <AppDownloadShowcase />
 
       {/* Footer verified seal and info */}
       <footer className="max-w-7xl mx-auto px-4 mt-12 mb-8 space-y-6">
