@@ -66,10 +66,12 @@ export default function AdminPanel({
     const saved = localStorage.getItem('recruit_admin_chats');
     return saved ? JSON.parse(saved) : INITIAL_CHAT_LOGS;
   });
+  const [voiceCalls, setVoiceCalls] = useState<any[]>([]);
 
   // Selected sub-elements for drill-down views
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [selectedChat, setSelectedChat] = useState<ArohiChatLog | null>(null);
+  const [selectedVoiceCall, setSelectedVoiceCall] = useState<any | null>(null);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [customAiGuideline, setCustomAiGuideline] = useState('');
   const [guidelineSuccess, setGuidelineSuccess] = useState(false);
@@ -82,7 +84,7 @@ export default function AdminPanel({
   const [upiUpdateSuccess, setUpiUpdateSuccess] = useState(false);
 
   // UI state variables
-  const [activeSubTab, setActiveSubTab] = useState<'telemetry' | 'users' | 'finance' | 'chats' | 'postings' | 'creator' | 'analytics'>('telemetry');
+  const [activeSubTab, setActiveSubTab] = useState<'telemetry' | 'users' | 'finance' | 'chats' | 'voice' | 'postings' | 'creator' | 'analytics'>('telemetry');
   const [telemetryLogs, setTelemetryLogs] = useState<any[]>([]);
   const [cumulativeCounts, setCumulativeCounts] = useState<{
     visit: number;
@@ -185,6 +187,18 @@ export default function AdminPanel({
       if (responseChats.ok) {
         const data = await responseChats.json();
         setChatLogs(data.chats);
+      }
+
+      // 3.5. Fetch Voice Call Logs
+      const responseVoice = await fetch('/api/admin/voice-calls', {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      if (responseVoice.ok) {
+        const data = await responseVoice.json();
+        setVoiceCalls(data.voiceCalls);
+        if (data.voiceCalls && data.voiceCalls.length > 0) {
+          setSelectedVoiceCall(prev => prev ? (data.voiceCalls.find((c: any) => c.id === prev.id) || data.voiceCalls[0]) : data.voiceCalls[0]);
+        }
       }
 
       // 4. Fetch Stats & Activity telemetry
@@ -979,6 +993,18 @@ export default function AdminPanel({
           >
             <MessageSquare className="w-4 h-4 text-pink-400" />
             <span>Arohi Chat Transcripts</span>
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('voice')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeSubTab === 'voice' 
+                ? 'bg-purple-950/40 text-purple-300 border border-purple-500/40 shadow-[0_0_15px_rgba(124,58,237,0.15)]' 
+                : 'text-slate-300 hover:bg-[#110d29]'
+            }`}
+          >
+            <Clock className="w-4 h-4 text-teal-400" />
+            <span>Voice Call Logs & Summaries</span>
           </button>
 
           <button
@@ -2082,6 +2108,193 @@ export default function AdminPanel({
                 <div className="h-full flex flex-col items-center justify-center text-center p-12 text-slate-500 text-xs italic">
                   <MessageSquare className="w-12 h-12 text-slate-700 mb-2" />
                   Select a candidate conversation session from the left trend tracker to inspect full message transcripts and inject specific guidance overrides.
+                </div>
+              )}
+            </div>
+
+          </div>
+        )}
+
+        {/* TAB 4.5: VOICE CALL LOGS & SUMMARIES */}
+        {activeSubTab === 'voice' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* Call Logs List */}
+            <div className="backdrop-blur-xl bg-[#090715]/70 border border-[#2b1b54]/80 rounded-3xl overflow-hidden shadow-xl h-[530px] flex flex-col justify-between">
+              <div>
+                <div className="p-4 bg-[#120d2c]/65 border-b border-[#2b1b54] flex justify-between items-center">
+                  <div className="text-left">
+                    <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-300">Live Voice Consultations</h3>
+                    <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Audit real-time voice transcripts & AI summaries</p>
+                  </div>
+                  <span className="text-[9px] bg-teal-950 text-teal-400 border border-teal-800/40 px-2 py-0.5 rounded-md font-mono">
+                    {voiceCalls.length} calls
+                  </span>
+                </div>
+
+                <div className="divide-y divide-[#221644] max-h-[420px] overflow-y-auto">
+                  {voiceCalls.map((call) => {
+                    const isSelected = selectedVoiceCall?.id === call.id;
+                    const displayDuration = call.duration > 0 
+                      ? `${Math.floor(call.duration / 60)}m ${call.duration % 60}s` 
+                      : '0s';
+                    return (
+                      <div
+                        key={call.id}
+                        onClick={() => setSelectedVoiceCall(call)}
+                        className={`p-4 cursor-pointer transition-colors text-left relative ${
+                          isSelected 
+                            ? 'bg-[#1a143f]/70 border-l-4 border-teal-500' 
+                            : 'hover:bg-[#110c2c]/40'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start gap-2">
+                          <span className="font-extrabold text-xs text-white max-w-[130px] truncate">
+                            {call.userName || 'Guest Caller'}
+                          </span>
+                          <span className="text-[9px] text-slate-400 font-semibold font-mono whitespace-nowrap">
+                            {new Date(call.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 truncate mt-1 font-semibold">{call.userEmail}</p>
+                        
+                        <div className="flex justify-between items-center mt-2 pt-2 border-t border-[#1e133d]/40">
+                          <span className={`text-[8px] px-1.5 py-0.5 rounded font-extrabold uppercase ${
+                            call.analysis?.isCareerRelated 
+                              ? 'bg-purple-950/40 text-purple-300 border border-purple-900/40' 
+                              : 'bg-emerald-950/40 text-emerald-300 border border-emerald-900/40'
+                          }`}>
+                            {call.analysis?.isCareerRelated ? 'Career Guidance' : 'Business Strategy'}
+                          </span>
+                          <span className="text-[9px] font-mono text-teal-400 font-bold">{displayDuration}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {voiceCalls.length === 0 && (
+                    <div className="text-center p-12 text-xs italic text-slate-500">No voice consultations registered yet.</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-4 bg-[#120d2c]/60 border-t border-[#2b1b54] text-left">
+                <span className="text-[9px] text-slate-500 font-mono font-bold uppercase">Real-Time Sync Protocol: Active</span>
+              </div>
+            </div>
+
+            {/* Call Detail Viewer */}
+            <div className="lg:col-span-2 backdrop-blur-xl bg-[#090715]/70 border border-[#2b1b54]/80 p-5 rounded-3xl shadow-xl h-[530px] overflow-y-auto text-left flex flex-col justify-between">
+              {selectedVoiceCall ? (
+                <div className="space-y-5">
+                  
+                  {/* Call Header */}
+                  <div className="flex justify-between items-start border-b border-[#25174e] pb-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[8px] px-2 py-0.5 rounded font-black uppercase ${
+                          selectedVoiceCall.analysis?.isCareerRelated 
+                            ? 'bg-purple-950 text-purple-400 border border-purple-900' 
+                            : 'bg-emerald-950 text-emerald-400 border border-emerald-900'
+                        }`}>
+                          {selectedVoiceCall.analysis?.isCareerRelated ? 'Career Consultation' : 'Business Consultation'}
+                        </span>
+                        <span className="text-[9px] font-mono text-slate-400">
+                          {new Date(selectedVoiceCall.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                      </div>
+                      <h3 className="font-extrabold text-base text-white mt-1.5">{selectedVoiceCall.userName}</h3>
+                      <p className="text-[11px] text-slate-400 font-medium">{selectedVoiceCall.userEmail}</p>
+                    </div>
+
+                    <div className="bg-[#120d2c]/80 border border-[#2d2163] p-3 rounded-2xl text-right">
+                      <p className="text-[8px] text-slate-400 font-extrabold uppercase tracking-widest">Active Duration</p>
+                      <p className="text-sm font-black text-teal-400 mt-0.5">
+                        {selectedVoiceCall.duration > 0 
+                          ? `${Math.floor(selectedVoiceCall.duration / 60).toString().padStart(2, '0')}:${(selectedVoiceCall.duration % 60).toString().padStart(2, '0')}` 
+                          : '00:00'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Real-Time Consultation Summary */}
+                  <div className="bg-gradient-to-r from-[#170e3a] to-[#0c0922] border border-[#492ca4]/60 p-4 rounded-2xl shadow-inner">
+                    <h4 className="text-[10px] font-black uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-teal-300 animate-pulse" />
+                      AROHI AI Synthesis Summary (Generative Insight)
+                    </h4>
+                    <p className="text-xs text-slate-100 font-medium leading-relaxed mt-2.5">
+                      {selectedVoiceCall.summary || selectedVoiceCall.analysis?.summary || 'No summary text extracted from this call.'}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Action Items / Strategic Priorities */}
+                    <div className="bg-[#0b081e] border border-[#221752] rounded-2xl p-4">
+                      <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-1.5">
+                        <Sliders className="w-3.5 h-3.5 text-purple-400" /> Strategic Next-Steps
+                      </h4>
+                      <div className="space-y-2">
+                        {selectedVoiceCall.analysis?.priorities?.map((prio: string, idx: number) => (
+                          <div key={idx} className="flex gap-2 items-start bg-[#140f2d]/50 p-2.5 rounded-xl border border-slate-900">
+                            <span className="text-[10px] text-purple-400 font-black mt-0.5">0{idx + 1}.</span>
+                            <span className="text-[11px] text-slate-200 font-semibold leading-normal">{prio}</span>
+                          </div>
+                        ))}
+                        {(!selectedVoiceCall.analysis?.priorities || selectedVoiceCall.analysis.priorities.length === 0) && (
+                          <p className="text-[11px] text-slate-500 italic">No priorities captured.</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Identified Milestones / Task Completions */}
+                    <div className="bg-[#0b081e] border border-[#221752] rounded-2xl p-4">
+                      <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-1.5">
+                        <UserCheck className="w-3.5 h-3.5 text-emerald-400" /> Session Milestones
+                      </h4>
+                      <div className="space-y-2">
+                        {selectedVoiceCall.analysis?.completedTasks?.map((task: string, idx: number) => (
+                          <div key={idx} className="flex gap-2 items-start bg-emerald-950/10 p-2.5 rounded-xl border border-emerald-950/20">
+                            <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                            <span className="text-[11px] text-slate-200 font-semibold leading-normal">{task}</span>
+                          </div>
+                        ))}
+                        {(!selectedVoiceCall.analysis?.completedTasks || selectedVoiceCall.analysis.completedTasks.length === 0) && (
+                          <p className="text-[11px] text-slate-500 italic">No milestones checked during this call.</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Complete Transcript Turns Accordion/Log */}
+                  <div className="border border-[#1f174d] rounded-2xl overflow-hidden">
+                    <div className="bg-[#120d2c] p-3 border-b border-[#1f174d]">
+                      <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                        <Activity className="w-3.5 h-3.5 text-pink-400" /> Full Voice Verbatims ({selectedVoiceCall.turns?.length || 0} Speech Turns)
+                      </h4>
+                    </div>
+                    <div className="bg-[#070512]/60 p-3 max-h-[160px] overflow-y-auto space-y-2.5">
+                      {selectedVoiceCall.turns?.map((turn: any, idx: number) => (
+                        <div key={idx} className="bg-[#130f2c]/40 p-2.5 rounded-xl border border-[#1e133d]/40">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className={`text-[8px] font-black uppercase tracking-wider ${turn.speaker === 'user' ? 'text-emerald-400' : 'text-purple-400'}`}>
+                              {turn.speaker === 'user' ? 'Candidate' : 'Arohi AI'}
+                            </span>
+                            {turn.timestamp && <span className="text-[8px] text-slate-500 font-mono">{turn.timestamp}</span>}
+                          </div>
+                          <p className="text-[11px] text-slate-200 font-medium leading-relaxed">{turn.text}</p>
+                        </div>
+                      ))}
+                      {(!selectedVoiceCall.turns || selectedVoiceCall.turns.length === 0) && (
+                        <p className="text-center text-xs italic text-slate-500 py-4">No speech turns registered in this session.</p>
+                      )}
+                    </div>
+                  </div>
+
+                </div>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-center p-12 text-slate-500 text-xs italic">
+                  <Clock className="w-12 h-12 text-slate-700 mb-2" />
+                  Select a live voice consultation session from the left queue to audit full conversation transcripts, speech turns, and dynamic generative summaries.
                 </div>
               )}
             </div>

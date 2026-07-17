@@ -331,6 +331,16 @@ function logActivity(type: string, description: string, metadata?: any) {
     (cumulativeCounts as any)[normalizedType] = ((cumulativeCounts as any)[normalizedType] || 0) + 1;
   }
   saveStats();
+
+  if (adminDb) {
+    try {
+      adminDb.collection('site_activities').doc(newActivity.id).set(newActivity).catch((err: any) => {
+        console.warn('[Firestore Log] Failed to save site activity async:', err.message || err);
+      });
+    } catch (err) {
+      // Ignore silent errors
+    }
+  }
 }
 
 // 0. Firebase Authentication Reverse Proxy for Custom Domain Hosting on Railway VPS
@@ -851,25 +861,51 @@ app.post('/api/admin/login', (req, res) => {
   return res.status(401).json({ error: 'Invalid ID or Password' });
 });
 
-app.get('/api/admin/stats', (req, res) => {
+app.get('/api/admin/stats', async (req, res) => {
   const authHeader = req.headers.authorization;
   if (authHeader !== 'Bearer recruit_admin_authorized_token_2026') {
     return res.status(403).json({ error: 'Access denied: Unauthorized' });
   }
 
+  let combinedActivities = [...siteActivities];
+  if (adminDb) {
+    try {
+      const snapshot = await adminDb.collection('site_activities').get();
+      snapshot.forEach((doc: any) => {
+        const data = doc.data();
+        const existingIdx = combinedActivities.findIndex(a => a.id === doc.id);
+        if (existingIdx !== -1) {
+          combinedActivities[existingIdx] = {
+            ...combinedActivities[existingIdx],
+            ...data
+          };
+        } else {
+          combinedActivities.unshift(data);
+        }
+      });
+      // Sort newest first
+      combinedActivities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      if (combinedActivities.length > 150) {
+        combinedActivities = combinedActivities.slice(0, 150);
+      }
+    } catch (err: any) {
+      console.warn('Failed to load site activities from Firestore:', err.message || err);
+    }
+  }
+
   // Count types
   const counts = {
-    visit: siteActivities.filter(a => a.type === 'visit').length,
-    chat: siteActivities.filter(a => a.type === 'chat').length,
-    resume: siteActivities.filter(a => a.type === 'resume').length,
-    roadmap: siteActivities.filter(a => a.type === 'roadmap').length,
-    apply: siteActivities.filter(a => a.type === 'apply').length,
-    enroll: siteActivities.filter(a => a.type === 'enroll').length,
-    admin: siteActivities.filter(a => a.type === 'admin').length,
+    visit: combinedActivities.filter(a => a.type === 'visit').length,
+    chat: combinedActivities.filter(a => a.type === 'chat').length,
+    resume: combinedActivities.filter(a => a.type === 'resume').length,
+    roadmap: combinedActivities.filter(a => a.type === 'roadmap').length,
+    apply: combinedActivities.filter(a => a.type === 'apply').length,
+    enroll: combinedActivities.filter(a => a.type === 'enroll').length,
+    admin: combinedActivities.filter(a => a.type === 'admin').length,
   };
 
   return res.json({
-    activities: siteActivities,
+    activities: combinedActivities,
     counts,
     cumulativeCounts
   });
@@ -1120,15 +1156,72 @@ function checkAdminAuth(req: express.Request) {
 }
 
 // 1. Users list
-app.get('/api/admin/users', (req, res) => {
+app.get('/api/admin/users', async (req, res) => {
   if (!checkAdminAuth(req)) {
     return res.status(403).json({ error: 'Access denied: Unauthorized' });
   }
-  return res.json({ users: serverAdminUsers });
+
+  let combinedUsers = [...serverAdminUsers];
+  if (adminDb) {
+    try {
+      const snapshot = await adminDb.collection('users').get();
+      snapshot.forEach((doc: any) => {
+        const data = doc.data();
+        const email = data.email || data.profile?.email;
+        if (!email) return;
+
+        // Check if this user already exists to avoid duplicates
+        const existingIdx = combinedUsers.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+
+        const mappedUser = {
+          id: data.uid || doc.id,
+          email: email,
+          name: data.displayName || data.profile?.name || email.split('@')[0],
+          role: data.role === 'recruiter' ? 'Business Owner/Recruiter' : 'Premium Candidate',
+          status: data.status || 'Active',
+          permissions: data.permissions || {
+            canEditJobs: data.role === 'recruiter' || email === 'elitetraderjunoon@gmail.com',
+            canApproveApps: data.role === 'recruiter' || email === 'elitetraderjunoon@gmail.com',
+            canViewFinance: email === 'elitetraderjunoon@gmail.com'
+          },
+          services: data.services || {
+            path1: (data.enrolledCourses && data.enrolledCourses.length > 0) || (data.profile?.activeGoal && data.profile.activeGoal.includes('Career')) || false,
+            path2: data.completedModules ? Object.keys(data.completedModules).length > 0 : false,
+            path3: (data.profile?.activeGoal && data.profile.activeGoal.includes('Mudra')) || false,
+            path4: false
+          },
+          takenCourses: data.enrolledCourses || [],
+          usage: data.usage || {
+            chatsWithArohi: data.arohiChats?.reduce((acc: number, c: any) => acc + (c.messages?.length || 0), 0) || 0,
+            resumeScans: data.diagnostics?.atsScore ? 1 : 0,
+            mockInterviews: data.diagnostics?.interviewScore ? 1 : 0
+          },
+          customizedSettings: data.customizedSettings || {
+            tutoringSlot: data.profile?.location || 'Not scheduled',
+            priorityLevel: email === 'elitetraderjunoon@gmail.com' ? 'Critical' : 'Standard',
+            assignedMentor: 'Automated AI Guide'
+          }
+        };
+
+        if (existingIdx !== -1) {
+          combinedUsers[existingIdx] = {
+            ...combinedUsers[existingIdx],
+            ...mappedUser
+          };
+        } else {
+          combinedUsers.push(mappedUser);
+        }
+      });
+    } catch (err: any) {
+      console.warn('Failed to load real-time users from Firestore:', err.message || err);
+    }
+  }
+
+  return res.json({ users: combinedUsers });
 });
 
 // 2. Add or Update User
-app.post('/api/admin/update-user', (req, res) => {
+app.post('/api/admin/update-user', async (req, res) => {
   if (!checkAdminAuth(req)) {
     return res.status(403).json({ error: 'Access denied: Unauthorized' });
   }
@@ -1137,6 +1230,7 @@ app.post('/api/admin/update-user', (req, res) => {
     return res.status(400).json({ error: 'User data and email are required' });
   }
 
+  let finalUser: any = null;
   const idx = serverAdminUsers.findIndex(u => u.email.toLowerCase() === updatedUser.email.toLowerCase());
   if (idx !== -1) {
     // Update existing user properties
@@ -1145,8 +1239,8 @@ app.post('/api/admin/update-user', (req, res) => {
       ...updatedUser,
       id: updatedUser.id || serverAdminUsers[idx].id
     };
+    finalUser = serverAdminUsers[idx];
     logActivity('admin', `Admin updated profile for user: ${updatedUser.email}`, { email: updatedUser.email });
-    return res.json({ success: true, user: serverAdminUsers[idx] });
   } else {
     // Add new user
     const newUser = {
@@ -1162,13 +1256,52 @@ app.post('/api/admin/update-user', (req, res) => {
       customizedSettings: updatedUser.customizedSettings || { tutoringSlot: 'None Scheduled', priorityLevel: 'Standard', assignedMentor: 'Automated AI Guide' }
     };
     serverAdminUsers.push(newUser);
+    finalUser = newUser;
     logActivity('admin', `Admin added new user profile: ${newUser.email}`, { email: newUser.email });
-    return res.json({ success: true, user: newUser });
   }
+
+  // Sync back to Firestore if adminDb is available
+  if (adminDb && finalUser) {
+    try {
+      const uid = finalUser.id;
+      let userDocRef = adminDb.collection('users').doc(uid);
+      let userDocSnap = await userDocRef.get();
+
+      if (!userDocSnap.exists) {
+        // Find by email to avoid creating multiple docs for same user
+        const userSnap = await adminDb.collection('users').where('email', '==', finalUser.email.toLowerCase()).get();
+        if (!userSnap.empty) {
+          userDocRef = userSnap.docs[0].ref;
+        }
+      }
+
+      // Convert from serverAdminUsers format back to UserData Firestore format
+      const isRecruiter = finalUser.role?.toLowerCase()?.includes('recruiter') || finalUser.role?.toLowerCase()?.includes('owner');
+      const docData = {
+        uid: uid,
+        email: finalUser.email.toLowerCase(),
+        displayName: finalUser.name,
+        role: isRecruiter ? 'recruiter' as const : 'candidate' as const,
+        status: finalUser.status,
+        permissions: finalUser.permissions,
+        services: finalUser.services,
+        enrolledCourses: finalUser.takenCourses || [],
+        usage: finalUser.usage,
+        customizedSettings: finalUser.customizedSettings,
+        updatedAt: new Date().toISOString()
+      };
+
+      await userDocRef.set(docData, { merge: true });
+    } catch (err: any) {
+      console.warn('Failed to save updated user to Firestore:', err.message || err);
+    }
+  }
+
+  return res.json({ success: true, user: finalUser });
 });
 
 // 3. Delete user
-app.post('/api/admin/delete-user', (req, res) => {
+app.post('/api/admin/delete-user', async (req, res) => {
   if (!checkAdminAuth(req)) {
     return res.status(403).json({ error: 'Access denied: Unauthorized' });
   }
@@ -1178,7 +1311,19 @@ app.post('/api/admin/delete-user', (req, res) => {
   }
   const initialLength = serverAdminUsers.length;
   serverAdminUsers = serverAdminUsers.filter(u => u.email.toLowerCase() !== email.toLowerCase());
+  
   if (serverAdminUsers.length < initialLength) {
+    if (adminDb) {
+      try {
+        const userSnap = await adminDb.collection('users').where('email', '==', email.toLowerCase()).get();
+        if (!userSnap.empty) {
+          await userSnap.docs[0].ref.delete();
+        }
+      } catch (err: any) {
+        console.warn('Failed to delete user from Firestore:', err.message || err);
+      }
+    }
+
     logActivity('admin', `Admin deleted user profile: ${email}`, { email });
     return res.json({ success: true });
   }
@@ -1186,11 +1331,35 @@ app.post('/api/admin/delete-user', (req, res) => {
 });
 
 // 4. Payments list
-app.get('/api/admin/payments', (req, res) => {
+app.get('/api/admin/payments', async (req, res) => {
   if (!checkAdminAuth(req)) {
     return res.status(403).json({ error: 'Access denied: Unauthorized' });
   }
-  return res.json({ payments: serverPayments });
+
+  let combinedPayments = [...serverPayments];
+  if (adminDb) {
+    try {
+      const snapshot = await adminDb.collection('payments').get();
+      snapshot.forEach((doc: any) => {
+        const data = doc.data();
+        const existingIdx = combinedPayments.findIndex(p => p.id === doc.id);
+        if (existingIdx !== -1) {
+          combinedPayments[existingIdx] = {
+            ...combinedPayments[existingIdx],
+            ...data
+          };
+        } else {
+          combinedPayments.unshift(data);
+        }
+      });
+      // Sort newest transactions first
+      combinedPayments.sort((a, b) => b.id.localeCompare(a.id));
+    } catch (err: any) {
+      console.warn('Failed to fetch payments from Firestore:', err.message || err);
+    }
+  }
+
+  return res.json({ payments: combinedPayments });
 });
 
 // GET active merchant settings (anyone can access, but specifically for candidates checkouts)
@@ -1217,7 +1386,7 @@ app.post('/api/admin/payment-settings', (req, res) => {
 });
 
 // SUBMIT PENDING UPI / QR PAYMENT
-app.post('/api/admin/submit-pending-payment', (req, res) => {
+app.post('/api/admin/submit-pending-payment', async (req, res) => {
   const { userEmail, amount, planName, utr, screenshotUrl } = req.body;
   if (!userEmail || !amount || !planName || !utr) {
     return res.status(400).json({ error: 'userEmail, amount, planName and transaction reference (UTR) are required' });
@@ -1236,12 +1405,21 @@ app.post('/api/admin/submit-pending-payment', (req, res) => {
   };
 
   serverPayments.unshift(newTxn);
+
+  if (adminDb) {
+    try {
+      await adminDb.collection('payments').doc(newTxn.id).set(newTxn);
+    } catch (err: any) {
+      console.warn('Failed to save pending payment to Firestore:', err.message || err);
+    }
+  }
+
   logActivity('enroll', `Candidate ${userEmail} scanned QR & submitted transaction ref (UTR): ${utr}`, newTxn);
   return res.json({ success: true, transaction: newTxn });
 });
 
 // VERIFY / APPROVE PAYMENT
-app.post('/api/admin/verify-payment', (req, res) => {
+app.post('/api/admin/verify-payment', async (req, res) => {
   if (!checkAdminAuth(req)) {
     return res.status(403).json({ error: 'Access denied: Unauthorized' });
   }
@@ -1294,12 +1472,48 @@ app.post('/api/admin/verify-payment', (req, res) => {
     });
   }
 
+  // Update payment in Firestore and sync to users document
+  if (adminDb) {
+    try {
+      await adminDb.collection('payments').doc(id).set(payment, { merge: true });
+
+      const userSnap = await adminDb.collection('users').where('email', '==', payment.userEmail.toLowerCase()).get();
+      if (!userSnap.empty) {
+        const userDoc = userSnap.docs[0];
+        const userData = userDoc.data();
+        const lowerPlan = payment.planName.toLowerCase();
+
+        const services = userData.services || { path1: false, path2: false, path3: false, path4: false };
+        if (lowerPlan.includes('path 1') || lowerPlan.includes('career') || lowerPlan.includes('resume')) {
+          services.path1 = true;
+        } else if (lowerPlan.includes('path 2') || lowerPlan.includes('skill')) {
+          services.path2 = true;
+        } else if (lowerPlan.includes('path 3') || lowerPlan.includes('udyam') || lowerPlan.includes('business')) {
+          services.path3 = true;
+        }
+
+        let diagnostics = userData.diagnostics || { atsScore: 74, interviewScore: 0, businessScore: 84 };
+        if (lowerPlan.includes('resume')) {
+          diagnostics.atsScore = Math.max(diagnostics.atsScore, 75);
+        }
+
+        await userDoc.ref.update({
+          services,
+          diagnostics,
+          updatedAt: new Date().toISOString()
+        });
+      }
+    } catch (err: any) {
+      console.warn('Failed to sync verified payment to Firestore:', err.message || err);
+    }
+  }
+
   logActivity('admin', `Admin manually verified payment voucher ${id} for ${payment.userEmail}`, { id });
   return res.json({ success: true, payment });
 });
 
 // 5. Add payment
-app.post('/api/admin/add-payment', (req, res) => {
+app.post('/api/admin/add-payment', async (req, res) => {
   const { userEmail, amount, planName, method } = req.body;
   if (!userEmail || !amount || !planName) {
     return res.status(400).json({ error: 'userEmail, amount and planName are required' });
@@ -1353,12 +1567,41 @@ app.post('/api/admin/add-payment', (req, res) => {
     });
   }
 
+  if (adminDb) {
+    try {
+      await adminDb.collection('payments').doc(newTxn.id).set(newTxn);
+
+      const userSnap = await adminDb.collection('users').where('email', '==', userEmail.toLowerCase()).get();
+      if (!userSnap.empty) {
+        const userDoc = userSnap.docs[0];
+        const userData = userDoc.data();
+        const lowerPlan = planName.toLowerCase();
+
+        const services = userData.services || { path1: false, path2: false, path3: false, path4: false };
+        if (lowerPlan.includes('path 1') || lowerPlan.includes('career') || lowerPlan.includes('resume')) {
+          services.path1 = true;
+        } else if (lowerPlan.includes('path 2') || lowerPlan.includes('skill')) {
+          services.path2 = true;
+        } else if (lowerPlan.includes('path 3') || lowerPlan.includes('udyam') || lowerPlan.includes('business')) {
+          services.path3 = true;
+        }
+
+        await userDoc.ref.update({
+          services,
+          updatedAt: new Date().toISOString()
+        });
+      }
+    } catch (err: any) {
+      console.warn('Failed to save manual payment to Firestore:', err.message || err);
+    }
+  }
+
   logActivity('enroll', `Subscription payment of ₹${amount} received for "${planName}" from ${userEmail}`, { userEmail, amount, planName });
   return res.json({ success: true, transaction: newTxn });
 });
 
 // 6. Sync / Add to user Chat logs
-app.post('/api/admin/sync-chat', (req, res) => {
+app.post('/api/admin/sync-chat', async (req, res) => {
   const { userEmail, userName, sender, text, topic } = req.body;
   if (!userEmail || !sender || !text) {
     return res.status(400).json({ error: 'userEmail, sender and text are required' });
@@ -1390,15 +1633,233 @@ app.post('/api/admin/sync-chat', (req, res) => {
     }
   }
 
+  // Sync back to Firestore if adminDb is available
+  if (adminDb) {
+    try {
+      const userSnap = await adminDb.collection('users').where('email', '==', cleanEmail).get();
+      if (!userSnap.empty) {
+        const userDoc = userSnap.docs[0];
+        const userData = userDoc.data();
+        let arohiChats = userData.arohiChats || [];
+
+        // Try to find the chat session by title/topic or use the latest one
+        let existingChatIdx = arohiChats.findIndex((c: any) => c.title === (topic || 'General Consultation') || c.title === 'Arohi AI Consultation');
+        if (existingChatIdx === -1 && arohiChats.length > 0) {
+          existingChatIdx = arohiChats.length - 1; // Fallback to last chat
+        }
+
+        const newMsg = {
+          id: `msg-${Math.random().toString(36).substring(2, 9)}`,
+          role: sender === 'user' ? 'user' as const : 'assistant' as const,
+          content: text,
+          timestamp: msgTime
+        };
+
+        if (existingChatIdx !== -1) {
+          arohiChats[existingChatIdx].messages = arohiChats[existingChatIdx].messages || [];
+          arohiChats[existingChatIdx].messages.push(newMsg);
+        } else {
+          arohiChats.push({
+            id: log.id,
+            title: topic || 'General Consultation',
+            date: new Date().toLocaleDateString('en-GB'),
+            messages: [newMsg]
+          });
+        }
+
+        await userDoc.ref.update({
+          arohiChats,
+          updatedAt: new Date().toISOString()
+        });
+      }
+    } catch (err: any) {
+      console.warn('Failed to sync chat message to Firestore user doc:', err.message || err);
+    }
+  }
+
   return res.json({ success: true, chatLog: log });
 });
 
 // 7. Chats list
-app.get('/api/admin/chats', (req, res) => {
+app.get('/api/admin/chats', async (req, res) => {
   if (!checkAdminAuth(req)) {
     return res.status(403).json({ error: 'Access denied: Unauthorized' });
   }
-  return res.json({ chats: serverChatLogs });
+
+  let combinedChats = [...serverChatLogs];
+  if (adminDb) {
+    try {
+      const snapshot = await adminDb.collection('users').get();
+      snapshot.forEach((doc: any) => {
+        const data = doc.data();
+        if (data.arohiChats && data.arohiChats.length > 0) {
+          data.arohiChats.forEach((c: any) => {
+            const userEmail = data.email || data.profile?.email || '';
+            if (!userEmail) return;
+
+            const mappedLog = {
+              id: c.id || `chat-${Math.random().toString(36).substring(2, 9)}`,
+              userEmail: userEmail.toLowerCase(),
+              userName: data.displayName || data.profile?.name || userEmail.split('@')[0],
+              topic: c.title || 'Arohi AI Consultation',
+              sentiment: 'Neutral',
+              messages: c.messages?.map((m: any) => ({
+                sender: m.role === 'user' ? 'user' : 'arohi',
+                text: m.content || m.text || '',
+                time: m.timestamp || c.date || ''
+              })) || []
+            };
+
+            const existingIdx = combinedChats.findIndex(ch => ch.userEmail.toLowerCase() === userEmail.toLowerCase() && ch.topic === mappedLog.topic);
+            if (existingIdx !== -1) {
+              combinedChats[existingIdx] = mappedLog;
+            } else {
+              combinedChats.unshift(mappedLog);
+            }
+          });
+        }
+      });
+    } catch (err: any) {
+      console.warn('Failed to load real-time chat logs from Firestore:', err.message || err);
+    }
+  }
+
+  return res.json({ chats: combinedChats });
+});
+
+// 7.5. Real-Time Voice Calls list for Admin Panel
+app.get('/api/admin/voice-calls', async (req, res) => {
+  if (!checkAdminAuth(req)) {
+    return res.status(403).json({ error: 'Access denied: Unauthorized' });
+  }
+
+  let combinedCalls: any[] = [];
+  
+  // First, let's seed with some high-quality mock call logs to ensure the admin panel is lively even on empty DB
+  const mockCalls = [
+    {
+      id: "call-mock-1",
+      userEmail: "elitetraderjunoon@gmail.com",
+      userName: "Elite Trader Junoon",
+      timestamp: new Date(Date.now() - 3600000 * 2).toISOString(), // 2 hours ago
+      duration: 165, // 2m 45s
+      summary: "The candidate discussed plans for setting up a fly ash bricks manufacturing factory with a capital budget of ₹10 Lakhs. AROHI recommended securing an Udyam MSME license and checked eligibility for the Mudra Loan scheme.",
+      turns: [
+        { speaker: "user", text: "Hi Arohi, I want to talk about setting up a brick kiln or brick factory in Bihar. I have 10 Lakhs capital.", timestamp: "11:07 AM" },
+        { speaker: "arohi", text: "Namaste! That is a very viable business idea. For a fly ash bricks unit with 10 Lakhs capital, you can structure it under the MSME schemes for credit linkages.", timestamp: "11:07 AM" },
+        { speaker: "user", text: "What licenses do I need and how can I get a government loan?", timestamp: "11:08 AM" },
+        { speaker: "arohi", text: "Your major priorities are securing an Udyam MSME status, obtaining local municipal trade licenses, and checking PM Mudra loan eligibility.", timestamp: "11:08 AM" }
+      ],
+      analysis: {
+        summary: "The candidate discussed plans for setting up a fly ash bricks manufacturing factory with a capital budget of ₹10 Lakhs. AROHI recommended securing an Udyam MSME license and checked eligibility for the Mudra Loan scheme.",
+        priorities: [
+          "PLANT INFRASTRUCTURE: Finalize machinery procurement specs for automatic/semi-automatic brick presses.",
+          "FINANCING PLAN: Structure the 10 Lakhs budget, dividing 60% for machinery and 40% for working capital.",
+          "MSME INCENTIVES: Apply for an Udyam MSME certificate to claim credit linkages and power tariff subsidies."
+        ],
+        completedTasks: [
+          "Fly Ash Bricks Factory Setup Outline Created",
+          "Capital Expenditure Allocations Mapped (10 Lakhs budget)",
+          "MSME Subsidies Eligibility Verified"
+        ],
+        isCareerRelated: false,
+        topics: { business: true, resume: false, jobs: false, courses: false }
+      }
+    },
+    {
+      id: "call-mock-2",
+      userEmail: "candidate.rahul@gmail.com",
+      userName: "Rahul Sharma",
+      timestamp: new Date(Date.now() - 3600000 * 24).toISOString(), // 1 day ago
+      duration: 124, // 2m 04s
+      summary: "Rahul Sharma discussed career growth tracks in modern web engineering. AROHI formulated an action plan targeting React 19 upskilling and corporate placement tracks.",
+      turns: [
+        { speaker: "user", text: "Hello Arohi, I am a frontend developer looking to get hired in high-growth startups.", timestamp: "03:15 PM" },
+        { speaker: "arohi", text: "Namaste Rahul! High-growth startups prioritize solid state management, modular component designs, and TypeScript proficiency. Let's work on upskilling.", timestamp: "03:15 PM" },
+        { speaker: "user", text: "Can you help me prepare a custom roadmap?", timestamp: "03:16 PM" },
+        { speaker: "arohi", text: "Absolutely, I have created a dynamic learning roadmap including advanced React and D3 visualizations. Let's start with your portfolio review.", timestamp: "03:16 PM" }
+      ],
+      analysis: {
+        summary: "Rahul Sharma discussed career growth tracks in modern web engineering. AROHI formulated an action plan targeting React 19 upskilling and corporate placement tracks.",
+        priorities: [
+          "DEVELOPER PORTFOLIO: Compile high-fidelity responsive projects demonstrating core technical competencies.",
+          "SKILLS ADVANCEMENT: Upskill in modern frameworks such as React 19, TypeScript, and state architectures.",
+          "PLACEMENT STRATEGY: Target state technical vacancies and corporate software development opportunities."
+        ],
+        completedTasks: [
+          "Analyzed software development career alignment",
+          "Configured personalized upskilling benchmarks",
+          "Matched target technical vacancy tracks"
+        ],
+        isCareerRelated: true,
+        topics: { business: false, resume: true, jobs: true, courses: true }
+      }
+    }
+  ];
+
+  combinedCalls = [...mockCalls];
+
+  if (adminDb) {
+    try {
+      // 1. Load directly from voice_call_logs collection
+      const logsSnap = await adminDb.collection('voice_call_logs').get();
+      const dbLogs: any[] = [];
+      logsSnap.forEach((doc: any) => {
+        const data = doc.data();
+        dbLogs.push({
+          id: doc.id,
+          uid: data.uid,
+          timestamp: data.timestamp || new Date().toISOString(),
+          duration: data.duration || 0,
+          turns: data.turns || [],
+          analysis: data.analysis || {},
+          summary: data.analysis?.summary || 'No summary available.'
+        });
+      });
+
+      // Fetch user profile info to enrich the DB log rows
+      const usersSnap = await adminDb.collection('users').get();
+      const userMap = new Map();
+      usersSnap.forEach((doc: any) => {
+        const data = doc.data();
+        userMap.set(doc.id, {
+          email: data.email || data.profile?.email || '',
+          name: data.displayName || data.profile?.name || (data.email ? data.email.split('@')[0] : '')
+        });
+      });
+
+      const enrichedDbLogs = dbLogs.map(log => {
+        const uInfo = userMap.get(log.uid) || { email: 'guest@recruit.org.in', name: 'Guest Caller' };
+        return {
+          id: log.id,
+          userEmail: uInfo.email,
+          userName: uInfo.name,
+          timestamp: log.timestamp,
+          duration: log.duration,
+          turns: log.turns,
+          analysis: log.analysis,
+          summary: log.summary
+        };
+      });
+
+      // Merge DB logs with combinedCalls list
+      enrichedDbLogs.forEach((newCall: any) => {
+        const idx = combinedCalls.findIndex(c => c.id === newCall.id);
+        if (idx !== -1) {
+          combinedCalls[idx] = newCall;
+        } else {
+          combinedCalls.unshift(newCall);
+        }
+      });
+    } catch (err: any) {
+      console.warn('Failed to load real-time voice call logs from Firestore:', err.message || err);
+    }
+  }
+
+  // Sort calls chronologically (newest first)
+  combinedCalls.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+  return res.json({ voiceCalls: combinedCalls });
 });
 
 // Resilient API calling helper with automatic fallback models to prevent 503 "High Demand" errors
@@ -2832,6 +3293,8 @@ async function startServer() {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
           },
           systemInstruction: AROHI_SYSTEM_INSTRUCTION + "\n\nCRITICAL CONTEXT: You are currently connected via real-time live voice link. Speak very concisely, dynamically, and warmly. Keep responses extremely brief (1-3 sentences maximum per turn) so they read nicely as speech without lagging.",
+          inputAudioTranscription: {},
+          outputAudioTranscription: {},
         },
         callbacks: {
           onmessage: (message: any) => {
