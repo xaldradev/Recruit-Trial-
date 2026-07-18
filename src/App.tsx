@@ -86,7 +86,13 @@ const INITIAL_MOCK_APPLICATIONS: Application[] = [
 export default function App() {
   const { user, userData, updateApplications } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [hasEntered, setHasEntered] = useState(false);
+  const [hasEntered, setHasEntered] = useState(() => {
+    try {
+      return localStorage.getItem('recruit_has_entered') === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
 
   // Auto-trigger walkthrough for newly logged-in users or guest users upon entry
@@ -235,8 +241,13 @@ export default function App() {
   
   // Dynamic reviews & ratings system state
   const [reviews, setReviews] = useState<Review[]>(() => {
-    const saved = localStorage.getItem('recruit_user_reviews');
-    return saved ? JSON.parse(saved) : INITIAL_REVIEWS;
+    try {
+      const saved = localStorage.getItem('recruit_user_reviews');
+      return saved ? JSON.parse(saved) : INITIAL_REVIEWS;
+    } catch (e) {
+      console.warn("Failed to parse local recruit_user_reviews, falling back to initial reviews.", e);
+      return INITIAL_REVIEWS;
+    }
   });
   const [currentReviewIdx, setCurrentReviewIdx] = useState(0);
   const [isAddingReview, setIsAddingReview] = useState(false);
@@ -909,7 +920,13 @@ export default function App() {
     }
 
     if (storedApplications) {
-      setApplications(JSON.parse(storedApplications));
+      try {
+        setApplications(JSON.parse(storedApplications));
+      } catch (err) {
+        console.warn("Failed to parse stored applications, resetting to initial mock applications.", err);
+        setApplications(INITIAL_MOCK_APPLICATIONS);
+        localStorage.setItem('recruit_applications', JSON.stringify(INITIAL_MOCK_APPLICATIONS));
+      }
     } else {
       setApplications(INITIAL_MOCK_APPLICATIONS);
       localStorage.setItem('recruit_applications', JSON.stringify(INITIAL_MOCK_APPLICATIONS));
