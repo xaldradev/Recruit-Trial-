@@ -23,7 +23,7 @@ export const translations = {
     
     // Quick Actions / Hero
     careerAdvisorTitle: "AROHI AI - Your Career Guide",
-    careerAdvisorDesc: "India's Unified Career & Business AI Guide. Talk or chat in English, Hindi, Odia, and 150+ languages!",
+    careerAdvisorDesc: "India's Unified Career & Business AI Guide. Talk or chat in 150+ languages globally and regionally!",
     searchPlaceholder: "Search jobs, skills, or state schemes...",
     searchBtn: "Search",
     
@@ -51,7 +51,7 @@ export const translations = {
     selectLang: "Select Language",
     
     // Multilingual Notice
-    multilingualNotice: "Now supporting English, Hindi (हिंदी), Odia (ଓଡ଼ିଆ), and 150+ languages perfectly!",
+    multilingualNotice: "Now supporting 150+ global & regional languages perfectly!",
     popupTip: "Pop-up Tip: If Google Sign-In windows get blocked or closed automatically in preview, please use the \"Open in New Tab\" button on the top-right of the screen to sign in perfectly.",
 
     // Welcome Landing & Categories
@@ -95,7 +95,7 @@ export const translations = {
     
     // Quick Actions / Hero
     careerAdvisorTitle: "आरोही एआई - आपकी करियर गाइड",
-    careerAdvisorDesc: "भारत की एकीकृत करियर और व्यवसाय एआई गाइड। अंग्रेजी, हिंदी, उड़िया और 150+ भाषाओं में बात या चैट करें!",
+    careerAdvisorDesc: "भारत की एकीकृत करियर और व्यवसाय एआई गाइड। 150+ वैश्विक और क्षेत्रीय भाषाओं में बात या चैट करें!",
     searchPlaceholder: "नौकरियां, कौशल, या राज्य योजनाओं की खोज करें...",
     searchBtn: "खोजें",
     
@@ -123,7 +123,7 @@ export const translations = {
     selectLang: "भाषा चुनें",
     
     // Multilingual Notice
-    multilingualNotice: "अब अंग्रेजी, हिंदी (हिंदी), उड़िया (ଓଡ଼ିଆ) और 150+ भाषाओं का पूर्ण समर्थन!",
+    multilingualNotice: "अब 150+ वैश्विक और क्षेत्रीय भाषाओं का पूर्ण समर्थन!",
     popupTip: "पॉप-अप टिप: यदि पूर्वावलोकन में गूगल साइन-इन विंडो अवरुद्ध या स्वचालित रूप से बंद हो जाती है, तो आसानी से साइन इन करने के लिए कृपया स्क्रीन के शीर्ष-दाईं ओर \"नया टैब खोलें\" बटन का उपयोग करें।",
 
     // Welcome Landing & Categories
@@ -167,7 +167,7 @@ export const translations = {
     
     // Quick Actions / Hero
     careerAdvisorTitle: "ଆରୋହୀ AI - ଆପଣଙ୍କ କ୍ୟାରିୟର ଗାଇଡ୍",
-    careerAdvisorDesc: "ଭାରତର ପ୍ରଥମ ଏକୀକୃତ କ୍ୟାରିୟର ଏବଂ ବ୍ୟବସାୟ ଏଆଇ ଗାଇଡ୍ | ଇଂରାଜୀ, ହିନ୍ଦୀ, ଓଡ଼ିଆ ଏବଂ ୧୫୦+ ଭାଷାରେ କଥା ହୁଅନ୍ତୁ!",
+    careerAdvisorDesc: "ଭାରତର ପ୍ରଥମ ଏକୀକୃତ କ୍ୟାରିୟର ଏବଂ ବ୍ୟବସାୟ ଏଆଇ ଗାଇଡ୍ | ୧୫୦+ ଗ୍ଲୋବାଲ୍ ଏବଂ ଆଞ୍ଚଳିକ ଭାଷାରେ କଥା ହୁଅନ୍ତୁ!",
     searchPlaceholder: "ଚାକିରି, ଦକ୍ଷତା କିମ୍ବା ସରକାରୀ ଯୋଜନା ଖୋଜନ୍ତୁ...",
     searchBtn: "ଖୋଜନ୍ତୁ",
     
@@ -195,7 +195,7 @@ export const translations = {
     selectLang: "ଭାଷା ବାଛନ୍ତୁ",
     
     // Multilingual Notice
-    multilingualNotice: "ବର୍ତ୍ତମାନ ଇଂରାଜୀ, ହିନ୍ଦୀ (हिंदी), ଓଡ଼ିଆ (ଓଡ଼ିଆ) ଏବଂ ୧୫୦+ ଭାଷାର ସମ୍ପୂର୍ଣ୍ଣ ସମର୍ଥନ!",
+    multilingualNotice: "ବର୍ତ୍ତମାନ ୧୫୦+ ଗ୍ଲୋବାଲ୍ ଏବଂ ଆଞ୍ଚଳିକ ଭାଷାର ସମ୍ପୂର୍ଣ୍ଣ ସମର୍ଥନ!",
     popupTip: "ପପ୍-ଅପ୍ ଟିପ୍: ଯଦି ଗୁଗୁଲ୍ ସାଇନ୍-ଇନ୍ ୱିଣ୍ଡୋ ବ୍ଲକ୍ ହୋଇଯାଏ, ଦୟାକରି ସାଇନ୍-ଇନ୍ କରିବା ପାଇଁ ସ୍କ୍ରିନର ଶୀର୍ଷ ଡାହାଣ ପାର୍ଶ୍ୱରେ ଥିବା \"Open in New Tab\" ବଟନ୍ ବ୍ୟବହାର କରନ୍ତୁ |",
 
     // Welcome Landing & Categories

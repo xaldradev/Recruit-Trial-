@@ -3689,6 +3689,14 @@ export default function App() {
         warningEnabled={warningEnabled}
       />
 
+      {/* Footer of recruit site */}
+      <div className="mt-16 mb-8 pt-8 border-t border-white/10 text-center text-xs font-bold text-slate-300 uppercase tracking-widest space-y-2 z-10 relative max-w-7xl mx-auto px-4 w-full">
+        <p className="text-slate-400 tracking-widest">© 2026 RECRUIT.ORG.IN • ALL RIGHTS RESERVED</p>
+        <p className="text-slate-200 font-semibold text-[10px] sm:text-xs tracking-wide">
+          Development and maintenance by <span className="text-cyan-400 font-extrabold">BRAGA TECHNOLOGIES PRIVATE LIMITED</span> IN ASSOCIATION WITH <span className="text-cyan-400 font-extrabold">ODITREE SERVICES</span>
+        </p>
+      </div>
+
       {/* Progressive Web App Install Suggestion Widget */}
       <PWAInstaller />
 

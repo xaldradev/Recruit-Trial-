@@ -1678,7 +1678,7 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
             <div className="mb-2 px-4 py-2 bg-rose-950/40 text-rose-200 text-xs font-extrabold rounded-lg flex items-center justify-between border border-rose-900/60 animate-pulse">
               <span className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-                AROHI Listening... Speak clearly in Hindi/English.
+                AROHI Listening... Speak in Odia (ଓଡ଼ିଆ), Hindi, English, or any language.
               </span>
               <button 
                 onClick={() => setRecording(false)} 

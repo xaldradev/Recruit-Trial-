@@ -55,6 +55,281 @@ interface WelcomeLandingProps {
   onQuickChat?: (prompt: string) => void;
 }
 
+const categoryColors: Record<string, {
+  border: string;
+  hoverBorder: string;
+  bg: string;
+  iconBg: string;
+  iconText: string;
+  selectedBg: string;
+  selectedBorder: string;
+  selectedText: string;
+  selectedGlow: string;
+  indicator: string;
+  badge: string;
+}> = {
+  students: {
+    border: 'border-indigo-500/25',
+    hoverBorder: 'hover:border-indigo-400/80',
+    bg: 'bg-indigo-950/20 hover:bg-indigo-950/40',
+    iconBg: 'bg-indigo-500/15 group-hover:bg-indigo-500/25',
+    iconText: 'text-indigo-400',
+    selectedBg: 'bg-gradient-to-r from-indigo-600/40 via-purple-600/30 to-blue-600/30',
+    selectedBorder: 'border-indigo-400',
+    selectedText: 'text-indigo-200',
+    selectedGlow: '0 0 25px rgba(99, 102, 241, 0.65)',
+    indicator: 'bg-indigo-400',
+    badge: 'STUDENT CORE'
+  },
+  teachers: {
+    border: 'border-emerald-500/25',
+    hoverBorder: 'hover:border-emerald-400/80',
+    bg: 'bg-emerald-950/20 hover:bg-emerald-950/40',
+    iconBg: 'bg-emerald-500/15 group-hover:bg-emerald-500/25',
+    iconText: 'text-emerald-400',
+    selectedBg: 'bg-gradient-to-r from-emerald-600/40 via-teal-600/30 to-green-600/30',
+    selectedBorder: 'border-emerald-400',
+    selectedText: 'text-emerald-200',
+    selectedGlow: '0 0 25px rgba(16, 185, 129, 0.65)',
+    indicator: 'bg-emerald-400',
+    badge: 'ACADEMIC HUBS'
+  },
+  parents: {
+    border: 'border-pink-500/25',
+    hoverBorder: 'hover:border-pink-400/80',
+    bg: 'bg-pink-950/20 hover:bg-pink-950/40',
+    iconBg: 'bg-pink-500/15 group-hover:bg-pink-500/25',
+    iconText: 'text-pink-400',
+    selectedBg: 'bg-gradient-to-r from-pink-600/40 via-rose-600/30 to-purple-600/30',
+    selectedBorder: 'border-pink-400',
+    selectedText: 'text-pink-200',
+    selectedGlow: '0 0 25px rgba(236, 72, 153, 0.65)',
+    indicator: 'bg-pink-400',
+    badge: 'FAMILY INSIGHTS'
+  },
+  scientists: {
+    border: 'border-cyan-500/25',
+    hoverBorder: 'hover:border-cyan-400/80',
+    bg: 'bg-cyan-950/20 hover:bg-cyan-950/40',
+    iconBg: 'bg-cyan-500/15 group-hover:bg-cyan-500/25',
+    iconText: 'text-cyan-400',
+    selectedBg: 'bg-gradient-to-r from-cyan-600/40 via-blue-600/30 to-teal-600/30',
+    selectedBorder: 'border-cyan-400',
+    selectedText: 'text-cyan-200',
+    selectedGlow: '0 0 25px rgba(6, 182, 212, 0.65)',
+    indicator: 'bg-cyan-400',
+    badge: 'HYPOTHESIS MAPPING'
+  },
+  researchers: {
+    border: 'border-blue-500/25',
+    hoverBorder: 'hover:border-blue-400/80',
+    bg: 'bg-blue-950/20 hover:bg-blue-950/40',
+    iconBg: 'bg-blue-500/15 group-hover:bg-blue-500/25',
+    iconText: 'text-blue-400',
+    selectedBg: 'bg-gradient-to-r from-blue-600/40 via-indigo-600/30 to-sky-600/30',
+    selectedBorder: 'border-blue-400',
+    selectedText: 'text-blue-200',
+    selectedGlow: '0 0 25px rgba(59, 130, 246, 0.65)',
+    indicator: 'bg-blue-400',
+    badge: 'DATA AUDITING'
+  },
+  doctors: {
+    border: 'border-rose-500/25',
+    hoverBorder: 'hover:border-rose-400/80',
+    bg: 'bg-rose-950/20 hover:bg-rose-950/40',
+    iconBg: 'bg-rose-500/15 group-hover:bg-rose-500/25',
+    iconText: 'text-rose-400',
+    selectedBg: 'bg-gradient-to-r from-rose-600/40 via-pink-600/30 to-orange-600/30',
+    selectedBorder: 'border-rose-400',
+    selectedText: 'text-rose-200',
+    selectedGlow: '0 0 25px rgba(244, 63, 94, 0.65)',
+    indicator: 'bg-rose-400',
+    badge: 'CLINICAL AIDS'
+  },
+  engineers: {
+    border: 'border-emerald-500/25',
+    hoverBorder: 'hover:border-emerald-400/80',
+    bg: 'bg-emerald-950/20 hover:bg-emerald-950/40',
+    iconBg: 'bg-emerald-500/15 group-hover:bg-emerald-500/25',
+    iconText: 'text-emerald-400',
+    selectedBg: 'bg-gradient-to-r from-emerald-600/40 via-green-600/30 to-cyan-600/30',
+    selectedBorder: 'border-emerald-400',
+    selectedText: 'text-emerald-200',
+    selectedGlow: '0 0 25px rgba(16, 185, 129, 0.65)',
+    indicator: 'bg-emerald-400',
+    badge: 'DEV OPERATIONS'
+  },
+  entrepreneurs: {
+    border: 'border-amber-500/25',
+    hoverBorder: 'hover:border-amber-400/80',
+    bg: 'bg-amber-950/20 hover:bg-amber-950/40',
+    iconBg: 'bg-amber-500/15 group-hover:bg-amber-500/25',
+    iconText: 'text-amber-400',
+    selectedBg: 'bg-gradient-to-r from-amber-600/40 via-orange-600/30 to-yellow-600/30',
+    selectedBorder: 'border-amber-400',
+    selectedText: 'text-amber-200',
+    selectedGlow: '0 0 25px rgba(245, 158, 11, 0.65)',
+    indicator: 'bg-amber-400',
+    badge: 'BUSINESS SCALE'
+  },
+  jobSeeker: {
+    border: 'border-teal-500/25',
+    hoverBorder: 'hover:border-teal-400/80',
+    bg: 'bg-teal-950/20 hover:bg-teal-950/40',
+    iconBg: 'bg-teal-500/15 group-hover:bg-teal-500/25',
+    iconText: 'text-teal-400',
+    selectedBg: 'bg-gradient-to-r from-teal-600/40 via-emerald-600/30 to-cyan-600/30',
+    selectedBorder: 'border-teal-400',
+    selectedText: 'text-teal-200',
+    selectedGlow: '0 0 25px rgba(20, 184, 166, 0.65)',
+    indicator: 'bg-teal-400',
+    badge: 'ACTIVE BOARDS'
+  },
+  professionals: {
+    border: 'border-violet-500/25',
+    hoverBorder: 'hover:border-violet-400/80',
+    bg: 'bg-violet-950/20 hover:bg-violet-950/40',
+    iconBg: 'bg-violet-500/15 group-hover:bg-violet-500/25',
+    iconText: 'text-violet-400',
+    selectedBg: 'bg-gradient-to-r from-violet-600/40 via-purple-600/30 to-indigo-600/30',
+    selectedBorder: 'border-violet-400',
+    selectedText: 'text-violet-200',
+    selectedGlow: '0 0 25px rgba(139, 92, 246, 0.65)',
+    indicator: 'bg-violet-400',
+    badge: 'CAREER PATH'
+  },
+  businesses: {
+    border: 'border-teal-500/25',
+    hoverBorder: 'hover:border-teal-400/80',
+    bg: 'bg-teal-950/20 hover:bg-teal-950/40',
+    iconBg: 'bg-teal-500/15 group-hover:bg-teal-500/25',
+    iconText: 'text-teal-400',
+    selectedBg: 'bg-gradient-to-r from-teal-600/40 via-cyan-600/30 to-indigo-600/30',
+    selectedBorder: 'border-teal-400',
+    selectedText: 'text-teal-200',
+    selectedGlow: '0 0 25px rgba(20, 184, 166, 0.65)',
+    indicator: 'bg-teal-400',
+    badge: 'WORKFLOW HUBS'
+  },
+  govAspirant: {
+    border: 'border-sky-500/25',
+    hoverBorder: 'hover:border-sky-400/80',
+    bg: 'bg-sky-950/20 hover:bg-sky-950/40',
+    iconBg: 'bg-sky-500/15 group-hover:bg-sky-500/25',
+    iconText: 'text-sky-400',
+    selectedBg: 'bg-gradient-to-r from-sky-600/40 via-blue-600/30 to-indigo-600/30',
+    selectedBorder: 'border-sky-400',
+    selectedText: 'text-sky-200',
+    selectedGlow: '0 0 25px rgba(14, 165, 233, 0.65)',
+    indicator: 'bg-sky-400',
+    badge: 'CIVIL EXAMS'
+  },
+  universities: {
+    border: 'border-pink-500/25',
+    hoverBorder: 'hover:border-pink-400/80',
+    bg: 'bg-pink-950/20 hover:bg-pink-950/40',
+    iconBg: 'bg-pink-500/15 group-hover:bg-pink-500/25',
+    iconText: 'text-pink-400',
+    selectedBg: 'bg-gradient-to-r from-pink-600/40 via-fuchsia-600/30 to-violet-600/30',
+    selectedBorder: 'border-pink-400',
+    selectedText: 'text-pink-200',
+    selectedGlow: '0 0 25px rgba(236, 72, 153, 0.65)',
+    indicator: 'bg-pink-400',
+    badge: 'ACADEMIC PORTALS'
+  },
+  organizations: {
+    border: 'border-purple-500/25',
+    hoverBorder: 'hover:border-purple-400/80',
+    bg: 'bg-purple-950/20 hover:bg-purple-950/40',
+    iconBg: 'bg-purple-500/15 group-hover:bg-purple-500/25',
+    iconText: 'text-purple-400',
+    selectedBg: 'bg-gradient-to-r from-purple-600/40 via-indigo-600/30 to-blue-600/30',
+    selectedBorder: 'border-purple-400',
+    selectedText: 'text-purple-200',
+    selectedGlow: '0 0 25px rgba(168, 85, 247, 0.65)',
+    indicator: 'bg-purple-400',
+    badge: 'CROSS-TEAM FLOW'
+  },
+  aliens: {
+    border: 'border-lime-500/25',
+    hoverBorder: 'hover:border-lime-400/80',
+    bg: 'bg-lime-950/20 hover:bg-lime-950/40',
+    iconBg: 'bg-lime-500/15 group-hover:bg-lime-500/25',
+    iconText: 'text-lime-400',
+    selectedBg: 'bg-gradient-to-r from-lime-600/40 via-emerald-600/30 to-green-600/30',
+    selectedBorder: 'border-lime-400',
+    selectedText: 'text-lime-200',
+    selectedGlow: '0 0 25px rgba(132, 204, 22, 0.65)',
+    indicator: 'bg-lime-400',
+    badge: 'QUANTUM COMM'
+  },
+  marsCitizens: {
+    border: 'border-red-500/25',
+    hoverBorder: 'hover:border-red-400/80',
+    bg: 'bg-red-950/20 hover:bg-red-950/40',
+    iconBg: 'bg-red-500/15 group-hover:bg-red-500/25',
+    iconText: 'text-red-400',
+    selectedBg: 'bg-gradient-to-r from-red-600/40 via-orange-600/30 to-amber-600/30',
+    selectedBorder: 'border-red-400',
+    selectedText: 'text-red-200',
+    selectedGlow: '0 0 25px rgba(239, 68, 68, 0.65)',
+    indicator: 'bg-red-400',
+    badge: 'COLONY SYSTEMS'
+  },
+  jupiterCitizens: {
+    border: 'border-amber-500/25',
+    hoverBorder: 'hover:border-amber-400/80',
+    bg: 'bg-amber-950/20 hover:bg-amber-950/40',
+    iconBg: 'bg-amber-500/15 group-hover:bg-amber-500/25',
+    iconText: 'text-amber-400',
+    selectedBg: 'bg-gradient-to-r from-amber-600/40 via-orange-600/30 to-yellow-600/30',
+    selectedBorder: 'border-amber-400',
+    selectedText: 'text-amber-200',
+    selectedGlow: '0 0 25px rgba(245, 158, 11, 0.65)',
+    indicator: 'bg-amber-400',
+    badge: 'JOVIAN SYSTEMS'
+  },
+  govOfficials: {
+    border: 'border-orange-500/25',
+    hoverBorder: 'hover:border-orange-400/80',
+    bg: 'bg-orange-950/20 hover:bg-orange-950/40',
+    iconBg: 'bg-orange-500/15 group-hover:bg-orange-500/25',
+    iconText: 'text-orange-400',
+    selectedBg: 'bg-gradient-to-r from-orange-600/40 via-amber-600/30 to-yellow-600/30',
+    selectedBorder: 'border-orange-400',
+    selectedText: 'text-orange-200',
+    selectedGlow: '0 0 25px rgba(249, 115, 22, 0.65)',
+    indicator: 'bg-orange-400',
+    badge: 'POLICY AUDITS'
+  },
+  privateOfficials: {
+    border: 'border-teal-500/25',
+    hoverBorder: 'hover:border-teal-400/80',
+    bg: 'bg-teal-950/20 hover:bg-teal-950/40',
+    iconBg: 'bg-teal-500/15 group-hover:bg-teal-500/25',
+    iconText: 'text-teal-400',
+    selectedBg: 'bg-gradient-to-r from-teal-600/40 via-sky-600/30 to-blue-600/30',
+    selectedBorder: 'border-teal-400',
+    selectedText: 'text-teal-200',
+    selectedGlow: '0 0 25px rgba(20, 184, 166, 0.65)',
+    indicator: 'bg-teal-400',
+    badge: 'CORPORATE STEER'
+  },
+  humans: {
+    border: 'border-fuchsia-500/25',
+    hoverBorder: 'hover:border-fuchsia-400/80',
+    bg: 'bg-fuchsia-950/20 hover:bg-fuchsia-950/40',
+    iconBg: 'bg-fuchsia-500/15 group-hover:bg-fuchsia-500/25',
+    iconText: 'text-fuchsia-400',
+    selectedBg: 'bg-gradient-to-r from-fuchsia-600/40 via-purple-600/30 to-pink-600/30',
+    selectedBorder: 'border-fuchsia-400',
+    selectedText: 'text-fuchsia-200',
+    selectedGlow: '0 0 25px rgba(217, 70, 239, 0.65)',
+    indicator: 'bg-fuchsia-400',
+    badge: 'HUMAN POTENTIAL'
+  },
+};
+
 interface InteractiveBubbleProps {
   id: string;
   key?: any;
@@ -78,6 +353,8 @@ function InteractiveBubble({ id, cat, isSelected, onClick, index }: InteractiveB
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [clickParticles, setClickParticles] = useState<{ id: number; x: number; y: number; size: number; color: string; targetX: number; targetY: number }[]>([]);
   const particleIdCounter = useRef(0);
+
+  const cTheme = categoryColors[cat.key] || categoryColors.students;
 
   // Magnetic Pull on Mouse Move
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -175,10 +452,10 @@ function InteractiveBubble({ id, cat, isSelected, onClick, index }: InteractiveB
           scale: isSelected ? 1.05 : 1,
         }}
         whileHover={{
-          scale: 1.03,
+          scale: 1.04,
           boxShadow: isSelected 
-            ? "0 0 25px rgba(0, 229, 255, 0.5)" 
-            : "0 0 15px rgba(0, 229, 255, 0.2)",
+            ? cTheme.selectedGlow 
+            : `0 0 20px rgba(255, 255, 255, 0.08)`,
         }}
         whileTap={{
           scale: 0.94,
@@ -190,32 +467,53 @@ function InteractiveBubble({ id, cat, isSelected, onClick, index }: InteractiveB
           damping: 12,
           mass: 0.5
         }}
-        className={`relative flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl border transition-colors duration-300 cursor-pointer text-left w-full justify-start overflow-hidden select-none ${
+        className={`relative flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer text-left w-full justify-start overflow-hidden select-none group ${
           isSelected 
-            ? 'bg-gradient-to-r from-[#005cff]/35 via-[#7c3aed]/20 to-[#005cff]/20 border-cyan-400 text-white shadow-[0_0_20px_rgba(0,229,255,0.45)]'
-            : 'bg-[#120d2a]/85 border-[#211b3d] text-slate-300 hover:border-cyan-500/45 hover:bg-[#161036]'
+            ? `${cTheme.selectedBg} ${cTheme.selectedBorder} text-white`
+            : `bg-gradient-to-br from-[#120d2a]/95 to-[#08051a]/95 ${cTheme.border} ${cTheme.hoverBorder} text-slate-200 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(255,255,255,0.05)]`
         }`}
+        style={{
+          boxShadow: isSelected ? cTheme.selectedGlow : undefined
+        }}
       >
         {/* Background bubble sheen overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none opacity-40 rounded-2xl"></div>
         
         {/* 3D highlight edge mimicking user's screenshot */}
         <div className={`absolute top-0 left-0 right-0 h-[1.5px] rounded-full pointer-events-none ${
-          isSelected ? 'bg-gradient-to-r from-transparent via-cyan-300 to-transparent opacity-80' : 'bg-gradient-to-r from-transparent via-slate-600 to-transparent opacity-40'
+          isSelected 
+            ? 'bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-90' 
+            : `bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-40 group-hover:via-white/40 transition-all`
         }`}></div>
 
-        <div className={`p-1.5 sm:p-2 rounded-xl shrink-0 transition-colors duration-300 ${
+        <div className={`p-1.5 sm:p-2 rounded-xl shrink-0 transition-all duration-300 ${
           isSelected 
-            ? 'bg-cyan-500/25 text-cyan-300 border border-cyan-400/40 shadow-[0_0_10px_rgba(0,229,255,0.3)]' 
-            : 'bg-slate-800/45 text-slate-400 border border-transparent'
+            ? 'bg-white/20 text-white border border-white/40 shadow-[0_0_12px_rgba(255,255,255,0.4)] scale-110' 
+            : `${cTheme.iconBg} ${cTheme.iconText} border border-transparent group-hover:scale-105`
         }`}>
-          <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isSelected ? 'animate-pulse' : ''}`} />
+          <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform ${isSelected ? 'animate-bounce' : 'group-hover:rotate-12'}`} />
         </div>
         
         <div className="flex flex-col">
-          <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest leading-snug">{cat.label}</span>
-          <span className="hidden sm:inline-block text-[8px] text-slate-400 uppercase tracking-widest font-semibold mt-0.5 opacity-80">
-            {cat.key === 'schoolStudent' ? 'Syllabus Core' : cat.key === 'govAspirant' ? 'Gov Exams' : 'Active Channel'}
+          <span className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-widest leading-snug transition-colors ${
+            isSelected ? 'text-white' : 'text-slate-100 group-hover:text-white'
+          }`}>{cat.label}</span>
+          <span className={`hidden sm:inline-block text-[8px] uppercase tracking-widest font-bold mt-0.5 opacity-90 transition-colors ${
+            isSelected ? 'text-white/80' : `${cTheme.iconText}`
+          }`}>
+            {cTheme.badge}
+          </span>
+        </div>
+
+        {/* Pulsing colored indicator dot on the right */}
+        <div className="ml-auto flex items-center justify-center pl-1">
+          <span className="relative flex h-2 w-2">
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+              isSelected ? 'bg-white' : cTheme.indicator
+            }`}></span>
+            <span className={`relative inline-flex rounded-full h-2 w-2 ${
+              isSelected ? 'bg-white' : cTheme.indicator
+            }`}></span>
           </span>
         </div>
 
@@ -516,7 +814,7 @@ export default function WelcomeLanding({
   ];
 
   return (
-    <div className="relative w-full bg-[#020208] text-white overflow-x-hidden font-sans select-none pb-12">
+    <div className="relative w-full bg-[#020208] text-white overflow-x-hidden font-sans select-none pb-32">
       
       {/* Dynamic Keyframes Styling for Orbit Nodes */}
       <style>{`
@@ -634,6 +932,16 @@ export default function WelcomeLanding({
           <p className="text-[11px] sm:text-xs md:text-sm font-black tracking-[0.3em] uppercase mt-2 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 drop-shadow-[0_0_12px_rgba(6,182,212,0.2)]">
             Dream • Prepare • Achieve
           </p>
+
+          <div className="inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-[#120d2a]/85 border border-[#7c3aed]/40 text-purple-200 px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-extrabold tracking-wider shadow-[0_4px_20px_rgba(124,58,237,0.15)] mt-4 backdrop-blur-sm uppercase select-none">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00e5ff] opacity-80"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00e5ff]"></span>
+            </span>
+            <span>NATIVE ODIA / ଓଡ଼ିଆ FULLY ACTIVE & OPTIMIZED</span>
+            <span className="text-slate-500 font-normal">|</span>
+            <span className="text-cyan-400 font-extrabold">150+ LANGUAGES CHAT & CALL</span>
+          </div>
         </div>
 
         {/* Desktop 3D Bubble Layout Container (Hidden on Mobile) */}
@@ -870,8 +1178,14 @@ export default function WelcomeLanding({
             </div>
           </div>
 
+        </div>
 
-
+        {/* Footer of recruit site */}
+        <div className="mt-16 pt-8 border-t border-white/10 text-center text-xs font-bold text-slate-300 uppercase tracking-widest space-y-2 z-10 relative">
+          <p className="text-slate-400 tracking-widest">© 2026 RECRUIT.ORG.IN • ALL RIGHTS RESERVED</p>
+          <p className="text-slate-200 font-semibold text-[10px] sm:text-xs tracking-wide">
+            Development and maintenance by <span className="text-cyan-400 font-extrabold">BRAGA TECHNOLOGIES PRIVATE LIMITED</span> IN ASSOCIATION WITH <span className="text-cyan-400 font-extrabold">ODITREE SERVICES</span>
+          </p>
         </div>
 
       </section>

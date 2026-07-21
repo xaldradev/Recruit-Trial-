@@ -487,7 +487,7 @@ export default function ArohiVoiceCall({ onClose, language = 'en', onNavigateTab
           {status === 'listening' && (
             <div>
               <p className="text-sm sm:text-lg font-black tracking-wide text-emerald-400">AROHI is Listening...</p>
-              <p className="text-[10px] sm:text-xs text-slate-300 font-bold mt-0.5 sm:mt-1">Speak in English, Hindi, Odia, and 150+ languages</p>
+              <p className="text-[10px] sm:text-xs text-slate-300 font-bold mt-0.5 sm:mt-1">Speak in <span className="text-cyan-400 font-extrabold">Odia (ଓଡ଼ିଆ)</span>, Hindi, English, or any of 150+ global languages</p>
             </div>
           )}
 

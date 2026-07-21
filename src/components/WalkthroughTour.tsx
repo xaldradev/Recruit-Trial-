@@ -254,7 +254,7 @@ export default function WalkthroughTour({ activeTab, setActiveTab, isOpen, onClo
         const messages = [
           { sender: 'user', text: 'Any Mudra Loans for software startups?' },
           { sender: 'arohi', text: 'Yes! Under Shishu/Kishor Mudra, get up to ₹5 Lakhs at low interest. No collateral needed!' },
-          { sender: 'arohi', text: 'I can help draft your business profile plan now in English, Odia, or Hindi!' }
+          { sender: 'arohi', text: 'I can help draft your business profile plan now in any language of your choice!' }
         ];
         return (
           <div className="flex flex-col h-full justify-between p-2">
