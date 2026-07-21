@@ -830,6 +830,36 @@ export default function WelcomeLanding({
           0% { transform: rotate(360deg); }
           100% { transform: rotate(0deg); }
         }
+        @keyframes grid-slide {
+          0% { background-position: 0 0; }
+          100% { background-position: 0 80px; }
+        }
+        @keyframes scanline-move {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100%); }
+        }
+        @keyframes nebula-drift-slow {
+          0%, 100% { transform: translate(0px, 0px) scale(1) rotate(0deg); opacity: 0.4; }
+          33% { transform: translate(40px, -30px) scale(1.15) rotate(120deg); opacity: 0.55; }
+          66% { transform: translate(-30px, 50px) scale(0.9) rotate(240deg); opacity: 0.35; }
+        }
+        @keyframes nebula-drift-medium {
+          0%, 100% { transform: translate(0px, 0px) scale(1.1) rotate(360deg); opacity: 0.35; }
+          50% { transform: translate(-50px, 40px) scale(0.85) rotate(180deg); opacity: 0.5; }
+        }
+        @keyframes shooting-star-fly {
+          0% { transform: translate(100vw, -10vh) rotate(-45deg) scale(0); opacity: 0; }
+          1% { opacity: 1; }
+          8% { transform: translate(-20vw, 110vh) rotate(-45deg) scale(1.5); opacity: 0; }
+          100% { transform: translate(-20vw, 110vh) rotate(-45deg) scale(0); opacity: 0; }
+        }
+        @keyframes space-dust-drift {
+          0% { transform: translateY(100vh) translateX(0) scale(0.5); opacity: 0; }
+          10% { opacity: 0.8; }
+          90% { opacity: 0.8; }
+          100% { transform: translateY(-10vh) translateX(50px) scale(1.2); opacity: 0; }
+        }
+        
         .animate-float-orbit {
           animation: float-orbit 6s ease-in-out infinite;
         }
@@ -839,19 +869,79 @@ export default function WelcomeLanding({
         .animate-rotate-concentric-reverse {
           animation: rotate-concentric-reverse 35s linear infinite;
         }
+        .animated-grid {
+          background-image: linear-gradient(rgba(124, 58, 237, 0.04) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
+          background-size: 40px 40px;
+          animation: grid-slide 12s linear infinite;
+        }
+        .animated-scanline {
+          background: linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(0, 229, 255, 0.01) 30%,
+            rgba(0, 229, 255, 0.04) 50%,
+            rgba(0, 229, 255, 0.01) 70%,
+            transparent 100%
+          );
+          animation: scanline-move 14s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .animate-nebula-1 {
+          animation: nebula-drift-slow 22s ease-in-out infinite;
+        }
+        .animate-nebula-2 {
+          animation: nebula-drift-medium 28s ease-in-out infinite;
+        }
+        .animate-nebula-3 {
+          animation: nebula-drift-slow 34s ease-in-out infinite;
+          animation-delay: -5s;
+        }
+        .animate-star-1 { animation: shooting-star-fly 14s linear infinite; animation-delay: 1s; }
+        .animate-star-2 { animation: shooting-star-fly 18s linear infinite; animation-delay: 5s; }
+        .animate-star-3 { animation: shooting-star-fly 22s linear infinite; animation-delay: 10s; }
+        .animate-star-4 { animation: shooting-star-fly 15s linear infinite; animation-delay: 3s; }
+        .animate-star-5 { animation: shooting-star-fly 25s linear infinite; animation-delay: 12s; }
+        
+        .animate-dust-1 { animation: space-dust-drift 18s linear infinite; }
+        .animate-dust-2 { animation: space-dust-drift 24s linear infinite; animation-delay: -6s; }
+        .animate-dust-3 { animation: space-dust-drift 30s linear infinite; animation-delay: -12s; }
+        .animate-dust-4 { animation: space-dust-drift 21s linear infinite; animation-delay: -3s; }
+        .animate-dust-5 { animation: space-dust-drift 27s linear infinite; animation-delay: -18s; }
       `}</style>
 
       {/* 1. Backdrop Stars and Plasma Clouds */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[5%] left-[-15%] w-[60%] h-[500px] bg-gradient-to-tr from-[#7c3aed]/10 via-[#3b82f6]/5 to-transparent rotate-12 blur-[140px] rounded-full"></div>
-        <div className="absolute top-[35%] right-[-15%] w-[60%] h-[500px] bg-gradient-to-bl from-[#ec4899]/8 via-[#7c3aed]/5 to-transparent -rotate-12 blur-[140px] rounded-full"></div>
-        <div className="absolute bottom-[10%] left-[-10%] w-[50%] h-[400px] bg-gradient-to-tr from-[#00e676]/5 via-[#3b82f6]/5 to-transparent blur-[120px] rounded-full"></div>
+        {/* Futuristic Sci-fi Grid */}
+        <div className="absolute inset-0 animated-grid opacity-[0.45] mix-blend-color-dodge"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#020208]/60 to-[#020208]"></div>
         
-        {/* Soft floating dots */}
+        {/* Holographic Scanline bar */}
+        <div className="absolute inset-0 animated-scanline mix-blend-screen"></div>
+
+        {/* Dynamic Plasma/Nebula Clouds */}
+        <div className="absolute top-[5%] left-[-15%] w-[65%] h-[600px] bg-gradient-to-tr from-[#7c3aed]/20 via-[#3b82f6]/10 to-transparent blur-[140px] rounded-full animate-nebula-1"></div>
+        <div className="absolute top-[35%] right-[-15%] w-[65%] h-[600px] bg-gradient-to-bl from-[#ec4899]/15 via-[#7c3aed]/8 to-transparent blur-[140px] rounded-full animate-nebula-2"></div>
+        <div className="absolute bottom-[10%] left-[-10%] w-[55%] h-[500px] bg-gradient-to-tr from-[#00e5ff]/12 via-[#3b82f6]/8 to-transparent blur-[120px] rounded-full animate-nebula-3"></div>
+        
+        {/* Cosmic Shooting Stars (Diagonal laser trails) */}
+        <div className="absolute top-0 right-0 w-[2px] h-[100px] bg-gradient-to-b from-transparent via-cyan-400 to-transparent animate-star-1 opacity-0 mix-blend-screen shadow-[0_0_12px_#00e5ff]"></div>
+        <div className="absolute top-0 right-0 w-[1.5px] h-[150px] bg-gradient-to-b from-transparent via-purple-400 to-transparent animate-star-2 opacity-0 mix-blend-screen shadow-[0_0_12px_#7c3aed]"></div>
+        <div className="absolute top-0 right-0 w-[2px] h-[80px] bg-gradient-to-b from-transparent via-pink-400 to-transparent animate-star-3 opacity-0 mix-blend-screen shadow-[0_0_12px_#ec4899]"></div>
+        <div className="absolute top-0 right-0 w-[1.5px] h-[120px] bg-gradient-to-b from-transparent via-emerald-400 to-transparent animate-star-4 opacity-0 mix-blend-screen shadow-[0_0_12px_#10b981]"></div>
+        <div className="absolute top-0 right-0 w-[2px] h-[90px] bg-gradient-to-b from-transparent via-cyan-300 to-transparent animate-star-5 opacity-0 mix-blend-screen shadow-[0_0_12px_#06b6d4]"></div>
+
+        {/* Slow drifting Space Dust particles */}
+        <div className="absolute left-[8%] w-1.5 h-1.5 bg-cyan-400 rounded-full animate-dust-1 blur-[0.5px]"></div>
+        <div className="absolute left-[24%] w-1 h-1 bg-purple-400 rounded-full animate-dust-2 blur-[0.5px]"></div>
+        <div className="absolute left-[48%] w-2 h-2 bg-pink-400/70 rounded-full animate-dust-3 blur-[1px]"></div>
+        <div className="absolute left-[68%] w-1 h-1 bg-blue-400 rounded-full animate-dust-4"></div>
+        <div className="absolute left-[88%] w-1.5 h-1.5 bg-emerald-400/80 rounded-full animate-dust-5 blur-[0.5px]"></div>
+        
+        {/* Constant subtle starry sparkle in grid corners */}
         <div className="absolute top-24 left-[15%] w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping" style={{ animationDuration: '6s' }}></div>
         <div className="absolute top-48 right-[18%] w-1 h-1 bg-purple-400 rounded-full animate-ping" style={{ animationDuration: '8s' }}></div>
-        <div className="absolute bottom-64 left-[25%] w-1.5 h-1.5 bg-pink-500/20 rounded-full animate-pulse" style={{ animationDuration: '4s' }}></div>
-        <div className="absolute bottom-24 right-[10%] w-2 h-2 bg-emerald-400/20 rounded-full animate-pulse" style={{ animationDuration: '5s' }}></div>
+        <div className="absolute bottom-64 left-[25%] w-1.5 h-1.5 bg-pink-500/30 rounded-full animate-pulse" style={{ animationDuration: '4s' }}></div>
+        <div className="absolute bottom-24 right-[10%] w-2 h-2 bg-emerald-400/30 rounded-full animate-pulse" style={{ animationDuration: '5s' }}></div>
       </div>
 
       {/* 2. Top Header Navigation (Nav) */}

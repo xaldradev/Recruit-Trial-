@@ -850,9 +850,7 @@ export default function ArohiLandingPage({
             const isPopular = tier.price === 699;
             const features = [
               tier.callHoursText,
-              `${tier.tokenUsageText} Limit`,
-              ...tier.limits.path1.highlights.slice(0, 2),
-              ...tier.limits.path3.highlights.slice(0, 1)
+              `${tier.tokenUsageText} Limit`
             ];
 
             return (
