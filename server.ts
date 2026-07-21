@@ -2154,14 +2154,13 @@ Response Guidelines:
 
 ============================================================
 
-You can assist with:
-1. Career Guidance (career counselling, roadmap generation, skill gap analysis, upskilling, education planning, future career predictions).
-2. Job Assistance (job discovery, resume review, ATS optimization, interview preparation, salary guidance).
-3. Business Guidance (MSME guidance, startup support, business idea validation, business planning, market insights, funding awareness, growth roadmaps).
-4. Government Schemes (discovering student/farmer/women/MSME central & state schemes, eligibility analysis, document requirements, application guidance).
-5. Learning Guidance (course recommendations, certification pathways, skill development).
+You are an expert AI Opportunity & Growth Guide, fully prepared to assist all 20+ specialized audience categories:
+- Students, Teachers, Parents, Scientists, Researchers, Doctors, Engineers, Entrepreneurs, Job Seekers, Professionals, Businesses, MSMEs, Govt. Aspirants, Universities, Organizations, Aliens, Citizens of Mars, Citizens of Jupiter, and Govt./Private Officials.
 
-Always speak as AROHI. Introduce yourself proudly and offer helpful, positive advice centered on Indian career and economic advancement.`;
+When greeting a user, always align your tone with your official welcoming note:
+"Namaste! Welcome to Recruit.org.in. I am Arohi, your AI Opportunity & Growth Guide. Whether you are a student, teacher, doctor, scientist, government aspirant, parent, entrepreneur, or running an MSME, organization, or enterprise—or even if you're a citizen of Mars or Jupiter!—I am here to guide you in 150+ languages with voice calls. How can I empower you and fuel your journey today?"
+
+Always speak as AROHI. Introduce yourself proudly and offer helpful, positive, and deeply tailored advice centered on universal advancement, career development, educational planning, business setup, and space/cosmic curiosity.`;
 
 // 1. Chat with AROHI Endpoint
 app.post('/api/chat', async (req, res) => {
@@ -3532,19 +3531,19 @@ function logWsEvent(event: string, data: any) {
 
 const SEO_TRANSLATIONS: Record<string, { title: string; description: string; keywords: string }> = {
   en: {
-    title: "Recruit.org.in - India’s Next-Gen Career, Job, and MSME Growth Engine",
-    description: "Empowering India's students, young professionals, and MSMEs. Get live career guidance from AI assistant Arohi, dynamic resume analysis, mock interviews, job postings, and Udyam business assistance.",
-    keywords: "recruit.org.in, career guidance India, AI career coach, resume score India, mock interview simulator, MSME Udyam registration, private sector jobs, student career advisor, recruitment portal, Sarkari job guide"
+    title: "Recruit.org.in - India's #1 Multilingual Career & MSME Engine | AI Voice Guide in 150+ Languages for Students, Teachers, Doctors, and Businesses",
+    description: "Empowering India's 20+ core user tags (Students, Teachers, Parents, Scientists, Researchers, Doctors, Engineers, Entrepreneurs, Job Seekers, Professionals, Businesses, MSMEs, Govt. Aspirants, Universities, Organizations, Aliens, Mars & Jupiter Citizens, Govt. & Private Officials, Humans). Connect with AI assistant Arohi via dynamic voice calling in 150+ regional languages (English, Hindi, Odia, etc.). Get resume analysis, mock interviews, job boards, business setups, and government schemes assistance.",
+    keywords: "recruit.org.in, career guidance India, AI career coach, resume score India, mock interview simulator, MSME Udyam registration, private sector jobs, student career advisor, recruitment portal, Sarkari job guide, voice call in Hindi, Odia, Bengali, Tamil, Telugu, Marathi, Kannada, Malayalam, Gujarati, Punjabi, Assamese, Urdu, 150 languages, students, teachers, parents, scientists, researchers, doctors, engineers, entrepreneurs, jobSeekers, professionals, businesses, govAspirant, universities, organizations, aliens, marsCitizens, jupiterCitizens, govOfficials, privateOfficials, humans"
   },
   hi: {
-    title: "Recruit.org.in - भारत का अगला पीढ़ी का करियर, नौकरी और एमएसएमई विकास इंजन",
-    description: "भारत के छात्रों, युवा पेशेवरों और एमएसएमई को सशक्त बनाना। एआई सहायक आरोही से लाइव करियर मार्गदर्शन, रेज़्यूमे विश्लेषण, मॉक इंटरव्यू, नौकरी पोस्टिंग और उद्यम व्यावसायिक सहायता प्राप्त करें।",
-    keywords: "रिक्रूट भारत, करियर मार्गदर्शन, एआई करियर कोच, रेज़्यूमे स्कोर, मॉक इंटरव्यू सिम्युलेटर, एमएसएमई उद्यम पंजीकरण, प्राइवेट नौकरियां, सरकारी नौकरी गाइड, रोजगार समाचार"
+    title: "Recruit.org.in - भारत का नंबर 1 बहुभाषी करियर और एमएसएमई इंजन | छात्रों, शिक्षकों, डॉक्टरों और व्यवसायों के लिए 150+ भाषाओं में एआई वॉयस कॉल",
+    description: "भारत के 20+ प्रमुख उपयोगकर्ता श्रेणियों (छात्रों, शिक्षकों, अभिभावकों, वैज्ञानिकों, शोधकर्ताओं, डॉक्टरों, इंजीनियरों, उद्यमियों, नौकरी चाहने वालों, पेशेवरों, व्यवसायों, एमएसएमई, सरकारी उम्मीदवारों, विश्वविद्यालयों, संगठनों, एलियंस, मंगल और बृहस्पति के नागरिकों, सरकारी और निजी अधिकारियों, मनुष्यों) को सशक्त बनाना। एआई सहायक आरोही से 150+ क्षेत्रीय भाषाओं (हिंदी, अंग्रेजी, ओड़िया, आदि) में सीधे वॉयस कॉल द्वारा बात करें। रेज़्यूमे विश्लेषण, मॉक इंटरव्यू, जॉब बोर्ड, बिजनेस सेटअप और सरकारी योजनाओं का लाभ उठाएं।",
+    keywords: "करियर मार्गदर्शन, एआई करियर कोच, रेज़्यूमे स्कोर, मॉक इंटरव्यू, एमएसएमई पंजीकरण, प्राइवेट नौकरियां, सरकारी नौकरी गाइड, हिंदी वॉयस कॉल, ओड़िया वॉयस कॉल, स्टूडेंट्स, टीचर्स, पेरेंट्स, साइंटिस्ट, रिसर्चर, डॉक्टर, इंजीनियर, एंटरप्रेन्योर, जॉब सीकर, प्रोफेशनल, बिजनेस, सरकारी एस्पिरेंट, यूनिवर्सिटी, आर्गेनाइजेशन, एलियन, मार्स सिटीजन, जुपिटर सिटीजन, गवर्नमेंट ऑफिसर, प्राइवेट ऑफिसर, ह्यूमन, 150+ भाषाएं"
   },
   or: {
-    title: "Recruit.org.in - ଓଡ଼ିଶା ଏବଂ ଭାରତର ପରବର୍ତ୍ତୀ ପିଢିର କ୍ୟାରିୟର, ଚାକିରି ଏବଂ MSME ବିକାଶ ପୋର୍ଟାଲ୍",
-    description: "ଭାରତର ଛାତ୍ର, ଯୁବ ପେସାଦାର ଓ ଏମଏସଏମଇ (MSME) ମାନଙ୍କୁ ସଶକ୍ତ କରିବା | AI ସହାୟକ ଆରୋହୀଙ୍କ ଠାରୁ କ୍ୟାରିୟର ପରାମର୍ଶ, ରେଜୁମେ ବିଶ୍ଳେଷଣ, ମକ୍ ଇଣ୍ଟରଭ୍ୟୁ ଏବଂ ସରକାରୀ ଯୋଜନା ସହାୟତା ପାଆନ୍ତୁ |",
-    keywords: "ଚାକିରି ସୂଚନା, ଓଡ଼ିଶା ଚାକିରି, କ୍ୟାରିୟର ଗାଇଡ୍, ଏଆଇ ଆରୋହୀ, ରେଜୁମେ ସ୍କୋਰ, ମକ୍ ଇଣ୍ଟରଭ୍ୟୁ, ସରକାରୀ ଯୋଜନା, ଏମଏସଏମଇ ପଞ୍ଜୀକରଣ, ଓଡ଼ିଆରେ କ୍ୟାରିୟର"
+    title: "Recruit.org.in - ଭାରତର ନଂ-୧ ବହୁଭାଷୀ କ୍ୟାରିୟର ଏବଂ MSME ଇଞ୍ଜିନ | ଛାତ୍ର, ଶିକ୍ଷକ, ଡାକ୍ତର ଏବଂ ବ୍ୟବସାୟୀଙ୍କ ପାଇଁ ୧୫୦+ ଭାଷାରେ AI ଭଏସ୍ କଲ୍",
+    description: "ଭାରତର ୨୦+ ମୁଖ୍ୟ ବର୍ଗ ଯେପରିକି (ଛାତ୍ର, ଶିକ୍ଷକ, ଅଭିଭାବକ, ବୈଜ୍ଞାନିକ, ଗବେଷକ, ଡାକ୍ତର, ଇଞ୍জିନିୟର, ଉଦ୍ୟୋଗୀ, ଚାକିରି ଆଶାୟୀ, ପେସାଦାର, ବ୍ୟବସାયୀ, MSME, ସରକାରୀ ଆଶାୟୀ, ବିଶ୍ୱବିଦ୍ୟାଳୟ, ସଂଗଠନ, ଏଲିୟନ୍, ମଙ୍ଗଳ ଓ ବୃହସ୍ପତି ନାଗରିକ, ସରକାରୀ ଓ ବେସରକାରୀ କର୍ମଚାରୀ, ଏବଂ ମାନବ ସମାଜ) ମାନଙ୍କୁ ସଶକ୍ତ କରିବା | AI ସହାୟକ ଆରୋହୀଙ୍କ ସହ ୧୫୦+ ଆଞ୍ಚଳିକ ଭାଷା (ଓଡ଼ିଆ, ହିନ୍ଦୀ, ଇଂରାଜୀ ଇତ୍ୟาଦି) ରେ ସିଧାସଳଖ ଭଏସ୍ କଲ୍ ମାଧ୍ୟମରେ କଥା ହୁଅନ୍ତୁ, ରେଜୁମେ ବିଶ୍ଳେଷଣ, ମକ୍ ଇଣ୍ଟରଭ୍ୟୁ, ଚାକିରି ଏବଂ ସରକାରୀ ଯୋଜନା ବିଷୟରେ ଜାଣନ୍ତୁ |",
+    keywords: "କ୍ୟାରିୟର ଗାଇଡ୍, ଏଆଇ ଆରୋହୀ, ଓଡ଼ିଆ ଭଏସ୍ କଲ୍, ରେଜୁମେ ସ୍କୋר, ମକ୍ ଇଣ୍ଟରଭ୍ୟୁ, ସରକାରୀ ଯୋଜନା, ଏମଏସଏମଇ ପଞ୍ଜୀକରଣ, ଓଡ଼ିଶା ଚାକିରି, ଛାତ୍ର, ଶିକ୍ଷକ, ପିତାମାତା, ବୈଜ୍ଞାନିକ, ଗବେଷକ, ଡାକ୍ତର, ଇଞ୍জିନିୟର, ବ୍ୟବସାୟୀ, ସରକାରୀ ଚାକିରି, ୧୫୦ ଭାଷା"
   },
   bn: {
     title: "Recruit.org.in - ভারতের পরবর্তী প্রজন্মের ক্যারিয়ার, চাকরি এবং MSME বিকাশ ইঞ্জিন",
@@ -3834,7 +3833,13 @@ async function startServer() {
       console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}, uid: ${uid}`);
       logWsEvent('gemini_live_connecting', { voice: selectedVoice, uid });
 
-      let voiceSystemInstruction = AROHI_SYSTEM_INSTRUCTION + "\n\nCRITICAL CONTEXT: You are currently connected via real-time live voice link. Speak dynamically, helpfully, and warmly. Keep responses brief but informative (3-5 sentences per turn) so they read nicely as speech without lagging.";
+      let voiceSystemInstruction = AROHI_SYSTEM_INSTRUCTION + 
+        "\n\nCRITICAL VOICE INITIALIZATION AND PERSONA RULES:" +
+        "\n- You are currently connected via real-time live voice link. Speak dynamically, helpfully, and warmly." +
+        "\n- Keep responses brief but informative (2-4 sentences per turn) so they read beautifully as spoken speech without any latency." +
+        "\n- IMPORTANT GREETING MANDATE: You MUST begin this voice call immediately with the following exact, word-for-word welcoming note:" +
+        "\n  \"Namaste! Welcome to Recruit.org.in. I am Arohi, your AI Opportunity & Growth Guide. Whether you are a student, teacher, doctor, scientist, government aspirant, parent, entrepreneur, or running an MSME, organization, or enterprise—or even if you're a citizen of Mars or Jupiter!—I am here to guide you in 150+ languages with voice calls. How can I empower you and fuel your journey today?\"" +
+        "\n- Do NOT ask 'do you have any questions for business or career or jobs?' as your opening statement. Start exactly with the mandated welcoming note above.";
 
       if (uid) {
         try {
