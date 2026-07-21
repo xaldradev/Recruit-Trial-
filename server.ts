@@ -3526,8 +3526,210 @@ function logWsEvent(event: string, data: any) {
   }
 }
 
+// ==========================================
+// ALL INDIA MULTILINGUAL SEO ENGINE & CONFIG
+// ==========================================
+
+const SEO_TRANSLATIONS: Record<string, { title: string; description: string; keywords: string }> = {
+  en: {
+    title: "Recruit.org.in - India’s Next-Gen Career, Job, and MSME Growth Engine",
+    description: "Empowering India's students, young professionals, and MSMEs. Get live career guidance from AI assistant Arohi, dynamic resume analysis, mock interviews, job postings, and Udyam business assistance.",
+    keywords: "recruit.org.in, career guidance India, AI career coach, resume score India, mock interview simulator, MSME Udyam registration, private sector jobs, student career advisor, recruitment portal, Sarkari job guide"
+  },
+  hi: {
+    title: "Recruit.org.in - भारत का अगला पीढ़ी का करियर, नौकरी और एमएसएमई विकास इंजन",
+    description: "भारत के छात्रों, युवा पेशेवरों और एमएसएमई को सशक्त बनाना। एआई सहायक आरोही से लाइव करियर मार्गदर्शन, रेज़्यूमे विश्लेषण, मॉक इंटरव्यू, नौकरी पोस्टिंग और उद्यम व्यावसायिक सहायता प्राप्त करें।",
+    keywords: "रिक्रूट भारत, करियर मार्गदर्शन, एआई करियर कोच, रेज़्यूमे स्कोर, मॉक इंटरव्यू सिम्युलेटर, एमएसएमई उद्यम पंजीकरण, प्राइवेट नौकरियां, सरकारी नौकरी गाइड, रोजगार समाचार"
+  },
+  or: {
+    title: "Recruit.org.in - ଓଡ଼ିଶା ଏବଂ ଭାରତର ପରବର୍ତ୍ତୀ ପିଢିର କ୍ୟାରିୟର, ଚାକିରି ଏବଂ MSME ବିକାଶ ପୋର୍ଟାଲ୍",
+    description: "ଭାରତର ଛାତ୍ର, ଯୁବ ପେସାଦାର ଓ ଏମଏସଏମଇ (MSME) ମାନଙ୍କୁ ସଶକ୍ତ କରିବା | AI ସହାୟକ ଆରୋହୀଙ୍କ ଠାରୁ କ୍ୟାରିୟର ପରାମର୍ଶ, ରେଜୁମେ ବିଶ୍ଳେଷଣ, ମକ୍ ଇଣ୍ଟରଭ୍ୟୁ ଏବଂ ସରକାରୀ ଯୋଜନା ସହାୟତା ପାଆନ୍ତୁ |",
+    keywords: "ଚାକିରି ସୂଚନା, ଓଡ଼ିଶା ଚାକିରି, କ୍ୟାରିୟର ଗାଇଡ୍, ଏଆଇ ଆରୋହୀ, ରେଜୁମେ ସ୍କୋਰ, ମକ୍ ଇଣ୍ଟରଭ୍ୟୁ, ସରକାରୀ ଯୋଜନା, ଏମଏସଏମଇ ପଞ୍ଜୀକରଣ, ଓଡ଼ିଆରେ କ୍ୟାରିୟର"
+  },
+  bn: {
+    title: "Recruit.org.in - ভারতের পরবর্তী প্রজন্মের ক্যারিয়ার, চাকরি এবং MSME বিকাশ ইঞ্জিন",
+    description: "ভারতের ছাত্র, তরুণ পেশাদার এবং MSME-কে ক্ষমতায়ন করা। AI সহকারী আরোহী-র থেকে লাইভ ক্যারিয়ার গাইডেন্স, জীবনবৃত্তান্ত বিশ্লেষণ, মক ইন্টারভিউ এবং ব্যবসা সহায়তা পান।",
+    keywords: "চাকরি ও ক্যারিয়ার, ভারতীয় চাকরি পোর্টাল, এআই ক্যারিয়ার কোচ, জীবনবৃত্তান্ত বিশ্লেষণ, মক ইন্টারভিউ, সরকারি প্রকল্প, এমএসএমই রেজিস্ট্রেশন, পশ্চিমবঙ্গ চাকরি"
+  },
+  te: {
+    title: "Recruit.org.in - భారతదేశపు నెక్స్ట్-జనరేషన్ కెరీర్, ఉద్యోగ మరియు MSME అభివృద్ధి ఇంజిన్",
+    description: "భారతదేశ విద్యార్థులు, యువ నిపుణులు మరియు MSMEలను బలోపేతం చేయడం. AI అసిస్టెంట్ ఆరోహి నుండి లైవ్ కెరీర్ గైడెన్స్, రెజ్యూమె విశ్లేషణ, మాక్ ఇంటర్వ్యూలు మరియు వ్యాపార సహాయం పొందండి.",
+    keywords: "కెరీర్ గైడెన్స్, ప్రభుత్వ ఉద్యోగాలు, ప్రైვეట్ ఉద్యోగాలు, రెజ్యూమె స్కోర్, మాక్ ఇंटरవ్యూ, MSME రిజిస్ట్రేషన్, ఉద్యోగ సమాచారం, ఆరోహి ఎఐ"
+  },
+  mr: {
+    title: "Recruit.org.in - भारतातील पुढील पिढीचे करिअर, नोकरी आणि MSME विकास प्लॅटफॉर्म",
+    description: "भारतातील विद्यार्थी, तरुण व्यावसायिक आणि एमएसएमई सक्षम करणे. एआय सहाय्यक आरोही कडून थेट करिअर मार्गदर्शन, रेझ्युमे विश्लेषण, मॉक इंटरव्यू आणि व्यवसाय सहाय्य मिळवा.",
+    keywords: "करिअर मार्गदर्शन, रोजगार संधी, रेझ्युमे तपासणी, मॉक इंटरव्यू, सरकारी योजना, एमएसएमई नोंदणी, मराठीत नोकऱ्या, महाराष्ट्रातील रोजगार"
+  },
+  ta: {
+    title: "Recruit.org.in - இந்தியாவின் அடுத்த தலைமுறை தொழில், வேலைவாய்ப்பு மற்றும் MSME வளர்ச்சி தளம்",
+    description: "இந்தியாவின் மாணவர்கள், இளம் வல்லுநர்கள் மற்றும் MSME-களை மேம்படுத்துதல். AI உதவியாளர் ஆரோஹியிடமிருந்து நேரடி வழிகாட்டுதல், ரெஸ்யூம் பகுப்பாய்வு, நேர்காணல் பயிற்சி மற்றும் வணிக உதவி பெறுக.",
+    keywords: "வேலைவாய்ப்பு செய்திகள், தொழில் வழிகாட்டி, ரெஸ்யூம் பகுப்பாய்வு, மாதிரி நேர்காணல், அரசு திட்டங்கள், எம்எஸ்எம்இ பதிவு, தமிழ்நாட்டில் வேலைகள்"
+  },
+  gu: {
+    title: "Recruit.org.in - ભારતનું આગામી પેઢીનું કારકિર્દી, નોકરી અને MSME বিকাশ પ્લેટફોર્મ",
+    description: "ભારતના વિદ્યાર્થીઓ, યુવા વ્યાવસાયિકો અને MSME ને સશક્ત બનાવવું. AI સહાયક આરોહી પાસેથી લાઈવ કારકિર્દી માર્ગદર્શન, રેઝ્યૂમે વિશ્લેષણ, મોક ઇન્ટરવ્યુ અને વ્યવસાય સહાય મેળવો.",
+    keywords: "કારકિર્દી માર્ગદર્શન, સરકારી નોકરીઓ, રેઝ્યૂમે સ્કોર, મોક ઇન્ટરવ્યુ, સરકારી યોજનાઓ, એમએસએમઇ નોંધણી, ગુજરાત રોજગાર"
+  },
+  ur: {
+    title: "Recruit.org.in - ہندوستان کا اگلی نسل کا کیریئر، ملازمت اور MSME ترقیاتی انجن",
+    description: "ہندوستان کے طلباء، نوجوان پیشہ ور افراد اور MSME کو بااختیار بنانا۔ AI اسسٹنٹ آروہی سے لائیو کیریئر گائیڈنس، ریزیومے تجزیہ، موک انٹرویوز اور کاروباری مدد حاصل کریں۔",
+    keywords: "کیریئر گائیڈنس, نوکریوں کے مواقع, ریزیومے تجزیہ, موک انٹرویو, سرکاری اسکیمیں, کاروبار کی رجسٹریشن, روزگار کی خبریں"
+  },
+  kn: {
+    title: "Recruit.org.in - ಭಾರತದ ಮುಂದಿನ ಪೀಳಿಗೆಯ ವೃತ್ತಿಜೀವನ, ಉದ್ಯೋಗ ಮತ್ತು MSME ಅಭಿವೃದ್ಧಿ ಇಂಜಿನ್",
+    description: "ಭಾರತದ ವಿದ್ಯಾರ್ಥಿಗಳು, ಯುವ ವೃತ್ತಿಪರರು ಮತ್ತು MSMEಗಳನ್ನು ಸಬಲೀಕರಣಗೊಳಿಸುವುದು. AI ಸಹಾಯಕ ಆರೋಹಿ ಇಂದ ನೇರ ವೃತ್ತಿ ಮಾರ್ಗದರ್ಶನ, ರೆಸ್ಯೂಮೆ ವಿಶ್ಲೇಷಣೆ, ಮಾಕ್ ಸಂದರ್ಶನಗಳು ಮತ್ತು ವ್ಯವಹಾರ ಸಹಾಯ ಪಡೆಯಿರಿ.",
+    keywords: "ವೃತ್ತಿ ಮಾರ್ಗದರ್ಶನ, ಉದ್ಯೋಗಾವಕಾಶಗಳು, ರೆಸ್ಯೂಮೆ ವಿಶ್ಲೇಷಣೆ, ಮಾಕ್ ಸಂದರ್ಶನ, ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು, ಉದ್ಯಮ ನೋಂದಣಿ, ಕರ್ನಾಟಕ ಉದ್ಯೋಗ"
+  },
+  ml: {
+    title: "Recruit.org.in - ഇന്ത്യയിലെ അടുത്ത തലമുറ കരിയർ, തൊഴിൽ, MSME വികസന വേദി",
+    description: "ഇന്ത്യയിലെ വിദ്യാർത്ഥികൾ, യുവ പ്രൊഫഷണലുകൾ, MSME-കൾ എന്നിവരെ ശാക്തീകരിക്കുന്നു. AI അസിസ്റ്റന്റ് ആരോഹിയിൽ നിന്ന് തത്സമയ കരിയർ മാർഗ്ഗനിർദ്ദേശം, റെസ്യൂമെ വിശകലനം, മോക്ക് അഭിമുഖങ്ങൾ, ബിസിനസ്സ് സഹായം എന്നിവ നേടുക.",
+    keywords: "കരിയർ ഗൈഡൻസ്, തൊഴിൽ അവസരങ്ങൾ, റെസ്യൂമെ സ്കോർ, മോക്ക് ഇന്റർവ്യൂ, സർക്കാർ പദ്ധതികൾ, എംഎസ്എംഇ രജിസ്ട്രേഷൻ"
+  },
+  pa: {
+    title: "Recruit.org.in - ਭਾਰਤ ਦਾ ਅਗਲੀ ਪੀੜ੍ਹੀ ਦਾ ਕਰੀਅਰ, ਨੌਕਰੀ ਅਤੇ MSME ਵਿਕਾਸ ਇੰਜਨ",
+    description: "ਭਾਰਤ ਦੇ ਵਿਦਿਆਰਥੀਆਂ, ਨੌਜਵਾਨ ਪੇਸ਼ੇਵਰਾਂ ਅਤੇ MSME ਨੂੰ ਸ਼ਕਤੀਸ਼ਾਲੀ ਬਣਾਉਣਾ। AI ਸਹਾਇਕ ਆਰੋਹੀ ਤੋਂ ਲਾਈਵ ਕਰੀਅਰ ਮਾਰਗਦਰਸ਼ਨ, ਰੈਜ਼ਿਊਮੇ ਵਿਸ਼ਲੇਸ਼ਣ, ਮੌਕ ਇੰਟਰਵਿਊ ਅਤੇ ਵਪਾਰਕ ਸਹਾਇਤਾ ਪ੍ਰਾਪਤ ਕਰੋ।",
+    keywords: "ਕਰੀਅਰ ਮਾਰਗਦਰਸ਼ਨ, ਨੌਕਰੀਆਂ ਦੇ ਮੌਕੇ, ਰੈਜ਼ਿਊਮੇ ਸਕੋਰ, ਮੌਕ ਇੰਟਰਵਿਊ, ਸਰਕਾਰੀ ਸਕੀਮਾਂ, ਕਾਰੋਬਾਰੀ ਰਜਿਸਟ੍ਰੇਸ਼ਨ, ਪੰਜਾਬ ਰੁਜ਼ਗਾਰ"
+  },
+  as: {
+    title: "Recruit.org.in - ভাৰতৰ পৰৱৰ্তী প্ৰজন্মৰ কেৰিয়াৰ, চাকৰি আৰু MSME বিকাশ মঞ্চ",
+    description: "ভাৰতৰ শিক্ষাৰ্থী, যুৱ পেচাদাৰী আৰু MSME সৱলীকৰণ কৰা। AI সহায়ক আৰোহীৰ পৰা লাইভ কেৰিয়াৰ নিৰ্দেশনা, ৰিজুমে বিশ্লেষণ, মক সাক্ষাৎকাৰ আৰু ব্যৱসায়িক সাহায্য লাভ কৰক।",
+    keywords: "কেৰিয়াৰ নিৰ্দেশনা, চাকৰিৰ খবৰ, ৰিজুমে বিশ্লেষণ, মক সাক্ষাৎকাৰ, চৰকাৰী আঁচনি, উদ্যোগ পঞ্জীয়ন, অসমৰ চাকৰি"
+  }
+};
+
+function serveIndexWithSEO(req: express.Request, res: express.Response) {
+  const validLanguages = ['en', 'hi', 'or', 'bn', 'te', 'mr', 'ta', 'gu', 'ur', 'kn', 'ml', 'pa', 'as'];
+  let lang = req.query.lang as string;
+  if (!lang || !validLanguages.includes(lang)) {
+    lang = 'en';
+  }
+
+  const isProd = process.env.NODE_ENV === 'production';
+  const filePath = isProd 
+    ? path.join(process.cwd(), 'dist', 'index.html')
+    : path.join(process.cwd(), 'index.html');
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send('Page index.html not found');
+  }
+
+  try {
+    let html = fs.readFileSync(filePath, 'utf8');
+    const meta = SEO_TRANSLATIONS[lang] || SEO_TRANSLATIONS['en'];
+
+    // Dynamic replacement
+    html = html.replace(/<title>.*?<\/title>/gi, `<title>${meta.title}</title>`);
+    html = html.replace(/<meta name="description" content=".*?"\s*\/?>/gi, `<meta name="description" content="${meta.description}" />`);
+    html = html.replace(/<meta name="keywords" content=".*?"\s*\/?>/gi, `<meta name="keywords" content="${meta.keywords}" />`);
+    
+    // Social Open Graph updates
+    html = html.replace(/<meta property="og:title" content=".*?"\s*\/?>/gi, `<meta property="og:title" content="${meta.title}" />`);
+    html = html.replace(/<meta property="og:description" content=".*?"\s*\/?>/gi, `<meta property="og:description" content="${meta.description}" />`);
+    html = html.replace(/<meta name="twitter:title" content=".*?"\s*\/?>/gi, `<meta name="twitter:title" content="${meta.title}" />`);
+    html = html.replace(/<meta name="twitter:description" content=".*?"\s*\/?>/gi, `<meta name="twitter:description" content="${meta.description}" />`);
+
+    const localeMap: Record<string, string> = {
+      en: 'en_IN', hi: 'hi_IN', or: 'or_IN', bn: 'bn_IN', te: 'te_IN',
+      mr: 'mr_IN', ta: 'ta_IN', gu: 'gu_IN', ur: 'ur_IN', kn: 'kn_IN',
+      ml: 'ml_IN', pa: 'pa_IN', as: 'as_IN'
+    };
+    const locale = localeMap[lang] || 'en_IN';
+    html = html.replace(/<meta property="og:locale" content=".*?"\s*\/?>/gi, `<meta property="og:locale" content="${locale}" />`);
+
+    // Schema updates
+    html = html.replace(/"description": "India's next-generation employment engine.*?"/gi, `"description": "${meta.description}"`);
+
+    res.setHeader('Content-Type', 'text/html');
+    res.send(html);
+  } catch (err) {
+    console.error('[SEO Meta Injection Error]:', err);
+    res.sendFile(filePath);
+  }
+}
+
+function serveSitemap(req: express.Request, res: express.Response) {
+  const host = req.get('host');
+  const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+  const baseUrl = `${protocol}://${host}`;
+
+  const pages = [
+    '',
+    'jobs',
+    'career',
+    'resume',
+    'interview',
+    'business',
+    'schemes',
+    'courses',
+    'syllabus',
+    'franchise',
+    'employer',
+    'dashboard',
+    'faqs',
+    'contact'
+  ];
+
+  const languages = ['en', 'hi', 'or', 'bn', 'te', 'mr', 'ta', 'gu', 'ur', 'kn', 'ml', 'pa', 'as'];
+
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n';
+  xml += '        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n';
+
+  pages.forEach(page => {
+    const relativePath = page === '' ? '' : `/${page}`;
+    languages.forEach(lang => {
+      const locUrl = `${baseUrl}${relativePath}?lang=${lang}`;
+      const lastmod = new Date().toISOString().split('T')[0];
+      const priority = page === '' ? '1.0' : page === 'jobs' || page === 'resume' || page === 'schemes' ? '0.9' : '0.8';
+
+      xml += '  <url>\n';
+      xml += `    <loc>${locUrl}</loc>\n`;
+      xml += `    <lastmod>${lastmod}</lastmod>\n`;
+      xml += '    <changefreq>daily</changefreq>\n';
+      xml += `    <priority>${priority}</priority>\n`;
+
+      // Multilingual alternate links
+      languages.forEach(l => {
+        const hreflang = l === 'en' ? 'en-IN' : `${l}-IN`;
+        xml += `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${baseUrl}${relativePath}?lang=${l}" />\n`;
+      });
+      // x-default point to english
+      xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}${relativePath}" />\n`;
+
+      xml += '  </url>\n';
+    });
+  });
+
+  xml += '</urlset>\n';
+
+  res.setHeader('Content-Type', 'application/xml');
+  res.send(xml);
+}
+
+function serveRobots(req: express.Request, res: express.Response) {
+  const host = req.get('host');
+  const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+  const baseUrl = `${protocol}://${host}`;
+
+  res.setHeader('Content-Type', 'text/plain');
+  res.send(`User-agent: *
+Allow: /
+
+# Multilingual India sitemaps
+Sitemap: ${baseUrl}/sitemap.xml
+
+# Friendly suggestions for Search Crawlers
+Crawl-delay: 1
+`);
+}
+
 // Vite middleware and asset delivery setup
 async function startServer() {
+  // Register SEO sitemaps & robots globally
+  app.get('/sitemap.xml', serveSitemap);
+  app.get('/robots.txt', serveRobots);
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -3544,16 +3746,7 @@ async function startServer() {
       console.error(`[Production mode] CRITICAL ERROR: index.html NOT found at: ${indexPath}`);
     }
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(indexPath, (err) => {
-        if (err) {
-          console.error(`[Static Serve Error] failed to send index.html for ${req.originalUrl}:`, err);
-          if (!res.headersSent) {
-            res.status(500).send(`Server Error: Failed to render layout. (Error details: ${err.message})`);
-          }
-        }
-      });
-    });
+    app.get('*', serveIndexWithSEO);
   }
 
   let backupServer: any = null;

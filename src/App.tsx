@@ -108,6 +108,13 @@ export default function App() {
   }, [hasEntered, user]);
 
   const [language, setLanguage] = useState<Language>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const queryLang = params.get('lang') as Language;
+    const validLanguages: Language[] = ['en', 'hi', 'or', 'bn', 'te', 'mr', 'ta', 'gu', 'ur', 'kn', 'ml', 'pa', 'as'];
+    if (queryLang && validLanguages.includes(queryLang)) {
+      localStorage.setItem('recruit_language', queryLang);
+      return queryLang;
+    }
     return (localStorage.getItem('recruit_language') as Language) || 'en';
   });
 
@@ -231,6 +238,42 @@ export default function App() {
       }).catch(err => console.log('Telemetry offline:', err));
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    // Client-side SEO update for document title & meta tags on tab / language change
+    const tabNameMap: Record<string, string> = {
+      home: language === 'hi' ? 'मुख्य पृष्ठ' : language === 'or' ? 'ମୁଖ୍ୟ ପୃଷ୍ଠା' : 'Ecosystem Home',
+      jobs: language === 'hi' ? 'नौकरियां और रिक्तियां' : language === 'or' ? 'ଚାକିରି ଏବଂ ନିଯುକ୍ତି' : 'Jobs & Career Board',
+      career: language === 'hi' ? 'करियर रोडमैप' : language === 'or' ? 'କ୍ୟାରਿୟର ରୋଡମ୍ୟାପ୍' : 'Career Intelligence',
+      resume: language === 'hi' ? 'रेज़्यूमे मूल्यांकनकर्ता' : language === 'or' ? 'ରେଜୁମେ AI ସମୀକ୍ଷକ' : 'AI Resume Score Analyzer',
+      interview: language === 'hi' ? 'मॉक इंटरव्यू' : language === 'or' ? 'ମକ୍ ଇଣ୍ଟरଭ୍ୟୁ' : 'AI Mock Interview Simulator',
+      business: language === 'hi' ? 'व्यापार गाइड' : language === 'or' ? 'ବ୍ୟବସାୟ ଗାଇଡ୍' : 'MSME & Startup Business Guides',
+      schemes: language === 'hi' ? 'सरकारी योजनाएं' : language === 'or' ? 'ସରକାରୀ ଯୋଜନା' : 'PM Government Schemes Portal',
+      courses: language === 'hi' ? 'कौशल पाठ्यक्रम' : language === 'or' ? 'ଦକ୍ଷତା ଓ ପାଠ୍ୟକ୍ରମ' : 'Skill Courses & Certifications',
+      syllabus: language === 'hi' ? 'स्कूली पाठ्यक्रम' : language === 'or' ? 'ବିਦ୍ୟାଳୟ ସିଲାବସ୍' : 'Class 1-10 School Syllabus',
+      dashboard: language === 'hi' ? 'डैशबोर्ड' : language === 'or' ? 'ୟୁଜର୍ ଡ୍ୟାସବୋର୍ଡ' : 'User Portal Dashboard',
+      employer: language === 'hi' ? 'नियोक्ता पोर्टल' : language === 'or' ? 'ନିଯੁକ୍ତିଦାਤਾ ପୋର୍ଟାଲ୍' : 'Employer & Recruiter Portal',
+      franchise: language === 'hi' ? 'फ्रेंचाइजी' : language === 'or' ? 'ଫ୍ରାଞ୍ଚାଇଜ୍' : 'Partner Portal Franchise',
+      privacy: 'Privacy Policy',
+      terms: 'Terms of Service',
+      faqs: 'Support FAQs'
+    };
+
+    const displayTab = tabNameMap[activeTab] || activeTab.charAt(0).toUpperCase() + activeTab.slice(1);
+    const suffix = language === 'hi' ? 'Recruit.org.in - भारत का करियर इंजन' : language === 'or' ? 'Recruit.org.in - ଭାରତର କ୍ୟାରିୟର ଇଞ୍ଜିନ' : 'Recruit.org.in - India\'s Next-Gen Career Engine';
+    document.title = `${displayTab} | ${suffix}`;
+
+    // Update Meta Description
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      const descMap: Record<string, string> = {
+        hi: 'भारत के छात्रों, युवा पेशेवरों और एमएसएमई के लिए एआई सहायक आरोही से लाइव करियर मार्गदर्शन, रेज़्यूमे विश्लेषण, मॉक इंटरव्यू, नौकरी पोस्टिंग और उद्यम व्यावसायिक सहायता।',
+        or: 'ଭାରତର ଛาତ୍ର, ଯୁବ ପେସାଦାର ଓ ଏମଏସଏମଇ ମାନଙ୍କ ପାଇଁ AI ସହାୟକ ଆରୋହୀଙ୍କ ଠାରୁ କ୍ୟାରିୟର ପରାମର୍ଶ, ରେଜୁମେ ବିଶ୍ଳେଷଣ, ମକ୍ ଇଣ୍ଟରଭ୍ୟୁ ଏବଂ ସରକារୀ ଯୋଜନା ସହାୟତା।',
+        en: 'Empowering India\'s students, young professionals, and MSMEs. Get live career guidance from AI assistant Arohi, dynamic resume analysis, mock interviews, job postings, and Udyam business assistance.'
+      };
+      metaDesc.setAttribute('content', descMap[language] || descMap['en']);
+    }
+  }, [activeTab, language]);
 
   const [postings, setPostings] = useState<Posting[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
