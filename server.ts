@@ -254,29 +254,53 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Lazy initializer helper for GoogleGenAI to handle dynamic API key configuration cleanly
 let globalAiClient: GoogleGenAI | null = null;
-function getAiClient(): GoogleGenAI | null {
+let globalAiClientAlpha: GoogleGenAI | null = null;
+function getAiClient(apiVersion: 'v1alpha' | 'v1beta' = 'v1beta'): GoogleGenAI | null {
   const currentKey = process.env.GEMINI_API_KEY;
   if (!currentKey || currentKey === 'MY_GEMINI_API_KEY') {
     return null;
   }
-  if (globalAiClient && (globalAiClient as any)._apiKey === currentKey) {
-    return globalAiClient;
-  }
-  try {
-    const client = new GoogleGenAI({
-      apiKey: currentKey,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
+  if (apiVersion === 'v1alpha') {
+    if (globalAiClientAlpha && (globalAiClientAlpha as any)._apiKey === currentKey) {
+      return globalAiClientAlpha;
+    }
+    try {
+      const client = new GoogleGenAI({
+        apiKey: currentKey,
+        httpOptions: {
+          apiVersion: 'v1alpha',
+          headers: {
+            'User-Agent': 'aistudio-build',
+          }
         }
-      }
-    });
-    (client as any)._apiKey = currentKey;
-    globalAiClient = client;
-    return client;
-  } catch (err) {
-    console.error('Error creating GoogleGenAI client:', err);
-    return null;
+      });
+      (client as any)._apiKey = currentKey;
+      globalAiClientAlpha = client;
+      return client;
+    } catch (err) {
+      console.error('Error creating GoogleGenAI alpha client:', err);
+      return null;
+    }
+  } else {
+    if (globalAiClient && (globalAiClient as any)._apiKey === currentKey) {
+      return globalAiClient;
+    }
+    try {
+      const client = new GoogleGenAI({
+        apiKey: currentKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          }
+        }
+      });
+      (client as any)._apiKey = currentKey;
+      globalAiClient = client;
+      return client;
+    } catch (err) {
+      console.error('Error creating GoogleGenAI client:', err);
+      return null;
+    }
   }
 }
 
@@ -3602,7 +3626,7 @@ async function startServer() {
       }
     }
 
-    const clientAi = getAiClient();
+    const clientAi = getAiClient('v1alpha');
     if (!clientAi) {
       logWsEvent('get_ai_client_failed', { reason: 'No GEMINI_API_KEY env or helper' });
       safeSendAndClose(
@@ -3664,11 +3688,10 @@ async function startServer() {
       }
 
       const liveModelsToTry = [
+        "gemini-3.1-flash-live-preview",
         "gemini-2.0-flash-exp",
-        "gemini-2.5-flash",
         "gemini-2.0-flash-live-preview",
-        "gemini-live-2.5-flash-preview",
-        "gemini-3.1-flash-live-preview"
+        "gemini-live-2.5-flash-preview"
       ];
 
       let session: any = null;
@@ -3679,99 +3702,145 @@ async function startServer() {
           console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}, model: ${liveModel}`);
           logWsEvent('gemini_live_connecting_model', { voice: selectedVoice, model: liveModel });
 
-          session = await clientAi.live.connect({
-            model: liveModel,
-            config: {
-              responseModalities: [Modality.AUDIO],
-              speechConfig: {
-                voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
-              },
-              systemInstruction: voiceSystemInstruction,
-              inputAudioTranscription: {},
-              outputAudioTranscription: {},
-            },
-            callbacks: {
-              onopen: () => {
-                console.log(`Gemini Live session successfully opened with model: ${liveModel}`);
-                logWsEvent('gemini_live_session_open', { model: liveModel });
-              },
-              onmessage: (message: any) => {
-                // Forward audio data to client safely
-                const audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-                if (audio && clientWs.readyState === WebSocket.OPEN) {
-                  try {
-                    clientWs.send(JSON.stringify({ audio }));
-                  } catch (e) {
-                    console.error("Error sending live audio packet:", e);
-                  }
-                }
-                if (message.serverContent?.interrupted && clientWs.readyState === WebSocket.OPEN) {
-                  try {
-                    clientWs.send(JSON.stringify({ interrupted: true }));
-                  } catch (e) {}
-                }
+          // We await a Promise that resolves once the session is successfully opened and stable
+          const establishedSession = await new Promise<any>(async (resolve, reject) => {
+            let finished = false;
+            let tempSession: any = null;
+            let stabilityTimeout: NodeJS.Timeout | null = null;
 
-                // Extract transcripts of what is being spoken (user & model)
-                let transcriptText = "";
-                let transcriptSpeaker: "user" | "arohi" | null = null;
+            try {
+              tempSession = await clientAi.live.connect({
+                model: liveModel,
+                config: {
+                  responseModalities: [Modality.AUDIO],
+                  speechConfig: {
+                    voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
+                  },
+                  systemInstruction: voiceSystemInstruction,
+                  inputAudioTranscription: {},
+                  outputAudioTranscription: {},
+                },
+                callbacks: {
+                  onopen: () => {
+                    console.log(`Gemini Live session opened with model: ${liveModel}, waiting for stability...`);
+                    logWsEvent('gemini_live_session_open', { model: liveModel });
+                    
+                    stabilityTimeout = setTimeout(() => {
+                      if (!finished) {
+                        finished = true;
+                        console.log(`Gemini Live session stable on model: ${liveModel}`);
+                        resolve(tempSession);
+                      }
+                    }, 400); // Wait 400ms to ensure the connection is stable and not immediately closed by validation
+                  },
+                  onmessage: (message: any) => {
+                    // Only process messages if this is the active session
+                    if (session !== tempSession) return;
 
-                // 1. Check userTurn in serverContent (Standard Multimodal Live API response)
-                if (message.serverContent?.userTurn?.parts) {
-                  for (const part of message.serverContent.userTurn.parts) {
-                    if (part.text) {
-                      transcriptText += part.text;
-                      transcriptSpeaker = "user";
+                    // Forward audio data to client safely
+                    const audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+                    if (audio && clientWs.readyState === WebSocket.OPEN) {
+                      try {
+                        clientWs.send(JSON.stringify({ audio }));
+                      } catch (e) {
+                        console.error("Error sending live audio packet:", e);
+                      }
+                    }
+                    if (message.serverContent?.interrupted && clientWs.readyState === WebSocket.OPEN) {
+                      try {
+                        clientWs.send(JSON.stringify({ interrupted: true }));
+                      } catch (e) {}
+                    }
+
+                    // Extract transcripts of what is being spoken (user & model)
+                    let transcriptText = "";
+                    let transcriptSpeaker: "user" | "arohi" | null = null;
+
+                    // 1. Check userTurn in serverContent (Standard Multimodal Live API response)
+                    if (message.serverContent?.userTurn?.parts) {
+                      for (const part of message.serverContent.userTurn.parts) {
+                        if (part.text) {
+                          transcriptText += part.text;
+                          transcriptSpeaker = "user";
+                        }
+                      }
+                    }
+
+                    // 2. Check legacy / alternative userContent.parts
+                    if (!transcriptText && message.userContent?.parts) {
+                      for (const part of message.userContent.parts) {
+                        if (part.text) {
+                          transcriptText += part.text;
+                          transcriptSpeaker = "user";
+                        }
+                      }
+                    }
+
+                    // 3. Check modelTurn in serverContent
+                    if (message.serverContent?.modelTurn?.parts) {
+                      for (const part of message.serverContent.modelTurn.parts) {
+                        if (part.text) {
+                          transcriptText += part.text;
+                          transcriptSpeaker = "arohi";
+                        }
+                      }
+                    }
+
+                    if (transcriptText && clientWs.readyState === WebSocket.OPEN) {
+                      try {
+                        clientWs.send(JSON.stringify({ transcript: transcriptText, speaker: transcriptSpeaker }));
+                      } catch (e) {}
+                    }
+                  },
+                  onerror: (err: any) => {
+                    console.error(`Gemini Live session connection error on model ${liveModel}:`, err);
+                    logWsEvent('gemini_live_session_error', { model: liveModel, error: err?.message || err });
+                    
+                    if (!finished) {
+                      finished = true;
+                      if (stabilityTimeout) clearTimeout(stabilityTimeout);
+                      reject(err || new Error(`Connection error on ${liveModel}`));
+                    } else {
+                      if (session === tempSession && clientWs.readyState === WebSocket.OPEN) {
+                        try {
+                          clientWs.send(JSON.stringify({ error: `Gemini Live session error: ${err?.message || err}` }));
+                        } catch (e) {}
+                      }
+                    }
+                  },
+                  onclose: (event: any) => {
+                    console.log(`Gemini Live session closed on model ${liveModel}. Code: ${event?.code}, Reason: ${event?.reason}`);
+                    logWsEvent('gemini_live_session_closed', { model: liveModel, code: event?.code, reason: event?.reason });
+                    
+                    if (!finished) {
+                      finished = true;
+                      if (stabilityTimeout) clearTimeout(stabilityTimeout);
+                      reject(new Error(`Session closed pre-handshake: ${event?.reason || 'Code ' + event?.code}`));
+                    } else {
+                      try {
+                        if (tempSession) {
+                          tempSession.close();
+                        }
+                      } catch (e) {}
+                      if (session === tempSession && clientWs.readyState === WebSocket.OPEN) {
+                        try {
+                          clientWs.close(event?.code || 1000, event?.reason || "Gemini Live session closed");
+                        } catch (e) {}
+                      }
                     }
                   }
-                }
-
-                // 2. Check legacy / alternative userContent.parts
-                if (!transcriptText && message.userContent?.parts) {
-                  for (const part of message.userContent.parts) {
-                    if (part.text) {
-                      transcriptText += part.text;
-                      transcriptSpeaker = "user";
-                    }
-                  }
-                }
-
-                // 3. Check modelTurn in serverContent
-                if (message.serverContent?.modelTurn?.parts) {
-                  for (const part of message.serverContent.modelTurn.parts) {
-                    if (part.text) {
-                      transcriptText += part.text;
-                      transcriptSpeaker = "arohi";
-                    }
-                  }
-                }
-
-                if (transcriptText && clientWs.readyState === WebSocket.OPEN) {
-                  try {
-                    clientWs.send(JSON.stringify({ transcript: transcriptText, speaker: transcriptSpeaker }));
-                  } catch (e) {}
-                }
-              },
-              onerror: (err: any) => {
-                console.error(`Gemini Live session connection error on model ${liveModel}:`, err);
-                logWsEvent('gemini_live_session_error', { model: liveModel, error: err.message || err });
-                if (clientWs.readyState === WebSocket.OPEN) {
-                  try {
-                    clientWs.send(JSON.stringify({ error: `Gemini Live session error: ${err.message || err}` }));
-                  } catch (e) {}
-                }
-              },
-              onclose: (event: any) => {
-                console.log(`Gemini Live session closed on model ${liveModel}. Code: ${event.code}, Reason: ${event.reason}`);
-                logWsEvent('gemini_live_session_closed', { model: liveModel, code: event.code, reason: event.reason });
-                if (clientWs.readyState === WebSocket.OPEN) {
-                  try {
-                    clientWs.close(event.code || 1000, event.reason || "Gemini Live session closed");
-                  } catch (e) {}
-                }
+                },
+              });
+            } catch (err) {
+              if (!finished) {
+                finished = true;
+                if (stabilityTimeout) clearTimeout(stabilityTimeout);
+                reject(err);
               }
-            },
+            }
           });
 
+          session = establishedSession;
           console.log(`Gemini Live session connected successfully with model: ${liveModel}`);
           logWsEvent('gemini_live_connected', { voice: selectedVoice, model: liveModel });
           break;
@@ -3789,7 +3858,7 @@ async function startServer() {
       clientWs.on("message", (data) => {
         try {
           const parsed = JSON.parse(data.toString());
-          if (parsed.audio) {
+          if (parsed.audio && session) {
             session.sendRealtimeInput({
               audio: { data: parsed.audio, mimeType: "audio/pcm;rate=16000" },
             });
@@ -3802,7 +3871,9 @@ async function startServer() {
       clientWs.on("close", () => {
         console.log("Client closed live voice WebSocket connection.");
         try {
-          session.close();
+          if (session) {
+            session.close();
+          }
         } catch (err) {
           // already closed
         }

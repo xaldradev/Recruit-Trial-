@@ -244,11 +244,8 @@ export default function ArohiVoiceCall({ onClose, language = 'en', onNavigateTab
         };
 
         ws.onerror = (err) => {
-          console.error('WebSocket error in live voice conversation:', err);
-          if (active) {
-            setErrorMessage('The live voice channel encountered an upgrade or protocol connection error. Please verify your internet connection and API key configuration, or close this panel and restart the call.');
-            setStatus('error');
-          }
+          console.warn('WebSocket warning/error in live voice conversation:', err);
+          // We let onclose handle the definitive connection failure or disconnect state transition
         };
 
         ws.onclose = (event) => {
