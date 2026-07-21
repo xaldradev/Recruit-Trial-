@@ -32,6 +32,7 @@ import WalkthroughTour from './components/WalkthroughTour';
 import FranchisePage from './components/FranchisePage';
 import PWAInstaller from './components/PWAInstaller';
 import BottomNavBar from './components/BottomNavBar';
+import ArohiLandingPage from './components/ArohiLandingPage';
 import { PRICING_TIERS, PATH_DETAILS, getTokenLimitForPrice } from './data/pricingData';
 import TokenWarningToastContainer from './components/TokenWarningToastContainer';
 
@@ -86,18 +87,13 @@ const INITIAL_MOCK_APPLICATIONS: Application[] = [
 export default function App() {
   const { user, userData, updateApplications } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [hasEntered, setHasEntered] = useState(() => {
-    try {
-      return localStorage.getItem('recruit_has_entered') === 'true';
-    } catch (e) {
-      return false;
-    }
-  });
+  const [hasEntered, setHasEntered] = useState(false);
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
+  const IS_TOUR_ENABLED = false; // Set to true to activate walkthrough / site tour
 
   // Auto-trigger walkthrough for newly logged-in users or guest users upon entry
   useEffect(() => {
-    if (hasEntered) {
+    if (IS_TOUR_ENABLED && hasEntered) {
       const tourKey = user ? `recruit_walkthrough_seen_${user.uid}` : 'recruit_walkthrough_seen_guest';
       const hasSeenTour = localStorage.getItem(tourKey);
       if (!hasSeenTour) {
@@ -268,6 +264,8 @@ export default function App() {
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isChatMinimized, setIsChatMinimized] = useState(false);
+  const [chatInitialPrompt, setChatInitialPrompt] = useState<string | undefined>(undefined);
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [isSyncingJobs, setIsSyncingJobs] = useState(false);
   const [syncSuccessMessage, setSyncSuccessMessage] = useState<string | null>(null);
 
@@ -1215,6 +1213,87 @@ export default function App() {
   const quickLinks = postings.filter(p => p.isNew).slice(0, 8);
   const departmentsList = ['All', 'SSC', 'Railway', 'UPSC', 'Bank', 'Defence', 'State PSC', 'Teaching', 'State Govt', 'Private Sector'];
 
+  const renderEcosystemHome = () => {
+    return (
+      <div className="flex flex-col items-center justify-center py-4 w-full select-none animate-in fade-in duration-300">
+        {/* Sleek rounded dark container matching the screenshot exactly */}
+        <div className="w-full max-w-4xl bg-gradient-to-br from-[#06040c] via-[#0b0816] to-[#040307] border border-slate-800/80 rounded-[3rem] p-8 md:p-14 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-10">
+          {/* Glowing ambient light nodes in the card */}
+          <div className="absolute right-0 bottom-0 w-96 h-96 bg-[#00e676]/5 rounded-full blur-3xl -translate-y-10 translate-x-10 animate-pulse pointer-events-none"></div>
+          <div className="absolute left-1/4 top-1/4 w-80 h-80 bg-purple-600/5 rounded-full blur-3xl animate-pulse delay-700 pointer-events-none"></div>
+
+          {/* Left Column: Info & Action Buttons */}
+          <div className="flex-1 space-y-7 text-left z-10 w-full">
+            {/* Pulsing AI Online badge & Interactive Site Tour */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center gap-2 bg-[#091515] border border-teal-500/30 text-teal-300 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide shadow-sm">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#00e676] animate-pulse"></span>
+                <span>AROHI is Live — Online Now</span>
+              </div>
+              {IS_TOUR_ENABLED && (
+                <button
+                  onClick={() => setIsWalkthroughOpen(true)}
+                  className="inline-flex items-center gap-2 bg-[#1b120c] border border-amber-500/30 text-amber-200 px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wide shadow-lg cursor-pointer transition-all active:scale-95"
+                >
+                  <span>🗺️ Take Site Tour</span>
+                  <span className="bg-amber-500 text-slate-950 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full animate-pulse">Tour</span>
+                </button>
+              )}
+            </div>
+
+            {/* Main Bold Display Heading */}
+            <h2 className="text-4xl sm:text-5xl lg:text-[54px] font-black tracking-tight leading-[1.1] text-white">
+              Confused About <br />
+              Your Career? <br />
+              We've Got <span className="text-[#f1b434] font-black bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">Your <br />Back!</span>
+            </h2>
+
+            {/* Dynamic subtitle description */}
+            <p className="text-xs sm:text-sm text-slate-300 max-w-lg font-medium leading-relaxed">
+              Personalized roadmaps and the right path that you'll love and grow in.
+            </p>
+
+            {/* ASK AROHI Button Section */}
+            <div className="flex items-center gap-4 pt-2">
+              <button
+                onClick={() => setActiveTab('arohi')}
+                className="inline-flex items-center gap-2.5 bg-gradient-to-r from-purple-600 via-indigo-600 to-indigo-700 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-xs uppercase tracking-wider py-3.5 px-6 rounded-2xl shadow-[0_4px_25px_rgba(124,58,237,0.35)] border border-[#7c3aed]/50 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <span>ASK AROHI! ✨</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Right Column: Rotating Orbit / Interactive Orb */}
+          <div className="relative z-10 flex items-center justify-center shrink-0 w-44 h-44 sm:w-56 sm:h-56">
+            {/* Elegant glowing background circle representing the tech background */}
+            <div className="absolute inset-0 bg-purple-500/5 rounded-full blur-2xl animate-pulse"></div>
+            
+            {/* Rotating circular cyber hud around Arohi */}
+            <div className="absolute inset-0 rounded-full border-2 border-dashed border-purple-500/20 animate-spin" style={{ animationDuration: '25s' }}></div>
+            <div className="absolute inset-2 rounded-full border border-dashed border-teal-500/15 animate-spin" style={{ animationDuration: '15s', animationDirection: 'reverse' }}></div>
+
+            {/* Circular Arohi Avatar Orb Container */}
+            <button
+              onClick={() => setActiveTab('arohi')}
+              className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full p-0 bg-transparent active:scale-95 transition-all duration-300 shadow-[0_8px_32px_rgba(124,58,237,0.5)] border-2 border-[#a78bfa]/50 hover:border-[#a78bfa] cursor-pointer overflow-visible group"
+            >
+              <div className="w-full h-full rounded-full overflow-hidden">
+                <ArohiAvatar className="w-full h-full scale-[1.08] object-cover transition-transform duration-500 group-hover:scale-120" />
+              </div>
+
+              {/* Glowing ring animation */}
+              <span className="absolute inset-0 rounded-full border-2 border-purple-400/40 animate-ping opacity-60 pointer-events-none"></span>
+
+              {/* Active green status light */}
+              <span className="absolute bottom-1 right-1 w-5 h-5 bg-[#00e676] rounded-full border-3 border-[#090714] z-10 shadow-[0_0_12px_#00e676]"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Router dispatcher
   const renderActiveContent = () => {
     switch (activeTab) {
@@ -1360,1231 +1439,20 @@ export default function App() {
   // Spectacular Home view with 100vh Hero section and central abstract illustration
   const renderHomeHero = () => {
     return (
-      <div className="space-y-12">
-        
-        {/* HERO AREA */}
-        <section className="bg-gradient-to-br from-[#06040c] via-[#0b0816] to-[#040307] text-white rounded-[3rem] p-8 md:p-14 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative overflow-hidden border border-slate-800/80">
-          {/* Glowing ambient light nodes */}
-          <div className="absolute right-0 bottom-0 w-96 h-96 bg-[#00e676]/5 rounded-full blur-3xl -translate-y-10 translate-x-10 animate-pulse"></div>
-          <div className="absolute left-1/3 top-1/4 w-80 h-80 bg-purple-600/5 rounded-full blur-3xl animate-pulse delay-700"></div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
-            
-            {/* Left side info */}
-            <div className="lg:col-span-7 space-y-7 text-left">
-              
-              {/* Pulsing AI Online badge & Interactive 3D Welcome Re-trigger */}
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="inline-flex items-center gap-2 bg-[#091515] border border-teal-500/30 text-teal-300 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide shadow-sm w-fit">
-                  <span className="w-2 h-2 rounded-full bg-[#00e676] animate-pulse"></span>
-                  <span>AROHI is Live — Online Now</span>
-                </div>
-                <button
-                  onClick={() => setIsWalkthroughOpen(true)}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/35 hover:to-yellow-500/35 border border-amber-500/30 hover:border-amber-400/70 text-amber-200 hover:text-white px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wide shadow-lg cursor-pointer transition-all active:scale-95 shrink-0"
-                >
-                  <span>🗺️ Take Site Tour</span>
-                  <span className="bg-amber-500 text-slate-950 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full animate-pulse">Tour</span>
-                </button>
-              </div>
-              
-              {/* Exact screenshot headings */}
-              <h2 className="text-4xl sm:text-5xl lg:text-[54px] font-black tracking-tight leading-[1.1] text-white">
-                Confused About <br />
-                Your Career? <br />
-                <span className="text-white">We've Got </span>
-                <span className="text-[#f1b434] font-black bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">Your Back!</span>
-              </h2>
-
-              {/* Exact subtitle */}
-              <p className="text-xs sm:text-sm text-slate-300 max-w-lg font-medium leading-relaxed">
-                Personalized roadmaps and the right path that you'll love and grow in.
-              </p>
-
-              {/* Dynamic Notification Toast */}
-              <NotificationToast />
-
-              {/* Standard layout four feature pills */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-w-md pt-2">
-                <div className="inline-flex items-center gap-2.5 bg-slate-900/55 border border-slate-800 hover:border-amber-500/25 text-slate-200 text-[11px] font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm">
-                  <span className="text-base">🌐</span> Personal Career Insights
-                </div>
-                <div className="inline-flex items-center gap-2.5 bg-slate-900/55 border border-slate-800 hover:border-amber-500/25 text-slate-200 text-[11px] font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm">
-                  <span className="text-base">👤</span> Expert Career Counselors
-                </div>
-                <div className="inline-flex items-center gap-2.5 bg-slate-900/55 border border-slate-800 hover:border-amber-500/25 text-slate-200 text-[11px] font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm">
-                  <span className="text-base">🗺️</span> Personalized Roadmaps
-                </div>
-                <div className="inline-flex items-center gap-2.5 bg-slate-900/55 border border-slate-800 hover:border-amber-500/25 text-slate-200 text-[11px] font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm">
-                  <span className="text-base">🔒</span> 100% Confidential & Trusted
-                </div>
-              </div>
-
-            </div>
-
-            {/* Right side AROHI Custom Assistant block */}
-            <div className="lg:col-span-5 relative flex flex-col gap-4 items-center justify-center select-none max-w-md w-full mx-auto">
-              
-              {/* Premium Resume Builder Card */}
-              <div className="bg-gradient-to-br from-[#0a0815] via-[#100e21] to-[#07050e] border border-slate-800 rounded-[2rem] p-6 shadow-[0_15px_35px_-5px_rgba(0,0,0,0.8)] relative overflow-hidden w-full text-left transition-all hover:border-slate-700">
-                {/* Background glow or accent */}
-                <div className="absolute right-0 top-0 w-24 h-24 bg-[#00e676]/5 rounded-full blur-2xl"></div>
-                
-                <div className="flex justify-between items-start gap-2">
-                  <div>
-                    <span className="bg-[#00e676]/10 text-[#00e676] text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border border-[#00e676]/20">
-                      ⚡ Professional Tool
-                    </span>
-                    <h4 className="text-[15px] font-black text-white mt-3 flex items-center gap-1.5">
-                      📑 Professional Resume Builder
-                    </h4>
-                    <p className="text-[11px] text-slate-300 mt-1.5 max-w-[280px] font-medium leading-relaxed">
-                      Create a professional, ATS-friendly resume to secure your dream role instantly.
-                    </p>
-                  </div>
-                  
-                  {/* Price Badge */}
-                  <div className="bg-[#ffdd00] text-slate-950 px-2.5 py-1.5 rounded-xl border border-yellow-300 font-black text-[12px] flex flex-col items-center leading-none shadow-md shrink-0">
-                    <span>₹99</span>
-                    <span className="text-[7px] font-bold uppercase tracking-tight mt-0.5 opacity-90">Only</span>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 mt-5">
-                  <button
-                    onClick={() => setActiveTab('resume')}
-                    className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
-                  >
-                    <span>Build Your Resume</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 stroke-[2px]">
-                      <path fillRule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.63l-3-3a.75.75 0 1 1 1.06-1.06l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 1 1-1.06-1.06l3-3H3.75A.75.75 0 0 1 3 10Z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => handleOpenShare('Professional Resume Builder', 'Check out the amazing Professional Resume Builder on Recruit.org.in! Create an ATS-friendly, professional resume to get hired instantly for only ₹99.', 'https://recruit.org.in')}
-                    className="px-3.5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white font-black text-xs uppercase rounded-xl flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
-                    title="Share Resume Builder with friends"
-                  >
-                    <Share2 className="w-4 h-4 text-emerald-400" />
-                    <span>Share</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-[#090812] via-[#0d0c1b] to-[#05040a] border border-slate-800/80 rounded-[2.25rem] p-6 sm:p-8 shadow-[0_15px_35px_-5px_rgba(0,0,0,0.8)] relative space-y-6 w-full hover:border-slate-700 transition-all">
-                
-                {/* Header Info */}
-                <div className="flex items-center gap-4">
-                  <div className="rounded-full w-14 h-14 flex items-center justify-center border border-slate-800 bg-slate-950 shadow-md shrink-0 relative overflow-hidden">
-                    <ArohiAvatar className="w-full h-full" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-lg font-extrabold text-white flex items-center gap-1.5">
-                      Hi! I'm AROHI <span className="animate-bounce">🎉</span>
-                    </h3>
-                    <p className="text-xs text-slate-400 font-semibold flex items-center gap-1.5 mt-0.5">
-                      <span className="w-2 h-2 rounded-full bg-[#00e676] animate-pulse"></span>
-                      Online — Career Guide
-                    </p>
-                  </div>
-                </div>
-
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed text-left font-medium">
-                  I can help you find clarity and the right direction for your career.
-                </p>
-
-                {/* Checklist items */}
-                <div className="space-y-3 text-left pt-1">
-                  {[
-                    "Discover your strengths",
-                    "Explore the best career options",
-                    "Get a personalized roadmap",
-                    "Plan your skill development",
-                    "Achieve your career goals"
-                  ].map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-teal-500/10 border border-teal-500/20 flex items-center justify-center shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 text-teal-400">
-                          <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <span className="text-xs font-semibold text-slate-300">{item}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* CTA Action button */}
-                <button
-                  onClick={() => setActiveTab('arohi')}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:scale-[0.98] text-white font-extrabold text-xs uppercase tracking-wider py-3.5 px-6 rounded-2xl w-full flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(124,58,237,0.3)] transition-all cursor-pointer border border-purple-500/20"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-white">
-                    <path fillRule="evenodd" d="M10 2c-2.236 0-4.43.18-6.57.53a.75.75 0 0 0-.63.732v6.417a5.21 5.21 0 0 0 1.253 3.39l1.411 1.693a.75.75 0 0 0 1.15-.054L8 12.333V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-4.667l1.396 2.393a.75.75 0 0 0 1.15.054l1.411-1.693a5.21 5.21 0 0 0 1.253-3.39V3.262a.75.75 0 0 0-.63-.73A42.12 42.12 0 0 0 10 2Zm-2.75 7.5a.75.75 0 0 1 .75-.75h4a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1-.75-.75ZM8 6.25a.75.75 0 0 1 .75-.75h4a.75.75 0 0 1 0 1.5H8a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
-                  </svg>
-                  Talk to AROHI Now
-                </button>
-
-                {/* Footer status text */}
-                <div className="text-[10px] font-bold text-slate-400 tracking-wider text-center uppercase">
-                  ⚡ ASK AROHI ANYTHING • ONLINE
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-        </section>
-
-        {/* PROMINENT NATIONAL REGISTER SIGNUP CALLOUT */}
-        {!user && (
-          <section className="bg-gradient-to-r from-[#1c124c] via-[#0f0a28] to-[#1c124c] border-2 border-purple-500/30 rounded-[2.5rem] p-8 md:p-10 text-left relative overflow-hidden shadow-[0_20px_50px_rgba(124,58,237,0.2)] animate-in fade-in slide-in-from-bottom duration-300">
-            <div className="absolute right-0 top-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute left-10 bottom-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-              <div className="lg:col-span-8 space-y-4">
-                <div className="inline-flex items-center gap-1.5 bg-[#fbbf24]/10 text-[#fcd34d] border border-[#fbbf24]/30 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-                  ⭐ Join 12,000+ Aspirants Registered This Month
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
-                  Formulate Your Permanent National Career Profile
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl font-semibold leading-relaxed">
-                  Connecting via Google Sign-In securely registers your candidacy to a secure cloud-synced account. Track course completions, save government matching schemes, preserve live AI speech interview ratings, and backup all your active application slips securely!
-                </p>
-                
-                <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-[11px] font-bold text-purple-300">
-                  <span className="flex items-center gap-1.5">🛡️ 100% Secure & Encrypted</span>
-                  <span className="flex items-center gap-1.5">📝 Save Live ATS Resume History</span>
-                  <span className="flex items-center gap-1.5">🏆 Verify Academic Credentials</span>
-                </div>
-              </div>
-              
-              <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 w-full shrink-0">
-                <button 
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className="w-full py-4 px-6 bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-600 hover:from-purple-400 hover:to-blue-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-xl transition-all hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <span className="text-base">🚀</span> Connect Securely Now
-                </button>
-                <div className="text-[10px] text-slate-400 font-bold text-center w-full mt-1">
-                  Connect instantly via Google OAuth or Email Registry
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* PROMINENT USER DASHBOARD LINK CALLOUT FOR LOGGED IN USERS */}
-        {user && (
-          <section className="bg-gradient-to-r from-[#0d1e2e] via-[#090714] to-[#1a113a] border-2 border-emerald-500/30 rounded-[2.5rem] p-8 md:p-10 text-left relative overflow-hidden shadow-[0_20px_50px_rgba(16,185,129,0.15)] animate-in fade-in slide-in-from-bottom duration-300">
-            <div className="absolute right-0 top-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute left-10 bottom-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-              <div className="lg:col-span-8 space-y-4">
-                <div className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-                  ✓ National Career Registry Account Active
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
-                  Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-purple-400">{userData?.profile?.name || user.displayName || 'Learner'}</span>!
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl font-semibold leading-relaxed">
-                  Your personalized career hub is updated. Access your active job applications, school curriculum guides, MSME guides, resume score reviews, and subscription statuses instantly from your central user dashboard.
-                </p>
-                
-                <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-[11px] font-bold text-slate-400">
-                  <span className="flex items-center gap-1.5 text-emerald-400">● Live Synchronization Active</span>
-                  <span className="flex items-center gap-1.5">★ {subscriptions && Object.values(subscriptions).filter(Boolean).length > 0 ? `${Object.values(subscriptions).filter(Boolean).length} Linked Subscriptions` : 'Free Tier Account'}</span>
-                  <span className="flex items-center gap-1.5 text-purple-400">👥 Access all features instantly</span>
-                </div>
-              </div>
-              
-              <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 w-full shrink-0">
-                <button 
-                  onClick={() => setActiveTab('dashboard')}
-                  className="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider rounded-2xl shadow-xl transition-all hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <User className="w-4 h-4" /> Go to User Dashboard
-                </button>
-                <div className="text-[10px] text-slate-400 font-bold text-center w-full mt-1">
-                  Manage profiles, subscription paths, and view certifications
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* INTERACTIVE 3D ORBITAL ECOSYSTEM ENGINE */}
-        <Interactive3DOrbit setActiveTab={setActiveTab} setSelectedPosting={setSelectedPosting} />
-
-        {/* SMOOTH 3D NON-STOP SCROLLING SHOWCASE */}
-        <Smooth3DShowcase setActiveTab={setActiveTab} setSelectedPosting={setSelectedPosting} />
-
-        {/* THREE STRATEGIC ASSISTANCE PATHS */}
-        <section className="space-y-6">
-          <div className="text-left space-y-1.5">
-            <div className="inline-flex items-center gap-1.5 bg-[#fbbf24]/10 text-[#fcd34d] border border-[#fbbf24]/30 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-            👑 Elite Career & Academic Ecosystem
-            </div>
-            <h3 className="text-2xl md:text-3xl font-black text-white tracking-tight">Four Strategic Support & Career Paths</h3>
-            <p className="text-xs text-slate-300 max-w-3xl font-semibold leading-relaxed">
-              Explore your ideal track below. Our monthly assistance plan starting from a budgeted rate of <span className="text-yellow-300 font-extrabold">₹399/Month</span> empowers you with active expert guidelines and continuous support.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            {/* PATH 1 CARD */}
-            <div className="bg-gradient-to-br from-[#101c5c] via-[#090b24] to-[#040512] border-2 border-blue-500/30 hover:border-blue-400/80 rounded-[2.5rem] p-7 text-left flex flex-col justify-between transition-all duration-500 group shadow-[0_20px_50px_rgba(59,130,246,0.3)] hover:shadow-[0_30px_70px_rgba(59,130,246,0.5)] hover:scale-[1.02] relative overflow-hidden">
-              <div className="absolute -top-12 -right-12 w-36 h-36 bg-blue-500/20 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/30 transition-colors"></div>
-              <div className="space-y-5">
-                <div className="flex justify-between items-center">
-                  <div className="bg-gradient-to-tr from-blue-600 to-indigo-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-[0_8px_25px_rgba(37,99,235,0.4)] border border-blue-400/30">
-                    🎓
-                  </div>
-                  <span className="text-[10px] bg-blue-500/25 text-blue-100 font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full border border-blue-400/30 shadow-sm">
-                    Path 1: Jobs & Resumes
-                  </span>
-                </div>
-                
-                <div className="space-y-2">
-                  <h4 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none group-hover:text-blue-100 transition-colors">
-                    Career & Resume Path
-                  </h4>
-                  <p className="text-sm text-slate-200 leading-relaxed font-medium">
-                    Search and apply for premium Government and Private jobs. Use ATS grading, find resume deficiencies, and practice tailored interview questions.
-                  </p>
-                </div>
-
-                <div className="space-y-2.5 border-t border-slate-800/60 pt-5">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Elite Benefits Included:</span>
-                  <div className="space-y-2 text-xs font-semibold text-slate-200">
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
-                      <span className="text-emerald-400 text-sm">✓</span>
-                      <span>Match-scoring with latest vacancies</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
-                      <span className="text-emerald-400 text-sm">✓</span>
-                      <span>Real-time ATS resume keyword checker</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
-                      <span className="text-emerald-400 text-sm">✓</span>
-                      <span>Interactive mock interview simulations</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-6 border-t border-slate-800/60 mt-6 space-y-3.5">
-                {/* 5-Tier Selector Pills */}
-                {!subscriptions.path1 && (
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Select Plan Tier:</span>
-                    <div className="grid grid-cols-5 gap-1 bg-slate-950/65 p-1 rounded-2xl border border-slate-800/80">
-                      {PRICING_TIERS.map((tier, idx) => {
-                        const isSelected = selectedTiers.path1 === idx;
-                        return (
-                          <button
-                            key={idx}
-                            onClick={() => {
-                              setSelectedTiers(prev => ({ ...prev, path1: idx }));
-                            }}
-                            className={`py-2 text-[10px] font-black rounded-xl transition-all cursor-pointer text-center ${
-                              isSelected
-                                ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-[0_4px_12px_rgba(124,58,237,0.35)] border border-violet-400/20'
-                                : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
-                            }`}
-                          >
-                            ₹{tier.price}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Assistance Fee</span>
-                  <div className="text-right">
-                    {subscriptions.path1 && subscriptionDetails.path1 ? (
-                      <div>
-                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5">
-                          {subscriptionDetails.path1.tierName}
-                        </span>
-                        <span className="text-2xl font-black text-white tracking-tight">₹{subscriptionDetails.path1.price}</span>
-                        <span className="text-xs font-semibold text-slate-400">/mo</span>
-                      </div>
-                    ) : (
-                      <div>
-                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5 text-right">
-                          {PRICING_TIERS[selectedTiers.path1].name}
-                        </span>
-                        <span className="text-2xl font-black text-white tracking-tight">₹{PRICING_TIERS[selectedTiers.path1].price}</span>
-                        <span className="text-xs font-semibold text-slate-400">/mo</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Call hours and AI Token usage indicators */}
-                <div className="grid grid-cols-2 gap-2 text-[10px] bg-slate-950/40 border border-slate-800/50 p-2.5 rounded-xl font-bold mt-2.5">
-                  <div className="flex items-center gap-1.5 justify-center text-slate-300">
-                    <span>📞</span>
-                    <span>
-                      {subscriptions.path1 && subscriptionDetails.path1
-                        ? PRICING_TIERS.find(t => t.price === subscriptionDetails.path1?.price)?.callHoursText || "2 Hours Calls"
-                        : PRICING_TIERS[selectedTiers.path1].callHoursText}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 justify-center text-slate-300 border-l border-slate-800/60">
-                    <span>🪙</span>
-                    <span>
-                      {subscriptions.path1 && subscriptionDetails.path1
-                        ? (PRICING_TIERS.find(t => t.price === subscriptionDetails.path1?.price)?.tokenUsageText || "1,000 AI Tokens") + " Limit"
-                        : PRICING_TIERS[selectedTiers.path1].tokenUsageText + " Limit"}
-                    </span>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <button 
-                    onClick={() => setActiveTab('jobs')}
-                    className="bg-white/10 hover:bg-white/15 text-white border border-white/20 hover:border-white/30 font-extrabold text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all text-center cursor-pointer active:scale-95"
-                  >
-                    Explore Jobs
-                  </button>
-                  <button 
-                    onClick={() => {
-                      if (subscriptions.path1) {
-                        handleSubscribe('path1');
-                      } else {
-                        const tier = PRICING_TIERS[selectedTiers.path1];
-                        setPendingSubscriptionDetail({
-                          tierName: tier.name,
-                          price: tier.price,
-                          margin: tier.margin
-                        });
-                        setCheckoutPath({
-                          id: 'path1',
-                          title: `${PATH_DETAILS.path1.title} (${tier.name})`,
-                          price: `₹${tier.price}/Month`
-                        });
-                      }
-                    }}
-                    className={`font-black text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all cursor-pointer text-center active:scale-95 ${
-                      subscriptions.path1 
-                        ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30' 
-                        : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-[0_4px_15px_rgba(37,99,235,0.4)] border border-blue-400/20'
-                    }`}
-                  >
-                    {subscriptions.path1 ? 'Cancel Subscription' : 'Subscribe'}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* PATH 2 CARD */}
-            <div className="bg-gradient-to-br from-[#4c1256] via-[#0d0724] to-[#050310] border-2 border-purple-500/30 hover:border-purple-400/80 rounded-[2.5rem] p-7 text-left flex flex-col justify-between transition-all duration-500 group shadow-[0_20px_50px_rgba(168,85,247,0.3)] hover:shadow-[0_30px_70px_rgba(168,85,247,0.5)] hover:scale-[1.02] relative overflow-hidden">
-              <div className="absolute -top-12 -right-12 w-36 h-36 bg-purple-500/20 rounded-full blur-3xl pointer-events-none group-hover:bg-purple-500/30 transition-colors"></div>
-              <div className="space-y-5">
-                <div className="flex justify-between items-center">
-                  <div className="bg-gradient-to-tr from-purple-600 to-pink-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-[0_8px_25px_rgba(168,85,247,0.4)] border border-purple-400/30">
-                    📖
-                  </div>
-                  <span className="text-[10px] bg-purple-500/25 text-purple-100 font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full border border-purple-400/30 shadow-sm">
-                    Path 2: Upgrade Skills
-                  </span>
-                </div>
-                
-                <div className="space-y-2">
-                  <h4 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none group-hover:text-purple-100 transition-colors">
-                    Skill Upgradation Path
-                  </h4>
-                  <p className="text-sm text-slate-200 leading-relaxed font-medium">
-                    No direct subscription cost. Sign up for any course and pay in flexible monthly breakups. Get Arohi AI classroom mentorship completely free of cost!
-                  </p>
-                </div>
-
-                <div className="space-y-2.5 border-t border-slate-800/60 pt-5">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Elite Benefits Included:</span>
-                  <div className="space-y-2 text-xs font-semibold text-slate-200">
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
-                      <span className="text-emerald-400 text-sm">✓</span>
-                      <span>Full access to Tech & Business academy</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
-                      <span className="text-emerald-400 text-sm">✓</span>
-                      <span>Industry standard certificates</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
-                      <span className="text-emerald-400 text-sm">✓</span>
-                      <span>Arohi AI Mentor Included Free</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-6 border-t border-slate-800/60 mt-6 space-y-3.5">
-                {/* 5-Tier Selector Pills */}
-                {!subscriptions.path2 && (
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Select Plan Tier:</span>
-                    <div className="grid grid-cols-5 gap-1 bg-slate-950/65 p-1 rounded-2xl border border-slate-800/80">
-                      {PRICING_TIERS.map((tier, idx) => {
-                        const isSelected = selectedTiers.path2 === idx;
-                        return (
-                          <button
-                            key={idx}
-                            onClick={() => {
-                              setSelectedTiers(prev => ({ ...prev, path2: idx }));
-                            }}
-                            className={`py-2 text-[10px] font-black rounded-xl transition-all cursor-pointer text-center ${
-                              isSelected
-                                ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-[0_4px_12px_rgba(124,58,237,0.35)] border border-violet-400/20'
-                                : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
-                            }`}
-                          >
-                            ₹{tier.price}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Assistance Fee</span>
-                  <div className="text-right">
-                    {subscriptions.path2 && subscriptionDetails.path2 ? (
-                      <div>
-                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5">
-                          {subscriptionDetails.path2.tierName}
-                        </span>
-                        <span className="text-2xl font-black text-white tracking-tight">₹{subscriptionDetails.path2.price}</span>
-                        <span className="text-xs font-semibold text-slate-400">/mo</span>
-                      </div>
-                    ) : (
-                      <div>
-                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5 text-right">
-                          {PRICING_TIERS[selectedTiers.path2].name}
-                        </span>
-                        <span className="text-2xl font-black text-white tracking-tight">₹{PRICING_TIERS[selectedTiers.path2].price}</span>
-                        <span className="text-xs font-semibold text-slate-400">/mo</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Call hours and AI Token usage indicators */}
-                <div className="grid grid-cols-2 gap-2 text-[10px] bg-slate-950/40 border border-slate-800/50 p-2.5 rounded-xl font-bold mt-2.5">
-                  <div className="flex items-center gap-1.5 justify-center text-slate-300">
-                    <span>📞</span>
-                    <span>
-                      {subscriptions.path2 && subscriptionDetails.path2
-                        ? PRICING_TIERS.find(t => t.price === subscriptionDetails.path2?.price)?.callHoursText || "2 Hours Calls"
-                        : PRICING_TIERS[selectedTiers.path2].callHoursText}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 justify-center text-slate-300 border-l border-slate-800/60">
-                    <span>🪙</span>
-                    <span>
-                      {subscriptions.path2 && subscriptionDetails.path2
-                        ? (PRICING_TIERS.find(t => t.price === subscriptionDetails.path2?.price)?.tokenUsageText || "1,000 AI Tokens") + " Limit"
-                        : PRICING_TIERS[selectedTiers.path2].tokenUsageText + " Limit"}
-                    </span>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <button 
-                    onClick={() => setActiveTab('courses')}
-                    className="bg-white/10 hover:bg-white/15 text-white border border-white/20 hover:border-white/30 font-extrabold text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all text-center cursor-pointer active:scale-95"
-                  >
-                    View Courses
-                  </button>
-                  <button 
-                    onClick={() => {
-                      if (subscriptions.path2) {
-                        handleSubscribe('path2');
-                      } else {
-                        const tier = PRICING_TIERS[selectedTiers.path2];
-                        setPendingSubscriptionDetail({
-                          tierName: tier.name,
-                          price: tier.price,
-                          margin: tier.margin
-                        });
-                        setCheckoutPath({
-                          id: 'path2',
-                          title: `${PATH_DETAILS.path2.title} (${tier.name})`,
-                          price: `₹${tier.price}/Month`
-                        });
-                      }
-                    }}
-                    className={`font-black text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all cursor-pointer text-center active:scale-95 ${
-                      subscriptions.path2 
-                        ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30' 
-                        : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-[0_4px_15px_rgba(168,85,247,0.4)] border border-purple-400/20'
-                    }`}
-                  >
-                    {subscriptions.path2 ? 'Cancel Subscription' : 'Subscribe'}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* PATH 3 CARD */}
-            <div className="bg-gradient-to-br from-[#0c3e29] via-[#040d0a] to-[#010504] border-2 border-emerald-500/30 hover:border-emerald-400/80 rounded-[2.5rem] p-7 text-left flex flex-col justify-between transition-all duration-500 group shadow-[0_20px_50px_rgba(16,185,129,0.3)] hover:shadow-[0_30px_70px_rgba(16,185,129,0.5)] hover:scale-[1.02] relative overflow-hidden">
-              <div className="absolute -top-12 -right-12 w-36 h-36 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/30 transition-colors"></div>
-              <div className="space-y-5">
-                <div className="flex justify-between items-center">
-                  <div className="bg-gradient-to-tr from-emerald-600 to-teal-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-[0_8px_25px_rgba(16,185,129,0.4)] border border-emerald-400/30">
-                    🚀
-                  </div>
-                  <span className="text-[10px] bg-emerald-500/25 text-emerald-100 font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full border border-emerald-400/30 shadow-sm">
-                    Path 3: Udyam
-                  </span>
-                </div>
-                
-                <div className="space-y-2">
-                  <h4 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none group-hover:text-emerald-100 transition-colors">
-                    Udyam Business Plan
-                  </h4>
-                  <p className="text-sm text-slate-200 leading-relaxed font-medium">
-                    Not looking for a job? Build your business startup instead. Master Udyam MSME registrations, check Mudra loan eligibility, and claim subsidies.
-                  </p>
-                </div>
-
-                <div className="space-y-2.5 border-t border-slate-800/60 pt-5">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Elite Benefits Included:</span>
-                  <div className="space-y-2 text-xs font-semibold text-slate-200">
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
-                      <span className="text-emerald-400 text-sm">✓</span>
-                      <span>Government portal verification guides</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
-                      <span className="text-emerald-400 text-sm">✓</span>
-                      <span>Mudra & PMEGP subsidy eligibility</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
-                      <span className="text-emerald-400 text-sm">✓</span>
-                      <span>Odisha state & local startup benefits</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-6 border-t border-slate-800/60 mt-6 space-y-3.5">
-                {/* 5-Tier Selector Pills */}
-                {!subscriptions.path3 && (
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Select Plan Tier:</span>
-                    <div className="grid grid-cols-5 gap-1 bg-slate-950/65 p-1 rounded-2xl border border-slate-800/80">
-                      {PRICING_TIERS.map((tier, idx) => {
-                        const isSelected = selectedTiers.path3 === idx;
-                        return (
-                          <button
-                            key={idx}
-                            onClick={() => {
-                              setSelectedTiers(prev => ({ ...prev, path3: idx }));
-                            }}
-                            className={`py-2 text-[10px] font-black rounded-xl transition-all cursor-pointer text-center ${
-                              isSelected
-                                ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-[0_4px_12px_rgba(124,58,237,0.35)] border border-violet-400/20'
-                                : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
-                            }`}
-                          >
-                            ₹{tier.price}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Assistance Fee</span>
-                  <div className="text-right">
-                    {subscriptions.path3 && subscriptionDetails.path3 ? (
-                      <div>
-                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5">
-                          {subscriptionDetails.path3.tierName}
-                        </span>
-                        <span className="text-2xl font-black text-white tracking-tight">₹{subscriptionDetails.path3.price}</span>
-                        <span className="text-xs font-semibold text-slate-400">/mo</span>
-                      </div>
-                    ) : (
-                      <div>
-                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5 text-right">
-                          {PRICING_TIERS[selectedTiers.path3].name}
-                        </span>
-                        <span className="text-2xl font-black text-white tracking-tight">₹{PRICING_TIERS[selectedTiers.path3].price}</span>
-                        <span className="text-xs font-semibold text-slate-400">/mo</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Call hours and AI Token usage indicators */}
-                <div className="grid grid-cols-2 gap-2 text-[10px] bg-slate-950/40 border border-slate-800/50 p-2.5 rounded-xl font-bold mt-2.5">
-                  <div className="flex items-center gap-1.5 justify-center text-slate-300">
-                    <span>📞</span>
-                    <span>
-                      {subscriptions.path3 && subscriptionDetails.path3
-                        ? PRICING_TIERS.find(t => t.price === subscriptionDetails.path3?.price)?.callHoursText || "2 Hours Calls"
-                        : PRICING_TIERS[selectedTiers.path3].callHoursText}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 justify-center text-slate-300 border-l border-slate-800/60">
-                    <span>🪙</span>
-                    <span>
-                      {subscriptions.path3 && subscriptionDetails.path3
-                        ? (PRICING_TIERS.find(t => t.price === subscriptionDetails.path3?.price)?.tokenUsageText || "1,000 AI Tokens") + " Limit"
-                        : PRICING_TIERS[selectedTiers.path3].tokenUsageText + " Limit"}
-                    </span>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <button 
-                    onClick={() => setActiveTab('business')}
-                    className="bg-white/10 hover:bg-white/15 text-white border border-white/20 hover:border-white/30 font-extrabold text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all text-center cursor-pointer active:scale-95"
-                  >
-                    Launch Business
-                  </button>
-                  <button 
-                    onClick={() => {
-                      if (subscriptions.path3) {
-                        handleSubscribe('path3');
-                      } else {
-                        const tier = PRICING_TIERS[selectedTiers.path3];
-                        setPendingSubscriptionDetail({
-                          tierName: tier.name,
-                          price: tier.price,
-                          margin: tier.margin
-                        });
-                        setCheckoutPath({
-                          id: 'path3',
-                          title: `${PATH_DETAILS.path3.title} (${tier.name})`,
-                          price: `₹${tier.price}/Month`
-                        });
-                      }
-                    }}
-                    className={`font-black text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all cursor-pointer text-center active:scale-95 ${
-                      subscriptions.path3 
-                        ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30' 
-                        : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-[0_4px_15px_rgba(16,185,129,0.4)] border border-emerald-400/20'
-                    }`}
-                  >
-                    {subscriptions.path3 ? 'Cancel Subscription' : 'Subscribe'}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* PATH 4 CARD */}
-            <div className="bg-gradient-to-br from-[#111e58] via-[#060b24] to-[#020410] border-2 border-indigo-500/30 hover:border-indigo-400/80 rounded-[2.5rem] p-7 text-left flex flex-col justify-between transition-all duration-500 group shadow-[0_20px_50px_rgba(99,102,241,0.3)] hover:shadow-[0_30px_70px_rgba(99,102,241,0.5)] hover:scale-[1.02] relative overflow-hidden">
-              <div className="absolute -top-12 -right-12 w-36 h-36 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/30 transition-colors"></div>
-              <div className="space-y-5">
-                <div className="flex justify-between items-center">
-                  <div className="bg-gradient-to-tr from-indigo-600 to-blue-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-[0_8px_25px_rgba(99,102,241,0.4)] border border-indigo-400/30">
-                    📚
-                  </div>
-                  <span className="text-[10px] bg-indigo-500/25 text-indigo-100 font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full border border-indigo-400/30 shadow-sm">
-                    Path 4: Class 1-10
-                  </span>
-                </div>
-                
-                <div className="space-y-2">
-                  <h4 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none group-hover:text-indigo-100 transition-colors">
-                    School Support Path
-                  </h4>
-                  <p className="text-sm text-slate-200 leading-relaxed font-medium">
-                    Syllabus explorer for Class 1-10 students. Access high-quality unique chapters for Languages and Sciences mapped to standard curricula.
-                  </p>
-                </div>
-
-                <div className="space-y-2.5 border-t border-slate-800/60 pt-5">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Elite Benefits Included:</span>
-                  <div className="space-y-2 text-xs font-semibold text-slate-200">
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
-                      <span className="text-emerald-400 text-sm">✓</span>
-                      <span>Unique high-quality chapter notes</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
-                      <span className="text-emerald-400 text-sm">✓</span>
-                      <span>Interactive school syllabus explorer</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2.5 rounded-xl backdrop-blur-md">
-                      <span className="text-emerald-400 text-sm">✓</span>
-                      <span>24/7 School support from AROHI AI</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-6 border-t border-slate-800/60 mt-6 space-y-3.5">
-                {/* 5-Tier Selector Pills */}
-                {!subscriptions.path4 && (
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Select Plan Tier:</span>
-                    <div className="grid grid-cols-5 gap-1 bg-slate-950/65 p-1 rounded-2xl border border-slate-800/80">
-                      {PRICING_TIERS.map((tier, idx) => {
-                        const isSelected = selectedTiers.path4 === idx;
-                        return (
-                          <button
-                            key={idx}
-                            onClick={() => {
-                              setSelectedTiers(prev => ({ ...prev, path4: idx }));
-                            }}
-                            className={`py-2 text-[10px] font-black rounded-xl transition-all cursor-pointer text-center ${
-                              isSelected
-                                ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-[0_4px_12px_rgba(124,58,237,0.35)] border border-violet-400/20'
-                                : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
-                            }`}
-                          >
-                            ₹{tier.price}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Assistance Fee</span>
-                  <div className="text-right">
-                    {subscriptions.path4 && subscriptionDetails.path4 ? (
-                      <div>
-                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5">
-                          {subscriptionDetails.path4.tierName}
-                        </span>
-                        <span className="text-2xl font-black text-white tracking-tight">₹{subscriptionDetails.path4.price}</span>
-                        <span className="text-xs font-semibold text-slate-400">/mo</span>
-                      </div>
-                    ) : (
-                      <div>
-                        <span className="text-[9px] bg-violet-500/25 text-violet-300 font-extrabold uppercase px-2 py-0.5 rounded border border-violet-500/30 block mb-0.5 text-right">
-                          {PRICING_TIERS[selectedTiers.path4].name}
-                        </span>
-                        <span className="text-2xl font-black text-white tracking-tight">₹{PRICING_TIERS[selectedTiers.path4].price}</span>
-                        <span className="text-xs font-semibold text-slate-400">/mo</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Call hours and AI Token usage indicators */}
-                <div className="grid grid-cols-2 gap-2 text-[10px] bg-slate-950/40 border border-slate-800/50 p-2.5 rounded-xl font-bold mt-2.5">
-                  <div className="flex items-center gap-1.5 justify-center text-slate-300">
-                    <span>📞</span>
-                    <span>
-                      {subscriptions.path4 && subscriptionDetails.path4
-                        ? PRICING_TIERS.find(t => t.price === subscriptionDetails.path4?.price)?.callHoursText || "2 Hours Calls"
-                        : PRICING_TIERS[selectedTiers.path4].callHoursText}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 justify-center text-slate-300 border-l border-slate-800/60">
-                    <span>🪙</span>
-                    <span>
-                      {subscriptions.path4 && subscriptionDetails.path4
-                        ? (PRICING_TIERS.find(t => t.price === subscriptionDetails.path4?.price)?.tokenUsageText || "1,000 AI Tokens") + " Limit"
-                        : PRICING_TIERS[selectedTiers.path4].tokenUsageText + " Limit"}
-                    </span>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <button 
-                    onClick={() => setActiveTab('syllabus')}
-                    className="bg-white/10 hover:bg-white/15 text-white border border-white/20 hover:border-white/30 font-extrabold text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all text-center cursor-pointer active:scale-95"
-                  >
-                    Open Syllabus
-                  </button>
-                  <button 
-                    onClick={() => {
-                      if (subscriptions.path4) {
-                        handleSubscribe('path4');
-                      } else {
-                        const tier = PRICING_TIERS[selectedTiers.path4];
-                        setPendingSubscriptionDetail({
-                          tierName: tier.name,
-                          price: tier.price,
-                          margin: tier.margin
-                        });
-                        setCheckoutPath({
-                          id: 'path4',
-                          title: `${PATH_DETAILS.path4.title} (${tier.name})`,
-                          price: `₹${tier.price}/Month`
-                        });
-                      }
-                    }}
-                    className={`font-black text-[11px] uppercase tracking-wider py-3 px-4 rounded-xl transition-all cursor-pointer text-center active:scale-95 ${
-                      subscriptions.path4 
-                        ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30' 
-                        : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-[0_4px_15px_rgba(99,102,241,0.4)] border border-indigo-400/20'
-                    }`}
-                  >
-                    {subscriptions.path4 ? 'Cancel Subscription' : 'Subscribe'}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        {/* FEATURED SARKARI JOB HIGHLIGHT BOARD */}
-        <section className="bg-[#120d2a] border border-[#2d2163] p-6 rounded-3xl shadow-xl">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-1.5 border-b border-[#211b3d] pb-2.5">
-            <CheckCircle className="w-4.5 h-4.5 text-[#10b981]" /> Hot Active Online Application Links
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {quickLinks.map((p, idx) => {
-              const borderColors = [
-                'border-orange-500/60 hover:border-orange-500',
-                'border-blue-500/60 hover:border-blue-500',
-                'border-emerald-500/60 hover:border-emerald-500',
-                'border-rose-500/60 hover:border-rose-500',
-                'border-indigo-500/60 hover:border-indigo-500',
-                'border-purple-500/60 hover:border-purple-500',
-                'border-teal-500/60 hover:border-teal-500',
-                'border-amber-500/60 hover:border-amber-500'
-              ];
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => {
-                    setSelectedPosting(p);
-                    setActiveTab('jobs');
-                  }}
-                  className={`text-left p-4 border-l-4 rounded-xl bg-[#171238]/60 border border-[#2d2165]/80 hover:bg-[#1a1442] hover:shadow-[0_0_15px_rgba(124,58,237,0.15)] transition-all duration-200 cursor-pointer flex justify-between items-center group font-bold text-xs ${borderColors[idx % borderColors.length]}`}
-                >
-                  <div className="pr-1.5 leading-snug text-slate-200">
-                    <span className="block text-[9px] text-[#8a70f5] uppercase font-black mb-0.5">{p.organization}</span>
-                    <span className="group-hover:underline text-white">{p.title}</span>
-                  </div>
-                  <ArrowUpRight className="w-4 h-4 shrink-0 text-slate-400 opacity-65 group-hover:opacity-100 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* PROMO CTA: Talk with AROHI */}
-        <section className="bg-gradient-to-r from-[#17123a] to-[#0d0924] border border-[#2d2163] rounded-[2rem] p-6 sm:p-8 text-left shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-violet-600/10 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="space-y-2 max-w-xl">
-            <div className="inline-flex items-center gap-1.5 bg-[#7c3aed]/20 text-[#a78bfa] border border-[#7c3aed]/30 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00e676] animate-pulse"></span>
-              AROHI Your Career guide
-            </div>
-            <h3 className="text-xl font-black text-white tracking-tight">Need Career or Subsidy Help? Ask AROHI</h3>
-            <p className="text-xs text-slate-300 font-semibold leading-relaxed">
-              Get immediate interactive advice regarding Mudra loans, exam syllabus, educational schemes, ATS resume tips, or business setup. Simply tap launch to open your chat window.
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              setIsChatOpen(true);
-              setIsChatMinimized(false);
-            }}
-            className="w-full md:w-auto bg-gradient-to-r from-[#7c3aed] to-[#a855f7] hover:from-[#6d28d9] hover:to-[#9333ea] text-white font-extrabold text-xs uppercase tracking-wider py-3.5 px-7 rounded-2xl shadow-[0_4px_20px_rgba(124,58,237,0.35)] cursor-pointer flex items-center justify-center gap-2 transition-all shrink-0 active:scale-95"
-          >
-            <Bot className="w-4.5 h-4.5 text-yellow-300" /> Launch Live Chat
-          </button>
-        </section>
-
-        {/* PREMIUM CANDIDATE TESTIMONIALS & RATINGS MODULE */}
-        <section className="bg-gradient-to-br from-[#130d2d] via-[#090618] to-[#1a113a] border border-[#2d2163] p-6 sm:p-10 rounded-3xl shadow-xl space-y-8 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="absolute bottom-0 right-0 w-80 h-80 bg-violet-600/5 rounded-full blur-3xl pointer-events-none"></div>
-
-          {/* Heading and Intro Stats */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-[#211b42] pb-6">
-            <div className="text-left space-y-2">
-              <div className="inline-flex items-center gap-1.5 bg-[#f59e0b]/10 text-[#fbbf24] border border-[#f59e0b]/30 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-                <Star className="w-3.5 h-3.5 fill-current text-amber-400 animate-pulse" /> Candidate Verification & Ratings
-              </div>
-              <h3 className="text-2xl md:text-3xl font-black text-white tracking-tight">Verified Candidate Testimonials</h3>
-              <p className="text-xs text-slate-300 max-w-2xl font-semibold leading-relaxed">
-                See how students, job aspirants, and entrepreneurs in <span className="text-amber-300">Odisha</span> and across <span className="text-[#a78bfa]">India</span> use our platform to empower their academic and professional journeys.
-              </p>
-            </div>
-
-            {/* Quick Overall rating badge */}
-            <div className="bg-[#120d2d]/80 border border-[#40308c] rounded-2xl p-4 flex items-center gap-4 shrink-0 text-left">
-              <div className="text-center">
-                <span className="block text-3xl font-black text-yellow-300 leading-none">4.9</span>
-                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1 block">Out of 5★</span>
-              </div>
-              <div className="border-l border-[#2e2365] pl-4 space-y-1">
-                <div className="flex items-center gap-1 text-amber-400">
-                  <Star className="w-3 h-3 fill-current" />
-                  <Star className="w-3 h-3 fill-current" />
-                  <Star className="w-3 h-3 fill-current" />
-                  <Star className="w-3 h-3 fill-current" />
-                  <Star className="w-3 h-3 fill-current" />
-                </div>
-                <span className="text-[10px] text-slate-200 font-extrabold block">
-                  {(14820 + 9330 + reviews.length).toLocaleString()} Total Reviews
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Audience Breakdown Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Odisha Audience Counter Card */}
-            <div className="bg-[#150f38]/50 border border-[#271d54] hover:border-[#382b75] p-5 rounded-2xl text-left transition-colors flex items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-[#a78bfa]">
-                  <MapPin className="w-3.5 h-3.5 text-amber-400" /> Odisha State Audience
-                </div>
-                <h4 className="text-lg font-black text-white">
-                  {(14820 + reviews.filter(r => r.state === 'Odisha').length).toLocaleString()} Candidates
-                </h4>
-                <p className="text-[11px] text-slate-300 font-medium">
-                  Verified upskilling program students and startup loan applications.
-                </p>
-              </div>
-              <div className="bg-amber-500/10 border border-amber-500/30 text-amber-400 font-black text-xs px-3 py-1.5 rounded-xl shrink-0 flex flex-col items-center leading-none">
-                <span className="text-sm">4.9</span>
-                <span className="text-[7px] uppercase tracking-wider mt-0.5 opacity-80">Rating</span>
-              </div>
-            </div>
-
-            {/* Indian Audience Counter Card */}
-            <div className="bg-[#150f38]/50 border border-[#271d54] hover:border-[#382b75] p-5 rounded-2xl text-left transition-colors flex items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-[#a78bfa]">
-                  <Users className="w-3.5 h-3.5 text-violet-400" /> Pan-India Audience
-                </div>
-                <h4 className="text-lg font-black text-white">
-                  {(9330 + reviews.filter(r => r.state !== 'Odisha').length).toLocaleString()} Candidates
-                </h4>
-                <p className="text-[11px] text-slate-300 font-medium">
-                  Central government postings, ATS resume scans, and national mock assessments.
-                </p>
-              </div>
-              <div className="bg-violet-500/10 border border-violet-500/30 text-violet-400 font-black text-xs px-3 py-1.5 rounded-xl shrink-0 flex flex-col items-center leading-none">
-                <span className="text-sm">4.8</span>
-                <span className="text-[7px] uppercase tracking-wider mt-0.5 opacity-80">Rating</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Core Interactive Testimonial Box */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
-            {/* Left Col: Current Active Testimonial Card */}
-            <div className="lg:col-span-7 bg-[#100b2a] border border-[#2c1f5e] rounded-2xl p-6 text-left relative overflow-hidden flex flex-col justify-between min-h-[220px]">
-              <div className="absolute -top-4 -right-4 w-20 h-20 bg-amber-500/5 rounded-full blur-xl pointer-events-none"></div>
-              
-              {(() => {
-                const activeReview = reviews[currentReviewIdx] || reviews[0];
-                return (
-                  <>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#7c3aed] to-[#d946ef] text-white flex items-center justify-center font-black text-sm uppercase shadow-inner">
-                            {activeReview.name.charAt(0)}
-                          </div>
-                          <div>
-                            <h5 className="text-sm font-black text-white">{activeReview.name}</h5>
-                            <p className="text-[11px] text-slate-400 flex items-center gap-1 font-semibold mt-0.5">
-                              <MapPin className="w-3 h-3 text-amber-400" /> {activeReview.city}, {activeReview.state}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-0.5 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-lg text-amber-400 font-black text-[11px]">
-                          <span className="mr-1">{activeReview.rating}.0</span>
-                          {Array.from({ length: activeReview.rating }).map((_, i) => (
-                            <Star key={i} className="w-2.5 h-2.5 fill-current" />
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="relative">
-                        <span className="absolute -top-2.5 -left-1 text-slate-700/40 text-4xl font-serif select-none pointer-events-none">“</span>
-                        <p className="text-xs sm:text-sm text-slate-200 italic leading-relaxed pl-4 font-medium">
-                          {activeReview.comment}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between border-t border-[#1e1742] pt-4 mt-6">
-                      <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                        Verified Candidate Review • {activeReview.date}
-                      </span>
-
-                      <button
-                        onClick={() => {
-                          if (reviews.length > 1) {
-                            let nextIdx;
-                            do {
-                              nextIdx = Math.floor(Math.random() * reviews.length);
-                            } while (nextIdx === currentReviewIdx);
-                            setCurrentReviewIdx(nextIdx);
-                          }
-                        }}
-                        className="bg-[#241a54] hover:bg-[#322474] text-[#a78bfa] border border-[#3f2c8d] hover:border-[#7c3aed] text-[10px] font-black uppercase tracking-wider py-1.5 px-3.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <RefreshCw className="w-3 h-3 animate-spin duration-1000" /> Next Review
-                      </button>
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
-
-            {/* Right Col: Write your own review CTA / Form */}
-            <div className="lg:col-span-5 bg-[#140e36]/60 border border-[#2b1f5d] rounded-2xl p-6 text-left">
-              {!isAddingReview ? (
-                <div className="space-y-4 h-full flex flex-col justify-center">
-                  <h4 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4 text-[#a78bfa]" /> Share Your Feedback
-                  </h4>
-                  <p className="text-xs text-slate-300 leading-relaxed font-semibold">
-                    Are you preparing for an upskilling exam in Odisha or updating your resume for top engineering roles? Your feedback helps thousands of fellow aspirants!
-                  </p>
-                  <button
-                    onClick={() => setIsAddingReview(true)}
-                    className="w-full bg-gradient-to-r from-[#7c3aed] to-[#a855f7] hover:from-[#6d28d9] hover:to-[#9333ea] text-white font-extrabold text-xs uppercase tracking-wider py-3 px-5 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
-                  >
-                    <Plus className="w-4 h-4 text-yellow-300" /> Write A Verified Review
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmitReview} className="space-y-3.5">
-                  <div className="flex justify-between items-center border-b border-[#211b4a] pb-2">
-                    <span className="text-xs font-black text-white uppercase tracking-wider">Write Your Testimonial</span>
-                    <button
-                      type="button"
-                      onClick={() => setIsAddingReview(false)}
-                      className="text-[10px] text-slate-400 hover:text-white font-bold uppercase tracking-wider"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-
-                  {reviewSubmitSuccess ? (
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-4 rounded-xl text-center space-y-1">
-                      <p className="text-xs font-black uppercase tracking-wider">✓ Review Submitted!</p>
-                      <p className="text-[11px] font-semibold text-slate-300">Thank you for sharing your experience. We have added your review to our candidate board.</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="grid grid-cols-2 gap-2.5">
-                        <div className="space-y-1 text-left">
-                          <label className="text-[9px] uppercase font-black text-slate-400">Full Name</label>
-                          <input
-                            type="text"
-                            required
-                            placeholder="e.g. Ramesh Giri"
-                            value={newReviewName}
-                            onChange={(e) => setNewReviewName(e.target.value)}
-                            className="w-full bg-[#0d0924] border border-[#2d2163] focus:border-[#7c3aed] text-white text-xs p-2 rounded-lg outline-none"
-                          />
-                        </div>
-                        <div className="space-y-1 text-left">
-                          <label className="text-[9px] uppercase font-black text-slate-400">City / Town</label>
-                          <input
-                            type="text"
-                            required
-                            placeholder="e.g. Puri"
-                            value={newReviewCity}
-                            onChange={(e) => setNewReviewCity(e.target.value)}
-                            className="w-full bg-[#0d0924] border border-[#2d2163] focus:border-[#7c3aed] text-white text-xs p-2 rounded-lg outline-none"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2.5">
-                        <div className="space-y-1 text-left">
-                          <label className="text-[9px] uppercase font-black text-slate-400">State Audience</label>
-                          <select
-                            value={newReviewState}
-                            onChange={(e) => setNewReviewState(e.target.value)}
-                            className="w-full bg-[#0d0924] border border-[#2d2163] focus:border-[#7c3aed] text-white text-xs p-2 rounded-lg outline-none"
-                          >
-                            <option value="Odisha">Odisha</option>
-                            <option value="Andhra Pradesh">Andhra Pradesh</option>
-                            <option value="Bihar">Bihar</option>
-                            <option value="Jharkhand">Jharkhand</option>
-                            <option value="West Bengal">West Bengal</option>
-                            <option value="Delhi">Delhi</option>
-                            <option value="Maharashtra">Maharashtra</option>
-                            <option value="Karnataka">Karnataka</option>
-                            <option value="Tamil Nadu">Tamil Nadu</option>
-                          </select>
-                        </div>
-
-                        <div className="space-y-1 text-left">
-                          <label className="text-[9px] uppercase font-black text-slate-400">Rating Scale</label>
-                          <select
-                            value={newReviewRating}
-                            onChange={(e) => setNewReviewRating(Number(e.target.value))}
-                            className="w-full bg-[#0d0924] border border-[#2d2163] focus:border-[#7c3aed] text-amber-400 font-extrabold text-xs p-2 rounded-lg outline-none"
-                          >
-                            <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
-                            <option value="4">⭐⭐⭐⭐ (4/5)</option>
-                            <option value="3">⭐⭐⭐ (3/5)</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="space-y-1 text-left">
-                        <label className="text-[9px] uppercase font-black text-slate-400">Your Feedback / Review Message</label>
-                        <textarea
-                          required
-                          rows={2}
-                          maxLength={250}
-                          placeholder="What did you learn? How was your ATS score or business guidelines helpful?"
-                          value={newReviewComment}
-                          onChange={(e) => setNewReviewComment(e.target.value)}
-                          className="w-full bg-[#0d0924] border border-[#2d2163] focus:border-[#7c3aed] text-white text-xs p-2 rounded-lg outline-none resize-none leading-relaxed"
-                        ></textarea>
-                      </div>
-
-                      <button
-                        type="submit"
-                        className="w-full bg-[#00e676] hover:bg-[#00c864] text-slate-950 font-black text-xs uppercase tracking-wider py-2.5 rounded-xl transition-all cursor-pointer"
-                      >
-                        Submit Verified Review
-                      </button>
-                    </>
-                  )}
-                </form>
-              )}
-            </div>
-
-          </div>
-
-          {/* Browse all reviews trigger */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-[#211b4a] mt-2 text-left">
-            <div className="space-y-0.5">
-              <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-amber-400" />
-                Explore {reviews.length} Verified Submissions
-              </h4>
-              <p className="text-[10px] text-slate-400 font-semibold">
-                Our active community spans over 100+ state and national reviews detailing genuine career impacts.
-              </p>
-            </div>
-            <button
-              onClick={() => setIsAllReviewsOpen(true)}
-              className="bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-100 font-extrabold text-[11px] uppercase tracking-wider py-2.5 px-5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shrink-0 active:scale-95"
-            >
-              <span>View All Verified Reviews ({reviews.length})</span>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3.5 h-3.5 text-amber-400">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-              </svg>
-            </button>
-          </div>
-
-        </section>
-
-      </div>
+      <ArohiLandingPage 
+        user={user}
+        setActiveTab={setActiveTab}
+        setIsChatOpen={setIsChatOpen}
+        setIsChatMinimized={setIsChatMinimized}
+        setChatInitialPrompt={setChatInitialPrompt}
+        setIsAuthModalOpen={setIsAuthModalOpen}
+        subscriptions={subscriptions}
+        handleSubscribe={handleSubscribe}
+        setIsWalkthroughOpen={setIsWalkthroughOpen}
+        setCheckoutPath={setCheckoutPath}
+        setPendingSubscriptionDetail={setPendingSubscriptionDetail}
+        isTourEnabled={IS_TOUR_ENABLED}
+      />
     );
   };
 
@@ -3453,17 +2321,117 @@ export default function App() {
 
   if (!hasEntered) {
     return (
-      <WelcomeLanding 
-        language={language}
-        onLanguageChange={changeLanguage}
-        onEnter={() => {
-          localStorage.setItem('recruit_has_entered', 'true');
-          setHasEntered(true);
-        }} 
-        setActiveTab={(tab) => {
-          setActiveTab(tab);
-        }}
-      />
+      <div className="relative w-full min-h-screen bg-[#020208] overflow-x-hidden">
+        <WelcomeLanding 
+          language={language}
+          onLanguageChange={changeLanguage}
+          onEnter={() => {
+            setHasEntered(true);
+          }} 
+          setActiveTab={(tab) => {
+            setActiveTab(tab);
+            setHasEntered(true);
+          }}
+          setIsChatOpen={setIsChatOpen}
+          onQuickChat={(prompt) => {
+            setChatInitialPrompt(prompt);
+            setIsChatOpen(true);
+            setIsChatMinimized(false);
+            setHasEntered(true);
+            setActiveTab('arohi');
+          }}
+        />
+
+        {/* Floating Chat Overlay Container */}
+        {isChatOpen && !isChatMinimized && (
+          <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 w-full sm:w-[480px] md:w-[820px] lg:w-[1120px] max-w-full sm:max-w-[calc(100vw-48px)] h-[100dvh] sm:h-[600px] md:h-[700px] lg:h-[760px] max-h-[100dvh] sm:max-h-[82vh] md:max-h-[85vh] lg:max-h-[88vh] z-[100] bg-[#090714] sm:rounded-3xl shadow-[0_12px_40px_rgba(124,58,237,0.3)] border-t sm:border border-[#a78bfa]/30 overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 duration-300">
+            <ArohiChat 
+              initialPrompt={chatInitialPrompt}
+              language={language}
+              onNavigateTab={(tab) => {
+                setActiveTab(tab);
+                setHasEntered(true);
+                setIsChatOpen(false);
+              }}
+              onMinimize={() => setIsChatMinimized(true)}
+              onClose={() => setIsChatOpen(false)}
+            />
+          </div>
+        )}
+        {/* Floating assistant bubble in bottom right corner */}
+        {(!isChatOpen || isChatMinimized) && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 50 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1, 
+              y: [0, -10, 0],
+            }}
+            transition={{
+              opacity: { duration: 0.5 },
+              scale: { duration: 0.5 },
+              y: {
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
+            className="fixed bottom-6 right-6 z-[60] flex flex-col items-end gap-2"
+          >
+            {/* Creative floating prompt with heartbeat effect to attract the user */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, x: 10 }}
+              animate={{ 
+                opacity: [0.95, 1, 0.95],
+                scale: [0.98, 1.02, 0.98],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="bg-gradient-to-r from-[#17103a] to-[#6327d4] text-white px-3.5 py-1.5 rounded-2xl rounded-br-none border border-[#7c3aed]/55 text-[11px] font-extrabold tracking-wide uppercase shadow-[0_6px_20px_rgba(124,58,237,0.4)] backdrop-blur-md flex items-center gap-2 select-none"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00e676] animate-ping shrink-0"></span>
+              <span>Ask Arohi! ✨</span>
+            </motion.div>
+
+            {/* Core circular button fully showing Arohi's image */}
+            <button
+              onClick={() => {
+                if (isChatOpen) {
+                  if (isChatMinimized) {
+                    setIsChatMinimized(false);
+                  } else {
+                    setIsChatOpen(false);
+                  }
+                } else {
+                  setIsChatOpen(true);
+                  setIsChatMinimized(false);
+                }
+              }}
+              className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full p-0 bg-transparent active:scale-95 transition-all duration-300 shadow-[0_8px_32px_rgba(124,58,237,0.5)] border-2 border-[#a78bfa]/50 hover:border-[#a78bfa] cursor-pointer overflow-visible group"
+              title="Talk to AROHI"
+            >
+              {/* The Arohi image filling the entire button */}
+              <div className="w-full h-full rounded-full overflow-hidden">
+                <ArohiAvatar className="w-full h-full scale-[1.08] object-cover transition-transform duration-500 group-hover:scale-120" />
+              </div>
+
+              {/* Glowing ring animation */}
+              <span className="absolute inset-0 rounded-full border-2 border-purple-400/40 animate-ping opacity-60 pointer-events-none"></span>
+
+              {/* Hover tooltip label */}
+              <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-slate-950/95 border border-purple-500/50 text-slate-100 font-bold px-3 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none tracking-wide">
+                {isChatOpen && !isChatMinimized ? 'Close AROHI' : 'Ask AROHI'}
+              </span>
+
+              {/* Active green status light */}
+              <span className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-[#00e676] rounded-full border-2 border-[#090714] z-10 shadow-[0_0_8px_#00e676]"></span>
+            </button>
+          </motion.div>
+        )}
+      </div>
     );
   }
 
@@ -3479,10 +2447,9 @@ export default function App() {
         }}
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onRevisitWelcome={() => {
-          localStorage.removeItem('recruit_has_entered');
           setHasEntered(false);
         }}
-        onStartTour={() => setIsWalkthroughOpen(true)}
+        onStartTour={IS_TOUR_ENABLED ? (() => setIsWalkthroughOpen(true)) : undefined}
         language={language}
         onLanguageChange={changeLanguage}
         onShare={() => handleOpenShare()}
@@ -3917,6 +2884,7 @@ export default function App() {
       {isChatOpen && !isChatMinimized && (
         <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 w-full sm:w-[480px] md:w-[820px] lg:w-[1120px] max-w-full sm:max-w-[calc(100vw-48px)] h-[100dvh] sm:h-[600px] md:h-[700px] lg:h-[760px] max-h-[100dvh] sm:max-h-[82vh] md:max-h-[85vh] lg:max-h-[88vh] z-[100] bg-[#090714] sm:rounded-3xl shadow-[0_12px_40px_rgba(124,58,237,0.3)] border-t sm:border border-[#a78bfa]/30 overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 duration-300">
           <ArohiChat 
+            initialPrompt={chatInitialPrompt}
             language={language}
             onNavigateTab={(tab) => {
               setActiveTab(tab);
@@ -3927,18 +2895,6 @@ export default function App() {
           />
         </div>
       )}
-
-      {/* Floating notification bar when chat is minimized */}
-      {isChatOpen && isChatMinimized && (
-        <button
-          onClick={() => setIsChatMinimized(false)}
-          className="fixed bottom-24 xl:bottom-7 right-4 xl:right-24 bg-[#120e2a]/95 border border-[#4c3ba0]/70 text-slate-100 hover:text-white px-4 py-2.5 rounded-2xl shadow-[0_4px_20px_rgba(124,58,237,0.25)] text-xs font-bold flex items-center gap-2 animate-pulse hover:animate-none cursor-pointer z-[100] transition-all active:scale-95"
-        >
-          <span className="w-2 h-2 rounded-full bg-[#00e676] animate-ping shrink-0"></span>
-          <span>💬 AROHI Minimized • Resume Chat</span>
-        </button>
-      )}
-
 
       {/* Floating assistant bubble in bottom right corner */}
       {(!isChatOpen || isChatMinimized) && (
@@ -4013,6 +2969,10 @@ export default function App() {
           </button>
         </motion.div>
       )}
+
+
+
+
 
       {/* TIER SELECTION OVERLAY MODAL */}
       {tierSelectPathId && (
@@ -4731,16 +3691,6 @@ export default function App() {
 
       {/* Progressive Web App Install Suggestion Widget */}
       <PWAInstaller />
-
-      {/* Bottom docked navigation bar for mobile thumb access */}
-      <BottomNavBar
-        activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab);
-          setSelectedPosting(null); // Clear selected posting
-        }}
-        language={language}
-      />
 
     </div>
   );

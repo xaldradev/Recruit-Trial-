@@ -80,14 +80,6 @@ export default function TierSelectorGrid({
                   </div>
                 </div>
 
-                {/* Transparent platform support & Odisha server margin */}
-                <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-2.5 text-[10px] text-emerald-300 leading-snug font-bold">
-                  <div className="flex justify-between items-center text-[9px]">
-                    <span>⚖️ 50% Gross Margin:</span>
-                    <span className="font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded text-emerald-400">₹{tier.margin}</span>
-                  </div>
-                </div>
-
                 {/* Plan limits preview */}
                 <div className="space-y-2 border-t border-[#231a4d] pt-3.5">
                   <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest block">Usage Limits:</span>
@@ -158,16 +150,11 @@ export default function TierSelectorGrid({
       {/* Selected Tier Deep-Dive Details */}
       <div className="bg-[#120e2a] border border-[#2d2163] p-6 rounded-[2rem] text-left grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
         <div className="md:col-span-8 space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="bg-emerald-500/10 text-emerald-400 text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full border border-emerald-500/20">
-              ⚖️ Fully Transparent Platform Surcharges (50% Gross Margin)
-            </span>
-          </div>
           <h4 className="text-base font-black text-white flex items-center gap-1.5">
             <span>You have chosen: {selectedTier.name} (₹{selectedTier.price}/mo)</span>
           </h4>
           <p className="text-xs text-slate-300 leading-relaxed font-semibold">
-            By dedicating 50% (₹{selectedTier.margin}) of each subscription strictly towards server workloads, continuous neural modeling for AROHI, state-level filing pipelines, and rural counselor salaries, Recruit.org.in operates with a completely fair and transparent 50% gross business margin.
+            Your premium subscription supports server workloads, continuous neural modeling for AROHI, state-level filing pipelines, and dedicated counselor support to maximize your career or business potential.
           </p>
           
           <div className="pt-2">

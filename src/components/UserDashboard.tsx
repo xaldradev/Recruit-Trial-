@@ -639,7 +639,7 @@ export default function UserDashboard({
       id: 'path1',
       title: 'Path 1: Career, Jobs & Resume Assistance',
       desc: 'Sarkari & Private matching, ATS analyzer, and live mock interview practice.',
-      price: '₹399/mo',
+      price: 'From ₹399/mo (5 Plans)',
       perks: ['AI-backed resume grading', 'Live exam portal alerts', 'Unlimited mock interviews', 'Instant agent assistance']
     },
     {
@@ -653,14 +653,14 @@ export default function UserDashboard({
       id: 'path3',
       title: 'Path 3: Udyam Business Launchpad',
       desc: 'If not interested in jobs, transform your vision into an MSME business.',
-      price: '₹399/mo',
+      price: 'From ₹399/mo (5 Plans)',
       perks: ['PMEGP & Mudra loan checklist', 'Odisha state startup benefits', 'Validating business scalability', 'Udyam micro registration steps']
     },
     {
       id: 'path4',
       title: 'Path 4: Class 1-10 Student Support',
       desc: 'Interactive school curriculum, high-quality unique chapters, and personalized academic guidance.',
-      price: '₹399/mo',
+      price: 'From ₹399/mo (5 Plans)',
       perks: ['NCERT mapped curriculum & unique notes', 'Personalized chapter quiz feedback', 'Sciences & Languages syllabus notes', '24/7 School support from AROHI AI']
     }
   ];
@@ -1088,7 +1088,7 @@ export default function UserDashboard({
               </div>
 
               <div className="text-[9px] text-slate-500 font-semibold border-t border-white/5 pt-2 mt-2">
-                💡 Repeated toast reminders alert users to upgrade before their limits are reached. Our 50% gross business margin provides sustainable computing power.
+                💡 Repeated toast reminders alert users to upgrade before their limits are reached. Premium accounts ensure stable real-time workspace access.
               </div>
             </div>
           </div>
@@ -1103,7 +1103,7 @@ export default function UserDashboard({
               <Sparkles className="w-4.5 h-4.5 text-yellow-300 animate-pulse" /> My Assistance Subscription Plans & Tiers
             </h3>
             <p className="text-[11px] text-slate-400 font-semibold mt-1">
-              Active subscription holders receive continuous real-time support, 50% clear development margin contribution, and customized usage limits.
+              Active subscription holders receive continuous real-time support, prioritized server workloads, and customized usage limits.
             </p>
           </div>
           <div className="bg-[#1c183a] px-3.5 py-1.5 rounded-xl border border-[#3b2a80] text-xs font-extrabold text-[#c084fc] flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
@@ -1152,17 +1152,6 @@ export default function UserDashboard({
                           <span className="text-xs font-black text-white">{details?.tierName || 'Starter Plan'}</span>
                           <span className="text-xs font-bold text-emerald-400">₹{details?.price || 399}/mo</span>
                         </div>
-                      </div>
-
-                      {/* Transparent 50% Margin display */}
-                      <div className="p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 space-y-1">
-                        <div className="flex justify-between items-center text-[9px] font-black text-emerald-400">
-                          <span>⚖️ 50% Platform Margin</span>
-                          <span className="font-mono bg-emerald-500/10 px-2 py-0.5 rounded-md">₹{(details?.price ? details.price * 0.5 : 199.50).toFixed(2)}</span>
-                        </div>
-                        <p className="text-[9px] text-slate-400 leading-relaxed font-semibold">
-                          50% of your payment is allocated directly to server resources, AROHI neural processing, and Indian MSME advisory support.
-                        </p>
                       </div>
 
                       {/* Dynamic Usage Limits list */}
@@ -1297,11 +1286,6 @@ export default function UserDashboard({
                         <span>Plan Price:</span>
                         <span className="text-yellow-400 font-extrabold">₹399 - ₹4,999/mo</span>
                       </div>
-
-                      {/* 50% transparent margin preview */}
-                      <p className="text-[10px] text-slate-400 font-semibold leading-relaxed">
-                        ⚖️ <span className="text-slate-300 font-bold">50% Transparent Gross Margin</span> goes back into Odisha technology development, PMEGP resources, and Arohi AI support.
-                      </p>
 
                       <div className="space-y-1.5 pt-1 border-t border-[#231a4d]">
                         <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block">Starter Perks Preview:</span>

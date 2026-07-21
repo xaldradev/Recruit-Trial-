@@ -63,7 +63,7 @@ export const PRICING_TIERS: PricingTier[] = [
     price: 399,
     name: "Starter Plan",
     margin: 199.50,
-    callHoursText: "1 Hour of AI Calls / mo",
+    callHoursText: "5 Hours of AI Calls / mo",
     tokenUsageText: "10,000 AI Tokens",
     limits: {
       path1: {
@@ -95,7 +95,7 @@ export const PRICING_TIERS: PricingTier[] = [
     price: 699,
     name: "Professional Plan",
     margin: 349.50,
-    callHoursText: "2 Hours of AI Calls / mo",
+    callHoursText: "10 Hours of AI Calls / mo",
     tokenUsageText: "15,000 AI Tokens",
     limits: {
       path1: {
@@ -127,7 +127,7 @@ export const PRICING_TIERS: PricingTier[] = [
     price: 1699,
     name: "Growth Business Plan",
     margin: 849.50,
-    callHoursText: "5 Hours of AI Calls / mo",
+    callHoursText: "25 Hours of AI Calls / mo",
     tokenUsageText: "35,000 AI Tokens",
     limits: {
       path1: {
@@ -159,7 +159,7 @@ export const PRICING_TIERS: PricingTier[] = [
     price: 3999,
     name: "Elite Executive Plan",
     margin: 1999.50,
-    callHoursText: "12 Hours of AI Calls / mo",
+    callHoursText: "60 Hours of AI Calls / mo",
     tokenUsageText: "80,000 AI Tokens",
     limits: {
       path1: {
@@ -191,7 +191,7 @@ export const PRICING_TIERS: PricingTier[] = [
     price: 4999,
     name: "Ultimate Premium Plan",
     margin: 2499.50,
-    callHoursText: "15 Hours of AI Calls / mo",
+    callHoursText: "80 Hours of AI Calls / mo",
     tokenUsageText: "100,000 AI Tokens",
     limits: {
       path1: {

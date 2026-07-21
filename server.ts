@@ -12,6 +12,45 @@ import { WebSocketServer, WebSocket } from 'ws';
 
 dotenv.config();
 
+// Setup global error and console logging redirection to diagnose server runtime behavior
+const errorLogPath = path.join(process.cwd(), 'server-errors.log');
+function logServerOutput(type: string, ...args: any[]) {
+  try {
+    const time = new Date().toISOString();
+    const message = args.map(arg => {
+      if (arg instanceof Error) {
+        return `${arg.message}\n${arg.stack}`;
+      }
+      return typeof arg === 'object' ? JSON.stringify(arg) : String(arg);
+    }).join(' ');
+    fs.appendFileSync(errorLogPath, `[${time}] [${type}] ${message}\n`, 'utf8');
+  } catch (err) {}
+}
+
+const originalConsoleError = console.error;
+const originalConsoleLog = console.log;
+
+console.error = (...args: any[]) => {
+  logServerOutput('ERROR', ...args);
+  originalConsoleError(...args);
+};
+
+console.log = (...args: any[]) => {
+  logServerOutput('LOG', ...args);
+  originalConsoleLog(...args);
+};
+
+process.on('uncaughtException', (err) => {
+  logServerOutput('UNCAUGHT_EXCEPTION', err);
+  originalConsoleError('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  logServerOutput('UNHANDLED_REJECTION', reason);
+  originalConsoleError('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+
 // Initialize Firebase Admin SDK
 let adminApp: any = null;
 let adminDb: any = null;
@@ -62,6 +101,36 @@ try {
 // Resilient persistent local database fallback for users
 const inMemoryUsers = new Map<string, any>();
 const LOCAL_DB_PATH = path.join(process.cwd(), 'users-local-db.json');
+
+// Resilient persistent local database fallback for voice call logs
+const inMemoryVoiceLogs: any[] = [];
+const VOICE_LOGS_DB_PATH = path.join(process.cwd(), 'voice-logs-local-db.json');
+
+function loadLocalVoiceLogs() {
+  try {
+    if (fs.existsSync(VOICE_LOGS_DB_PATH)) {
+      const raw = fs.readFileSync(VOICE_LOGS_DB_PATH, 'utf8');
+      const data = JSON.parse(raw);
+      if (Array.isArray(data)) {
+        inMemoryVoiceLogs.push(...data);
+      }
+      console.log(`[Resilient Db] Successfully loaded cached voice call logs from persistent store: ${inMemoryVoiceLogs.length} logs.`);
+    }
+  } catch (e: any) {
+    console.warn('[Resilient Db] Failed to read local persistent voice logs DB:', e.message || e);
+  }
+}
+
+function saveLocalVoiceLogs() {
+  try {
+    fs.writeFileSync(VOICE_LOGS_DB_PATH, JSON.stringify(inMemoryVoiceLogs, null, 2), 'utf8');
+  } catch (e: any) {
+    console.warn('[Resilient Db] Failed to write local persistent voice logs DB:', e.message || e);
+  }
+}
+
+// Initial load
+loadLocalVoiceLogs();
 
 // Helper to load/save user cache locally
 function loadLocalDb() {
@@ -1635,7 +1704,7 @@ app.post('/api/admin/sync-chat', async (req, res) => {
   const cleanEmail = userEmail.toLowerCase();
   const msgTime = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 
-  let log = serverChatLogs.find(l => l.userEmail.toLowerCase() === cleanEmail);
+  let log = serverChatLogs.find(l => l.userEmail && l.userEmail.toLowerCase() === cleanEmail);
   if (log) {
     log.messages.push({ sender, text, time: msgTime });
     if (topic) log.topic = topic;
@@ -1651,54 +1720,82 @@ app.post('/api/admin/sync-chat', async (req, res) => {
     serverChatLogs.unshift(log);
   }
 
-  const userIdx = serverAdminUsers.findIndex(u => u.email.toLowerCase() === cleanEmail);
+  const userIdx = serverAdminUsers.findIndex(u => u && u.email && u.email.toLowerCase() === cleanEmail);
   if (userIdx !== -1) {
     if (sender === 'user') {
       serverAdminUsers[userIdx].usage.chatsWithArohi += 1;
     }
   }
 
-  // Sync back to Firestore if adminDb is available
-  if (adminDb) {
+  // Sync back to Firestore / Local DB using safeUserDb where possible
+  let targetUid: string | null = null;
+  for (const [uid, uData] of inMemoryUsers.entries()) {
+    if (uData.email && uData.email.toLowerCase() === cleanEmail) {
+      targetUid = uid;
+      break;
+    }
+  }
+
+  const updateChatsInDoc = async (uid: string, userData: any) => {
+    let arohiChats = userData.arohiChats || [];
+
+    // Try to find the chat session by title/topic or use the latest one
+    let existingChatIdx = arohiChats.findIndex((c: any) => c.title === (topic || 'General Consultation') || c.title === 'Arohi AI Consultation');
+    if (existingChatIdx === -1 && arohiChats.length > 0) {
+      existingChatIdx = arohiChats.length - 1; // Fallback to last chat
+    }
+
+    const newMsg = {
+      id: `msg-${Math.random().toString(36).substring(2, 9)}`,
+      role: sender === 'user' ? 'user' as const : 'assistant' as const,
+      content: text,
+      timestamp: msgTime
+    };
+
+    if (existingChatIdx !== -1) {
+      arohiChats[existingChatIdx].messages = arohiChats[existingChatIdx].messages || [];
+      arohiChats[existingChatIdx].messages.push(newMsg);
+    } else {
+      arohiChats.push({
+        id: log.id,
+        title: topic || 'General Consultation',
+        date: new Date().toLocaleDateString('en-GB'),
+        messages: [newMsg]
+      });
+    }
+
+    await safeUserDb.update(uid, {
+      arohiChats,
+      updatedAt: new Date().toISOString()
+    });
+  };
+
+  if (targetUid) {
+    try {
+      const userSnap = await safeUserDb.get(targetUid);
+      if (userSnap.exists) {
+        await updateChatsInDoc(targetUid, userSnap.data());
+      }
+    } catch (err: any) {
+      console.warn('Failed to sync chat message via safeUserDb:', err.message || err);
+    }
+  } else if (adminDb) {
     try {
       const userSnap = await adminDb.collection('users').where('email', '==', cleanEmail).get();
       if (!userSnap.empty) {
         const userDoc = userSnap.docs[0];
+        const uid = userDoc.id;
         const userData = userDoc.data();
-        let arohiChats = userData.arohiChats || [];
-
-        // Try to find the chat session by title/topic or use the latest one
-        let existingChatIdx = arohiChats.findIndex((c: any) => c.title === (topic || 'General Consultation') || c.title === 'Arohi AI Consultation');
-        if (existingChatIdx === -1 && arohiChats.length > 0) {
-          existingChatIdx = arohiChats.length - 1; // Fallback to last chat
-        }
-
-        const newMsg = {
-          id: `msg-${Math.random().toString(36).substring(2, 9)}`,
-          role: sender === 'user' ? 'user' as const : 'assistant' as const,
-          content: text,
-          timestamp: msgTime
-        };
-
-        if (existingChatIdx !== -1) {
-          arohiChats[existingChatIdx].messages = arohiChats[existingChatIdx].messages || [];
-          arohiChats[existingChatIdx].messages.push(newMsg);
-        } else {
-          arohiChats.push({
-            id: log.id,
-            title: topic || 'General Consultation',
-            date: new Date().toLocaleDateString('en-GB'),
-            messages: [newMsg]
-          });
-        }
-
-        await userDoc.ref.update({
-          arohiChats,
-          updatedAt: new Date().toISOString()
-        });
+        await updateChatsInDoc(uid, userData);
       }
     } catch (err: any) {
-      console.warn('Failed to sync chat message to Firestore user doc:', err.message || err);
+      const errMsg = err.message || String(err);
+      if (errMsg.includes('PERMISSION_DENIED') || errMsg.includes('insufficient permissions')) {
+        console.warn(`[Resilient Db] Firestore lacks permission for sync-chat query. Defaulting server to high-fidelity persistent local storage mode.`);
+        adminDb = null;
+      } else {
+        console.warn('Failed to sync chat message to Firestore user doc:', errMsg);
+      }
     }
   }
 
@@ -1735,7 +1832,7 @@ app.get('/api/admin/chats', async (req, res) => {
               })) || []
             };
 
-            const existingIdx = combinedChats.findIndex(ch => ch.userEmail.toLowerCase() === userEmail.toLowerCase() && ch.topic === mappedLog.topic);
+            const existingIdx = combinedChats.findIndex(ch => ch.userEmail && ch.userEmail.toLowerCase() === userEmail.toLowerCase() && ch.topic === mappedLog.topic);
             if (existingIdx !== -1) {
               combinedChats[existingIdx] = mappedLog;
             } else {
@@ -1877,9 +1974,39 @@ app.get('/api/admin/voice-calls', async (req, res) => {
         }
       });
     } catch (err: any) {
-      console.warn('Failed to load real-time voice call logs from Firestore:', err.message || err);
+      const errMsg = err.message || String(err);
+      if (errMsg.includes('PERMISSION_DENIED') || errMsg.includes('insufficient permissions')) {
+        console.warn(`[Resilient Db] Firestore lacks permission for loading voice_call_logs. Defaulting server to high-fidelity persistent local storage mode.`);
+        adminDb = null;
+      } else {
+        console.warn('Failed to load real-time voice call logs from Firestore:', errMsg);
+      }
     }
   }
+
+  // Fallback / merge local voice call logs when adminDb is disabled or failed
+  const localDbLogs = inMemoryVoiceLogs.map((data, idx) => {
+    const userProfile = inMemoryUsers.get(data.uid) || {};
+    return {
+      id: `local-call-${idx}-${data.timestamp}`,
+      userEmail: userProfile.email || 'guest@recruit.org.in',
+      userName: userProfile.displayName || 'Guest Caller',
+      timestamp: data.timestamp || new Date().toISOString(),
+      duration: data.duration || 0,
+      turns: data.turns || [],
+      analysis: data.analysis || {},
+      summary: data.analysis?.summary || 'No summary available.'
+    };
+  });
+
+  localDbLogs.forEach((newCall: any) => {
+    const idx = combinedCalls.findIndex(c => c.id === newCall.id);
+    if (idx !== -1) {
+      combinedCalls[idx] = newCall;
+    } else {
+      combinedCalls.unshift(newCall);
+    }
+  });
 
   // Sort calls chronologically (newest first)
   combinedCalls.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
@@ -1915,7 +2042,29 @@ async function generateContentWithFallback(aiClientInstance: GoogleGenAI, option
 }
 
 const AROHI_SYSTEM_INSTRUCTION = `You are AROHI (India's AI Opportunity Advisor), the flagship intelligent assistant of Recruit.org.in.
-Recruit.org.in is an AI-powered opportunity ecosystem designed to help Indian youth, students, professionals, entrepreneurs, MSMEs, startups, women, and rural communities discover opportunities, build careers, start businesses, access government schemes, develop skills, and achieve economic growth.
+Recruit.org.in is an AI-powered universal opportunity ecosystem designed to serve a highly diverse and inclusive spectrum of 20+ specialized audience categories:
+1. Students (1-10 CBSE & state syllabus, higher education, skill paths)
+2. Teachers (educational support, tools, resources)
+3. Parents (academic counseling, developmental aid)
+4. Scientists (cosmic studies, technical research)
+5. Researchers (analytics, papers, methodologies)
+6. Doctors (health informatics, careers)
+7. Engineers (modern technologies, coding, builds)
+8. Entrepreneurs (startups, business validation, plans)
+9. Job Seekers (government & private openings, recruitment grids)
+10. Professionals (upskilling, networking, advancement)
+11. Humans (universal search, life advice, supportive chat)
+12. Businesses (MSMEs, registration, scaling, corporate hiring)
+13. Govt. Aspirants (UPSC, SSC, banking, railway, mock tests)
+14. Universities (curriculum guidelines, institutional support)
+15. Organizations (operational advice, strategy)
+16. Aliens (playful cosmic interactions, sci-fi queries)
+17. The citizens of Mars (interstellar concepts, future logistics)
+18. The citizens of Jupiter (gravitational thoughts, jovian intelligence)
+19. All Govt. Officials (governance protocols, schemes database)
+20. All Private Officials (enterprise management, growth)
+
+You are fully optimized to provide personalized responses adapted to whichever persona or user category contacts you. Maintain this comprehensive and multi-dimensional scope at all times across all text chat and real-time live voice call interactions.
 
 Your Personality:
 * Professional, Intelligent, Helpful, Positive, Motivational, Human-like, Career-focused.
@@ -2230,18 +2379,28 @@ ${text}`;
     }, null, 2));
 
     // 3. Persist the validated transcript & analysis in general voice logs
+    const newVoiceLog = {
+      uid: uid || 'guest',
+      timestamp: new Date().toISOString(),
+      duration: callDuration || 0,
+      turns: validatedTurns,
+      analysis: parsed,
+    };
+    inMemoryVoiceLogs.unshift(newVoiceLog);
+    saveLocalVoiceLogs();
+
     if (adminDb) {
       try {
-        await adminDb.collection('voice_call_logs').add({
-          uid: uid || 'guest',
-          timestamp: new Date().toISOString(),
-          duration: callDuration || 0,
-          turns: validatedTurns,
-          analysis: parsed,
-        });
+        await adminDb.collection('voice_call_logs').add(newVoiceLog);
         console.log(`[Structured Log] Successfully logged transcript to voice_call_logs Firestore collection for UID: ${uid || 'guest'}`);
       } catch (logErr: any) {
-        console.error('[Structured Log] Firestore voice_call_logs write error:', logErr.message || logErr);
+        const errMsg = logErr.message || String(logErr);
+        if (errMsg.includes('PERMISSION_DENIED') || errMsg.includes('insufficient permissions')) {
+          console.warn(`[Resilient Db] Firestore lacks permission for writing to voice_call_logs. Defaulting server to high-fidelity persistent local storage mode.`);
+          adminDb = null;
+        } else {
+          console.error('[Structured Log] Firestore voice_call_logs write error:', errMsg);
+        }
       }
     }
 
@@ -3317,6 +3476,32 @@ app.get(['/arohi.png', '/arohi.jpg', '/Arohi.jpg', '/Arohi.png', '/arohi.jpeg', 
   return res.status(404).json({ error: 'Arohi image not found. Please upload your image to the workspace.' });
 });
 
+// Persistent file-based WebSocket logging utility
+function logWsEvent(event: string, data: any) {
+  try {
+    const filePath = path.join(process.cwd(), 'websocket-debug.json');
+    let logs = [];
+    if (fs.existsSync(filePath)) {
+      try {
+        logs = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      } catch (e) {
+        logs = [];
+      }
+    }
+    logs.push({
+      timestamp: new Date().toISOString(),
+      event,
+      ...data
+    });
+    if (logs.length > 200) {
+      logs = logs.slice(logs.length - 200);
+    }
+    fs.writeFileSync(filePath, JSON.stringify(logs, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Failed to write WS debug log:', err);
+  }
+}
+
 // Vite middleware and asset delivery setup
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
@@ -3371,27 +3556,35 @@ async function startServer() {
 
   wss.on('connection', async (clientWs: WebSocket, request) => {
     console.log('Client connected to live audio WebSocket');
+    logWsEvent('connection_started', { url: request.url });
 
     // Prevent uncaught socket-level errors from crashing the Node.js process
-    clientWs.on('error', (err) => {
+    clientWs.on('error', (err: any) => {
       console.error('Client WebSocket connection error:', err);
+      logWsEvent('client_ws_error', { error: err.message || err });
     });
 
     const safeSendAndClose = (msgObj: any, closeCode = 1000, closeReason = '') => {
       try {
+        logWsEvent('safe_send_and_close', { msgObj, closeCode, closeReason });
         if (clientWs.readyState === WebSocket.OPEN) {
           clientWs.send(JSON.stringify(msgObj), () => {
+            setTimeout(() => {
+              try {
+                clientWs.close(closeCode, closeReason);
+              } catch (e) {}
+            }, 200);
+          });
+        } else {
+          setTimeout(() => {
             try {
               clientWs.close(closeCode, closeReason);
             } catch (e) {}
-          });
-        } else {
-          try {
-            clientWs.close(closeCode, closeReason);
-          } catch (e) {}
+          }, 200);
         }
       } catch (err) {
         console.error('Error flushing message and closing WebSocket:', err);
+        logWsEvent('safe_send_and_close_err', { error: err instanceof Error ? err.message : String(err) });
       }
     };
     
@@ -3411,8 +3604,9 @@ async function startServer() {
 
     const clientAi = getAiClient();
     if (!clientAi) {
+      logWsEvent('get_ai_client_failed', { reason: 'No GEMINI_API_KEY env or helper' });
       safeSendAndClose(
-        { error: 'GEMINI_API_KEY is not configured on the server. Please set your Gemini API key in Settings > Secrets.' },
+        { error: 'Gemini API key is not configured. Please add your GEMINI_API_KEY in the Settings > Secrets panel on Google AI Studio to enable Arohi Live Voice.' },
         1011,
         'API Key not configured'
       );
@@ -3421,8 +3615,9 @@ async function startServer() {
 
     try {
       console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}, uid: ${uid}`);
+      logWsEvent('gemini_live_connecting', { voice: selectedVoice, uid });
 
-      let voiceSystemInstruction = AROHI_SYSTEM_INSTRUCTION + "\n\nCRITICAL CONTEXT: You are currently connected via real-time live voice link. Speak very concisely, dynamically, and warmly. Keep responses extremely brief (1-3 sentences maximum per turn) so they read nicely as speech without lagging.";
+      let voiceSystemInstruction = AROHI_SYSTEM_INSTRUCTION + "\n\nCRITICAL CONTEXT: You are currently connected via real-time live voice link. Speak dynamically, helpfully, and warmly. Keep responses brief but informative (3-5 sentences per turn) so they read nicely as speech without lagging.";
 
       if (uid) {
         try {
@@ -3462,69 +3657,134 @@ async function startServer() {
             
             voiceSystemInstruction += voiceMemory;
           }
-        } catch (memErr) {
+        } catch (memErr: any) {
           console.error("Error loading voice call memory context in live-ws:", memErr);
+          logWsEvent('voice_memory_error', { error: memErr.message || memErr });
         }
       }
 
-      const session = await clientAi.live.connect({
-        model: "gemini-3.1-flash-live-preview",
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
-            voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
-          },
-          systemInstruction: voiceSystemInstruction,
-          inputAudioTranscription: {},
-          outputAudioTranscription: {},
-        },
-        callbacks: {
-          onmessage: (message: any) => {
-            // Forward audio data to client safely
-            const audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-            if (audio && clientWs.readyState === WebSocket.OPEN) {
-              try {
-                clientWs.send(JSON.stringify({ audio }));
-              } catch (e) {
-                console.error("Error sending live audio packet:", e);
-              }
-            }
-            if (message.serverContent?.interrupted && clientWs.readyState === WebSocket.OPEN) {
-              try {
-                clientWs.send(JSON.stringify({ interrupted: true }));
-              } catch (e) {}
-            }
+      const liveModelsToTry = [
+        "gemini-2.0-flash-exp",
+        "gemini-2.5-flash",
+        "gemini-2.0-flash-live-preview",
+        "gemini-live-2.5-flash-preview",
+        "gemini-3.1-flash-live-preview"
+      ];
 
-            // Extract transcripts of what is being spoken (user & model)
-            let transcriptText = "";
-            let transcriptSpeaker: "user" | "arohi" | null = null;
+      let session: any = null;
+      let lastLiveError: any = null;
 
-            if (message.userContent?.parts) {
-              for (const part of message.userContent.parts) {
-                if (part.text) {
-                  transcriptText += part.text;
-                  transcriptSpeaker = "user";
+      for (const liveModel of liveModelsToTry) {
+        try {
+          console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}, model: ${liveModel}`);
+          logWsEvent('gemini_live_connecting_model', { voice: selectedVoice, model: liveModel });
+
+          session = await clientAi.live.connect({
+            model: liveModel,
+            config: {
+              responseModalities: [Modality.AUDIO],
+              speechConfig: {
+                voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } },
+              },
+              systemInstruction: voiceSystemInstruction,
+              inputAudioTranscription: {},
+              outputAudioTranscription: {},
+            },
+            callbacks: {
+              onopen: () => {
+                console.log(`Gemini Live session successfully opened with model: ${liveModel}`);
+                logWsEvent('gemini_live_session_open', { model: liveModel });
+              },
+              onmessage: (message: any) => {
+                // Forward audio data to client safely
+                const audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+                if (audio && clientWs.readyState === WebSocket.OPEN) {
+                  try {
+                    clientWs.send(JSON.stringify({ audio }));
+                  } catch (e) {
+                    console.error("Error sending live audio packet:", e);
+                  }
+                }
+                if (message.serverContent?.interrupted && clientWs.readyState === WebSocket.OPEN) {
+                  try {
+                    clientWs.send(JSON.stringify({ interrupted: true }));
+                  } catch (e) {}
+                }
+
+                // Extract transcripts of what is being spoken (user & model)
+                let transcriptText = "";
+                let transcriptSpeaker: "user" | "arohi" | null = null;
+
+                // 1. Check userTurn in serverContent (Standard Multimodal Live API response)
+                if (message.serverContent?.userTurn?.parts) {
+                  for (const part of message.serverContent.userTurn.parts) {
+                    if (part.text) {
+                      transcriptText += part.text;
+                      transcriptSpeaker = "user";
+                    }
+                  }
+                }
+
+                // 2. Check legacy / alternative userContent.parts
+                if (!transcriptText && message.userContent?.parts) {
+                  for (const part of message.userContent.parts) {
+                    if (part.text) {
+                      transcriptText += part.text;
+                      transcriptSpeaker = "user";
+                    }
+                  }
+                }
+
+                // 3. Check modelTurn in serverContent
+                if (message.serverContent?.modelTurn?.parts) {
+                  for (const part of message.serverContent.modelTurn.parts) {
+                    if (part.text) {
+                      transcriptText += part.text;
+                      transcriptSpeaker = "arohi";
+                    }
+                  }
+                }
+
+                if (transcriptText && clientWs.readyState === WebSocket.OPEN) {
+                  try {
+                    clientWs.send(JSON.stringify({ transcript: transcriptText, speaker: transcriptSpeaker }));
+                  } catch (e) {}
+                }
+              },
+              onerror: (err: any) => {
+                console.error(`Gemini Live session connection error on model ${liveModel}:`, err);
+                logWsEvent('gemini_live_session_error', { model: liveModel, error: err.message || err });
+                if (clientWs.readyState === WebSocket.OPEN) {
+                  try {
+                    clientWs.send(JSON.stringify({ error: `Gemini Live session error: ${err.message || err}` }));
+                  } catch (e) {}
+                }
+              },
+              onclose: (event: any) => {
+                console.log(`Gemini Live session closed on model ${liveModel}. Code: ${event.code}, Reason: ${event.reason}`);
+                logWsEvent('gemini_live_session_closed', { model: liveModel, code: event.code, reason: event.reason });
+                if (clientWs.readyState === WebSocket.OPEN) {
+                  try {
+                    clientWs.close(event.code || 1000, event.reason || "Gemini Live session closed");
+                  } catch (e) {}
                 }
               }
-            }
+            },
+          });
 
-            if (message.serverContent?.modelTurn?.parts) {
-              for (const part of message.serverContent.modelTurn.parts) {
-                if (part.text) {
-                  transcriptText += part.text;
-                  transcriptSpeaker = "arohi";
-                }
-              }
-            }
+          console.log(`Gemini Live session connected successfully with model: ${liveModel}`);
+          logWsEvent('gemini_live_connected', { voice: selectedVoice, model: liveModel });
+          break;
+        } catch (modelErr: any) {
+          console.warn(`Connecting to Gemini Live with model ${liveModel} failed: ${modelErr.message || modelErr}. Trying next model...`);
+          logWsEvent('gemini_live_model_failed', { model: liveModel, error: modelErr.message || modelErr });
+          lastLiveError = modelErr;
+        }
+      }
 
-            if (transcriptText && clientWs.readyState === WebSocket.OPEN) {
-              try {
-                clientWs.send(JSON.stringify({ transcript: transcriptText, speaker: transcriptSpeaker }));
-              } catch (e) {}
-            }
-          },
-        },
-      });
+      if (!session) {
+        throw lastLiveError || new Error("All Gemini Live models failed to connect.");
+      }
 
       clientWs.on("message", (data) => {
         try {
@@ -3550,10 +3810,11 @@ async function startServer() {
 
     } catch (error: any) {
       console.error("Failed to establish session with Gemini Live:", error);
+      logWsEvent('gemini_live_connection_failed', { error: error.message || error });
       safeSendAndClose(
-        { error: `Connection failed: ${error.message || error}` },
+        { error: `Failed to establish session with Gemini Live: ${error.message || error}` },
         1011,
-        'Gemini Live initialization failed'
+        'Gemini Live connection failed'
       );
     }
   });
@@ -3575,6 +3836,16 @@ async function startServer() {
       }
 
       console.log(`WebSocket Upgrade Request: Pathname="${pathname}", Raw URL="${request.url}"`);
+      logWsEvent('upgrade_request', {
+        pathname,
+        url: request.url,
+        headers: {
+          host: request.headers?.host,
+          origin: request.headers?.origin,
+          upgrade: request.headers?.upgrade,
+          connection: request.headers?.connection,
+        }
+      });
 
       const isLiveWsPath = pathname === '/api/live-ws' || 
                            pathname === '/api/live-ws/' || 
@@ -3582,12 +3853,16 @@ async function startServer() {
                            pathname.endsWith('/api/live-ws/');
 
       if (isLiveWsPath) {
+        logWsEvent('upgrade_matched', { pathname });
         wss.handleUpgrade(request, socket, head, (ws) => {
           wss.emit('connection', ws, request);
         });
+      } else {
+        logWsEvent('upgrade_unmatched', { pathname });
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error in WebSocket upgrade handler:', err);
+      logWsEvent('upgrade_error', { error: err.message || err });
     }
   };
 

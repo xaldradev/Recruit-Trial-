@@ -5,6 +5,8 @@ import { Language, getTranslation, getWelcomeContent, getSuggestedPrompts } from
 import ArohiVoiceCall from './ArohiVoiceCall';
 import { generateCallSummaryPDF, generateResumePDF, analyzeTurns } from '../lib/pdfGenerator';
 import { useAuth } from '../context/AuthContext';
+import { db } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 interface Message {
   id: string;
@@ -606,8 +608,6 @@ Here is your customized learning journey:
 
       // Layer 2: Fallback to direct client-side Firestore SDK
       try {
-        const { db } = await import('../firebase');
-        const { doc, getDoc } = await import('firebase/firestore');
         const docRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -638,7 +638,14 @@ Here is your customized learning journey:
     if (savedChats.length > 0) {
       const currentChat = savedChats.find(c => c.id === activeChatId) || savedChats[0];
       if (currentChat) {
-        setMessages(currentChat.messages);
+        // Always dynamically update the content of the welcome message to match the latest universal version
+        const processedMessages = currentChat.messages.map(m => {
+          if (m.id === 'welcome') {
+            return { ...m, content: getWelcomeContent(language) };
+          }
+          return m;
+        });
+        setMessages(processedMessages);
         if (activeChatId !== currentChat.id) {
           setActiveChatId(currentChat.id);
         }
@@ -921,10 +928,7 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
         {
           id: 'welcome',
           role: 'assistant',
-          content: `Greetings! I am **AROHI**, back to help you conquer new opportunities! What are we focusing on today?
-- Type **"Mudra loan"** to check startup funding options.
-- Type **"Resume help"** to optimize your profile.
-- Type **"Sarkari job"** to explore government exam dates!`,
+          content: getWelcomeContent(language),
           timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
         }
       ]

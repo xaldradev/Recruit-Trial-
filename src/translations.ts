@@ -23,7 +23,7 @@ export const translations = {
     
     // Quick Actions / Hero
     careerAdvisorTitle: "AROHI AI - Your Career Guide",
-    careerAdvisorDesc: "India's Unified Career & Business AI Guide. Talk or chat in English, Hindi, or Odia!",
+    careerAdvisorDesc: "India's Unified Career & Business AI Guide. Talk or chat in English, Hindi, Odia, and 150+ languages!",
     searchPlaceholder: "Search jobs, skills, or state schemes...",
     searchBtn: "Search",
     
@@ -51,7 +51,7 @@ export const translations = {
     selectLang: "Select Language",
     
     // Multilingual Notice
-    multilingualNotice: "Now supporting English, Hindi (हिंदी), and Odia (ଓଡ଼ିଆ) perfectly!",
+    multilingualNotice: "Now supporting English, Hindi (हिंदी), Odia (ଓଡ଼ିଆ), and 150+ languages perfectly!",
     popupTip: "Pop-up Tip: If Google Sign-In windows get blocked or closed automatically in preview, please use the \"Open in New Tab\" button on the top-right of the screen to sign in perfectly.",
 
     // Welcome Landing & Categories
@@ -95,7 +95,7 @@ export const translations = {
     
     // Quick Actions / Hero
     careerAdvisorTitle: "आरोही एआई - आपकी करियर गाइड",
-    careerAdvisorDesc: "भारत की एकीकृत करियर और व्यवसाय एआई गाइड। अंग्रेजी, हिंदी या उड़िया में बात या चैट करें!",
+    careerAdvisorDesc: "भारत की एकीकृत करियर और व्यवसाय एआई गाइड। अंग्रेजी, हिंदी, उड़िया और 150+ भाषाओं में बात या चैट करें!",
     searchPlaceholder: "नौकरियां, कौशल, या राज्य योजनाओं की खोज करें...",
     searchBtn: "खोजें",
     
@@ -123,7 +123,7 @@ export const translations = {
     selectLang: "भाषा चुनें",
     
     // Multilingual Notice
-    multilingualNotice: "अब अंग्रेजी, हिंदी (हिंदी) और उड़िया (ଓଡ଼ିଆ) का पूर्ण समर्थन!",
+    multilingualNotice: "अब अंग्रेजी, हिंदी (हिंदी), उड़िया (ଓଡ଼ିଆ) और 150+ भाषाओं का पूर्ण समर्थन!",
     popupTip: "पॉप-अप टिप: यदि पूर्वावलोकन में गूगल साइन-इन विंडो अवरुद्ध या स्वचालित रूप से बंद हो जाती है, तो आसानी से साइन इन करने के लिए कृपया स्क्रीन के शीर्ष-दाईं ओर \"नया टैब खोलें\" बटन का उपयोग करें।",
 
     // Welcome Landing & Categories
@@ -167,7 +167,7 @@ export const translations = {
     
     // Quick Actions / Hero
     careerAdvisorTitle: "ଆରୋହୀ AI - ଆପଣଙ୍କ କ୍ୟାରିୟର ଗାଇଡ୍",
-    careerAdvisorDesc: "ଭାରତର ପ୍ରଥମ ଏକୀକୃତ କ୍ୟାରିୟର ଏବଂ ବ୍ୟବସାୟ ଏଆଇ ଗାଇଡ୍ | ଇଂରାଜୀ, ହିନ୍ଦୀ କିମ୍ବା ଓଡ଼ିଆରେ କଥା ହୁଅନ୍ତୁ!",
+    careerAdvisorDesc: "ଭାରତର ପ୍ରଥମ ଏକୀକୃତ କ୍ୟାରିୟର ଏବଂ ବ୍ୟବସାୟ ଏଆଇ ଗାଇଡ୍ | ଇଂରାଜୀ, ହିନ୍ଦୀ, ଓଡ଼ିଆ ଏବଂ ୧୫୦+ ଭାଷାରେ କଥା ହୁଅନ୍ତୁ!",
     searchPlaceholder: "ଚାକିରି, ଦକ୍ଷତା କିମ୍ବା ସରକାରୀ ଯୋଜନା ଖୋଜନ୍ତୁ...",
     searchBtn: "ଖୋଜନ୍ତୁ",
     
@@ -195,7 +195,7 @@ export const translations = {
     selectLang: "ଭାଷା ବାଛନ୍ତୁ",
     
     // Multilingual Notice
-    multilingualNotice: "ବର୍ତ୍ତମାନ ଇଂରାଜୀ, ହିନ୍ଦୀ (हिंदी) ଏବଂ ଓଡ଼ିଆ (ଓଡ଼ିଆ) ର ସମ୍ପୂର୍ଣ୍ଣ ସମର୍ଥନ!",
+    multilingualNotice: "ବର୍ତ୍ତମାନ ଇଂରାଜୀ, ହିନ୍ଦୀ (हिंदी), ଓଡ଼ିଆ (ଓଡ଼ିଆ) ଏବଂ ୧୫୦+ ଭାଷାର ସମ୍ପୂର୍ଣ୍ଣ ସମର୍ଥନ!",
     popupTip: "ପପ୍-ଅପ୍ ଟିପ୍: ଯଦି ଗୁଗୁଲ୍ ସାଇନ୍-ଇନ୍ ୱିଣ୍ଡୋ ବ୍ଲକ୍ ହୋଇଯାଏ, ଦୟାକରି ସାଇନ୍-ଇନ୍ କରିବା ପାଇଁ ସ୍କ୍ରିନର ଶୀର୍ଷ ଡାହାଣ ପାର୍ଶ୍ୱରେ ଥିବା \"Open in New Tab\" ବଟନ୍ ବ୍ୟବହାର କରନ୍ତୁ |",
 
     // Welcome Landing & Categories
@@ -338,38 +338,44 @@ export function getWelcomeContent(lang: Language): string {
   }
 
   if (lang === 'hi') {
-    return `नमस्ते! मैं हूं **आरोही**, आपकी व्यक्तिगत एआई अवसर सलाहकार। 🌟
+    return `नमस्ते! मैं हूं **आरोही (AROHI)**, आपकी सार्वभौमिक एआई अवसर सलाहकार। 🌟
 
-मैं पूरे Recruit.org.in प्लेटफॉर्म पर आपका मार्गदर्शन करने के लिए यहां हूं। मुझसे कुछ भी पूछें:
-* 💼 **नौकरी की रिक्तियां और पात्रता** (जैसे, एसएससी, यूपीएससी, बैंक, रेलवे)
+मैं पूरे Recruit.org.in प्लेटफॉर्म पर आपकी सहायता के लिए तैयार हूं। हम पृथ्वी से लेकर ब्रह्मांड तक **विशेष श्रेणियों** (जैसे छात्र, शिक्षक, वैज्ञानिक, शोधकर्ता, डॉक्टर, इंजीनियर, उद्यमी, सरकारी और निजी अधिकारी, और यहाँ तक कि मंगल एवं बृहस्पति के नागरिक) को सशक्त बना रहे हैं!
+
+मुझसे कुछ भी पूछें:
+* 💼 **सरकारी एवं कॉर्पोरेट नौकरियां और पात्रता** (नौकरी चाहने वालों और पेशेवरों के लिए)
 * 📝 **एटीएस रेज़्यूमे विश्लेषण और साक्षात्कार की तैयारी**
-* 🏛️ **सरकारी योजनाएं और सब्सिडी** (मुद्रा, पीएमईजीपी, स्टार्टअप इंडिया)
-* 🚀 **व्यापार विचार सत्यापन और एमएसएमई सेटअप**
-* 📖 **कौशल और अपस्किलिंग रास्ते**
+* 🏛️ **सरकारी योजनाएं, सब्सिडी और एमएसएमई सेटअप**
+* 🌌 **वैज्ञानिक, अनुसंधान और शैक्षणिक सहायता** (शोधकर्ताओं और वैज्ञानिकों के लिए)
+* 📖 **कौशल विकास, सीबीएसई और स्कूल सिलेबस** (छात्रों और शिक्षकों के लिए)
 
-आज आपका सपना या करियर लक्ष्य क्या है? आइए इसे मिलकर सच करें!`;
+आज आपका क्या लक्ष्य है? आइए मिलकर अनंत संभावनाओं को साकार करें!`;
   } else if (lang === 'or') {
-    return `ନମସ୍କାର! ମୁଁ ହେଉଛି **ଆରୋହୀ (AROHI)**, ଆପଣଙ୍କ ବ୍ୟକ୍ତିଗତ AI କ୍ୟାରିୟର ଏବଂ ସରକାରୀ ଯୋଜନା ପରାମର୍ଶଦାତା | 🌟
+    return `ନମସ୍କାର! ମୁଁ ହେଉଛି **ଆରୋହୀ (AROHI)**, ଆପଣଙ୍କ ସାର୍ବଭୌମ AI ସୁଯୋଗ ପରାମର୍ଶଦାତା | 🌟
 
-ମୁଁ ଆପଣଙ୍କୁ Recruit.org.in ପ୍ଲାଟଫର୍ମରେ ସମ୍ପୂର୍ଣ୍ଣ ସହାୟତା ପ୍ରଦାନ କରିବି | ଆପଣ ମତେ ଯେକୌଣସି ପ୍ରଶ୍ନ ପଚାରିପାରିବେ, ଯେପରିକି:
-* 💼 **ନିଯୁକ୍ତି ସୂଚନା ଏବଂ ଯୋଗ୍ୟତା** (ଯେପରିକି SSC, UPSC, Bank, Railways)
+ମୁଁ ଆପଣଙ୍କୁ Recruit.org.in ପ୍ଲାଟଫର୍ମରେ ସମ୍ପୂର୍ଣ୍ଣ ସହାୟତା ପ୍ରଦାନ କରିବି | ଆମେ ପୃଥିବୀରୁ ମହାକାଶ ପର୍ଯ୍ୟନ୍ତ **ବିଶେଷ ଶ୍ରେଣୀର ଲୋକଙ୍କୁ** (ଯେପରିକି ଛାତ୍ରଛาତ୍ରୀ, ଶିକ୍ଷକ, ବୈଜ୍ଞାନିକ, ଗବେଷକ, ଡାକ୍ତର, ଇଞ୍जିନିୟର, ଉଦ୍ୟୋଗୀ, ସରକାରୀ ଓ ବେସରକାରୀ ଅଧିକାରୀ, ଏବଂ ମଙ୍ଗଳ ଓ ବୃହସ୍ପତିର ନାଗରିକ) ସଶକ୍ତ କରୁଛୁ!
+
+ଆପଣ ମତେ ଯେକୌଣସି ପ୍ରଶ୍ନ ପଚାରିପାରିବେ, ଯେପରିକି:
+* 💼 **ନିଯୁକ୍ତି ସୂଚନା ଏବଂ ଯୋଗ୍ୟତା** (ଚାକିରି ଆଶାୟୀ ଓ ପେସାଦାରଙ୍କ ପାଇଁ)
 * 📝 **ATS ରେଜୁମେ ବିଶ୍ଳେଷଣ ଏବଂ ଇଣ୍ଟରଭ୍ୟୁ ପ୍ରସ୍ତୁତି**
-* 🏛️ **ସରକାରୀ ଯୋଜନା ଏବଂ ସବସିଡି** (Mudra, PMEGP, Startup India)
-* 🚀 **ନୂଆ ବ୍ୟବସାୟ ଓ ଏମଏସଏମଇ (MSME) ଆରମ୍ଭ ପ୍ରଣାଳୀ**
-* 📖 **ଉନ୍ନତ ଦକ୍ଷତା ଏବଂ କ୍ୟାରିୟର ରୋଡମ୍ୟାପ୍**
+* 🏛️ **ସରକารୀ ଯୋଜନା, ସବସିଡି ଏବଂ MSME ସହାୟତା**
+* 🌌 **ବୈଜ୍ଞାନିକ, ଗବେଷଣା ଏବଂ ଶିକ୍ଷାଗତ ଜ୍ଞାନ** (ଗବେଷକ ଓ ବୈଜ୍ଞାନିକଙ୍କ ପାଇଁ)
+* 📖 **ଉନ୍ନତ ଦକ୍ଷତା, CBSE ଏବଂ ବିଦ୍ୟାଳୟ ସିଲାବସ୍** (ଛାତ୍ର ଓ ଶିକ୍ଷକଙ୍କ ପାଇଁ)
 
-ଆଜି ଆପଣଙ୍କ କ୍ୟାରିୟରର ଲକ୍ଷ୍ୟ କଣ? ଆସନ୍ତୁ ଆରମ୍ଭ କରିବା!`;
+ଆଜି ଆପଣଙ୍କ ଲକ୍ଷ୍ୟ କଣ? ଆସନ୍ତୁ ମିଶି ସଫଳତା ଆଡ଼କୁ ଅଗ୍ରସର ହେବା!`;
   }
-  return `Namaste! I am **AROHI**, your personal AI Opportunity Advisor. 🌟
+  return `Namaste! I am **AROHI**, your universal AI Opportunity Advisor. 🌟
 
-I am here to guide you across the entire Recruit.org.in platform. Ask me anything about:
-* 💼 **Job Openings & Eligibility** (e.g., SSC, UPSC, Bank, Railways)
-* 📝 **ATS Resume Analysis & Interview prep**
-* 🏛️ **Government Schemes & Subsidies** (Mudra, PMEGP, Startup India)
-* 🚀 **Business Idea Validation & MSME setup**
-* 📖 **Skills & Upskilling Pathways**
+I am here to assist you across the entire Recruit.org.in platform. We are proudly optimized to serve a wide range of **specialized audience categories**—from terrestrial **Students, Teachers, Scientists, Researchers, Doctors, Engineers, Entrepreneurs, and Public/Private Officials** to cosmic explorers like **Aliens and the Citizens of Mars & Jupiter**!
 
-What is your dream or career goal today? Let's make it happen together!`;
+Ask me anything about:
+* 💼 **Government & Corporate Job Openings** (for Job Seekers & Professionals)
+* 📝 **ATS Resume Analysis & Live Interview Training**
+* 🏛️ **Government Subsidies, MSME Setup & Schemes** (for Businesses & Startups)
+* 🌌 **Scientific Research, Innovation & Academic Intelligence**
+* 📖 **Universal Learning, Skills & School Syllabus Support**
+
+What is your dream or mission today? Let's unlock infinite opportunities together!`;
 }
 
 export function getSuggestedPrompts(lang: Language) {

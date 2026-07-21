@@ -12,82 +12,89 @@ import {
   Flame, 
   ShieldAlert, 
   HelpCircle,
-  HelpCircle as QuestionIcon
+  HelpCircle as QuestionIcon,
+  GraduationCap,
+  FlaskConical,
+  Globe,
+  Rocket,
+  Zap,
+  MessageSquare
 } from 'lucide-react';
 
 interface Interactive3DOrbitProps {
   setActiveTab: (tab: string) => void;
   setSelectedPosting?: (posting: any) => void;
+  onQuickChat?: (prompt: string) => void;
 }
 
-export default function Interactive3DOrbit({ setActiveTab, setSelectedPosting }: Interactive3DOrbitProps) {
+export default function Interactive3DOrbit({ setActiveTab, setSelectedPosting, onQuickChat }: Interactive3DOrbitProps) {
   const [rotation, setRotation] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const [depthOffset, setDepthOffset] = useState(240); // 3D radius depth of the cylinder
   const [tilt, setTilt] = useState(-5); // RotateX tilt
   const [autoRotate, setAutoRotate] = useState(true);
 
-  // Core sectors of the India Career Ecosystem
+  // Core sectors of Arohi AI Capabilities
   const sectors = [
     {
-      title: "Sarkari Job Vacancies",
-      label: "Ministry Exams & Railways",
-      emoji: "💼",
-      desc: "Apply directly for SSC, Railway, UPSC, and State commissions with offline backup logs.",
-      tabId: "jobs",
-      badge: "ACTIVE BOARDS",
-      accent: "from-cyan-500 to-blue-600",
-      stats: "15,409 Live Vacancies"
-    },
-    {
-      title: "AROHI Career Assistant",
-      label: "Instant Interactive Advisor",
-      emoji: "🤖",
-      desc: "Get instant guidance regarding your career path, resume scores, and business loan eligibility.",
-      tabId: "arohi",
-      badge: "LIVE SUPPORT",
-      accent: "from-purple-500 to-pink-600",
-      stats: "24/7 Realtime Sync"
-    },
-    {
-      title: "Interactive ATS Builder",
-      label: "Resume Deficiency Grader",
-      emoji: "📄",
-      desc: "Calculate resume ATS compatibility grades instantly. Unlock deep premium templates.",
-      tabId: "resume",
-      badge: "ATS CHECKER",
-      accent: "from-emerald-400 to-teal-600",
-      stats: "₹99 Complete Unlock"
-    },
-    {
-      title: "Mudra MSME Loans",
-      label: "Government Startup Calculator",
-      emoji: "🏦",
-      desc: "Generate project compliance reports for Shishu, Kishor & Tarun government subsidies.",
-      tabId: "business",
-      badge: "RBI GUIDELINES",
-      accent: "from-amber-400 to-orange-600",
-      stats: "PMEGP Integration"
-    },
-    {
-      title: "ISO-Certified Skill Classes",
-      label: "Advanced Growth Upgrades",
+      title: "Learn Anything",
+      label: "Tutorials & Academics",
       emoji: "🎓",
-      desc: "Learn TallyPrime, cybersecurity, & cloud computing to fit current fast-growing Indian demands.",
+      desc: "Formulate custom visual learning roadmaps, school/university syllabus explanations, and career upskilling guides.",
       tabId: "courses",
-      badge: "CERTIFICATIONS",
-      accent: "from-violet-500 to-fuchsia-600",
-      stats: "12 Certified Tracks"
+      badge: "ACADEMICS",
+      accent: "from-purple-500 to-indigo-600",
+      stats: "Visual Roadmap Builder"
     },
     {
-      title: "User Control Dashboard",
-      label: "Hall Tickets & Applications",
-      emoji: "👤",
-      desc: "Review your saved mock applications, download hall tickets, and track premium subscriptions.",
-      tabId: "dashboard",
-      badge: "SECURE PORTAL",
-      accent: "from-rose-500 to-red-600",
-      stats: "Encrypted Locker"
+      title: "Research & Innovate",
+      label: "Literature & Thesis",
+      emoji: "🔬",
+      desc: "Analyze research papers, brainstorm novel hypotheses, design experiments, and compose citations in real-time.",
+      tabId: "arohi",
+      badge: "LITERATURE",
+      accent: "from-cyan-500 to-blue-600",
+      stats: "Literature Review Sync"
+    },
+    {
+      title: "Speak 150+ Languages",
+      label: "Global Translation",
+      emoji: "🌐",
+      desc: "Practice real-time conversational audio translation, regional dialects, and voice-to-voice multilingual tutoring.",
+      tabId: "arohi",
+      badge: "MULTILINGUAL",
+      accent: "from-emerald-400 to-teal-600",
+      stats: "Realtime Voice Engine"
+    },
+    {
+      title: "Build Your Business",
+      label: "Mudra & MSME Aid",
+      emoji: "🚀",
+      desc: "Generate project compliance reports for Shishu, Kishor, and Tarun government subsidies, business templates, and RBI guidelines.",
+      tabId: "business",
+      badge: "GOVERNMENT AID",
+      accent: "from-amber-400 to-orange-600",
+      stats: "Mudra Project Planner"
+    },
+    {
+      title: "Grow Your Career",
+      label: "ATS & Vacancy Finder",
+      emoji: "💼",
+      desc: "Check resume ATS compatibility, conduct mock AI voice interviews, and search live India state board job listings instantly.",
+      tabId: "resume",
+      badge: "CAREERS",
+      accent: "from-pink-500 to-rose-600",
+      stats: "ATS Deficiency Grader"
+    },
+    {
+      title: "Get Smart Answers",
+      label: "Instant Problem Solver",
+      emoji: "⚡",
+      desc: "Solve complex mathematical formulas, outline robust code architectures, compose long-form copy, and reason multi-step logic.",
+      tabId: "arohi",
+      badge: "SOLVER",
+      accent: "from-violet-500 to-fuchsia-600",
+      stats: "Multi-Step Logic Engine"
     }
   ];
 
@@ -127,10 +134,14 @@ export default function Interactive3DOrbit({ setActiveTab, setSelectedPosting }:
     setActiveIndex(index);
   };
 
-  const handleTeleport = (tabId: string) => {
-    setActiveTab(tabId);
-    if (setSelectedPosting) {
-      setSelectedPosting(null);
+  const handleTeleport = (tabId: string, title?: string, desc?: string) => {
+    if (tabId === 'arohi' && onQuickChat && title) {
+      onQuickChat(`Hi Arohi, I want to use the "${title}" capability: ${desc}`);
+    } else {
+      setActiveTab(tabId);
+      if (setSelectedPosting) {
+        setSelectedPosting(null);
+      }
     }
   };
 
@@ -326,7 +337,7 @@ export default function Interactive3DOrbit({ setActiveTab, setSelectedPosting }:
             {/* Action Buttons to launch the actual tab or portal */}
             <div className="pt-4 flex flex-col sm:flex-row gap-3">
               <button
-                onClick={() => handleTeleport(sectors[activeIndex].tabId)}
+                onClick={() => handleTeleport(sectors[activeIndex].tabId, sectors[activeIndex].title, sectors[activeIndex].desc)}
                 className="flex-1 bg-gradient-to-r from-[#7c3aed] to-[#d946ef] hover:from-[#6d28d9] hover:to-[#c084fc] text-white font-black text-xs uppercase tracking-wider py-3 px-5 rounded-xl shadow-[0_4px_20px_rgba(124,58,237,0.4)] flex items-center justify-center gap-1.5 cursor-pointer transform hover:scale-[1.02] active:scale-95 transition-all"
               >
                 <span>Teleport to Portal</span>

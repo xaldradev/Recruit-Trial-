@@ -60,7 +60,7 @@ export default function WalkthroughTour({ activeTab, setActiveTab, isOpen, onClo
     {
       tab: 'arohi',
       title: 'AROHI: Smart AI Career Guide',
-      description: 'Your round-the-clock digital career expert. Ask AROHI anything in English, Hindi, or Odia about job vacancies, career advice, exam schedules, or academic syllabi!',
+      description: 'Your round-the-clock digital career expert. Ask AROHI anything in English, Hindi, Odia, and 150+ languages about job vacancies, career advice, exam schedules, or academic syllabi!',
       icon: Bot,
       highlightText: 'Talk in your native language and receive immediate structured counseling roadmaps.'
     },
