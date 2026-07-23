@@ -67,7 +67,7 @@ export default function LegalPages({ initialTab }: LegalPagesProps) {
     {
       category: 'Account Recovery',
       q: 'How do I recover my account if I forget my login password or registration number?',
-      a: 'To recover your credentials, click the "Forgot Password" link on the login page, or utilize our AI Assistant Arohi to initialize verification. You will be prompted to enter your registered email address or mobile number. A secure password reset link or dynamic OTP will be dispatched to verify your identity. Alternatively, you can search your email inbox for "Recruit.org.in Confirmation" to retrieve your unique Application Registration Number.'
+      a: 'To recover your credentials, click the "Forgot Password" link on the login page, or utilize our AI Assistant Arohi to initialize verification. You will be prompted to enter your registered email address or mobile number. A secure password reset link or dynamic OTP will be dispatched to verify your identity. Alternatively, you can search your email inbox for "Arohi.ai Confirmation" to retrieve your unique Application Registration Number.'
     },
     {
       category: 'Account Recovery',
@@ -258,7 +258,7 @@ export default function LegalPages({ initialTab }: LegalPagesProps) {
                 <section className="space-y-2">
                   <h3 className="font-extrabold text-white text-sm md:text-base">1. Information We Collect</h3>
                   <p>
-                    Recruit.org.in ("we", "us", or "our") collects critical user data strictly to facilitate job recommendations, custom roadmaps, and resume compilation. This includes:
+                    Arohi.ai ("we", "us", or "our") collects critical user data strictly to facilitate job recommendations, custom roadmaps, and resume compilation. This includes:
                   </p>
                   <ul className="list-disc pl-5 space-y-1 text-slate-400">
                     <li><strong>Personal Identifiers:</strong> Name, email address, telephone contact number, and location.</li>
@@ -390,7 +390,7 @@ export default function LegalPages({ initialTab }: LegalPagesProps) {
                     To claim a manual refund:
                   </p>
                   <ol className="list-decimal pl-5 space-y-1 text-slate-400">
-                    <li>Head over to our <strong>Contact Us</strong> pane or email <code>refunds@recruit.org.in</code>.</li>
+                    <li>Head over to our <strong>Contact Us</strong> pane or email <code>refunds@arohi.ai</code>.</li>
                     <li>Include your Name, Registrant Email, date of transaction, and unique Transaction ID (e.g., UTR, Bank Ref No., or Gateway Ref).</li>
                     <li>Our finance support desk will review and confirm eligibility within 24 hours. Approved claims are initiated instantly.</li>
                   </ol>
@@ -512,7 +512,7 @@ export default function LegalPages({ initialTab }: LegalPagesProps) {
                       <Mail className="w-4 h-4 text-[#8a70f5] shrink-0 mt-0.5" />
                       <div>
                         <span className="text-slate-400 font-bold block text-[10px]">Email Support</span>
-                        <a href="mailto:support@recruit.org.in" className="text-white font-black hover:underline">support@recruit.org.in</a>
+                        <a href="mailto:support@arohi.ai" className="text-white font-black hover:underline">support@arohi.ai</a>
                       </div>
                     </div>
 
@@ -551,7 +551,7 @@ export default function LegalPages({ initialTab }: LegalPagesProps) {
                     <div className="text-[11px] space-y-1 mt-2 bg-[#120d2a] p-2.5 rounded-lg border border-[#211b3d]">
                       <div><strong>Officer:</strong> Rajesh Kumar</div>
                       <div><strong>Designation:</strong> Chief Grievance Officer</div>
-                      <div><strong>Direct Desk:</strong> <a href="mailto:grievance@recruit.org.in" className="text-[#a855f7] hover:underline">grievance@recruit.org.in</a></div>
+                      <div><strong>Direct Desk:</strong> <a href="mailto:grievance@arohi.ai" className="text-[#a855f7] hover:underline">grievance@arohi.ai</a></div>
                       <div className="text-[9px] text-slate-500 mt-1">Issues are resolved within 15 days as mandated.</div>
                     </div>
                   </div>

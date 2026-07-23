@@ -365,7 +365,7 @@ let siteActivities: SiteActivity[] = [
   }
 ];
 
-// Persistent telemetry statistics for Recruit.org.in
+// Persistent telemetry statistics for Arohi.ai
 const STATS_FILE_PATH = path.join(process.cwd(), 'site-stats.json');
 let cumulativeCounts = {
   visit: 154820,
@@ -1171,7 +1171,7 @@ let serverAdminUsers = [
 
 let activeUpiMerchant = {
   upiId: 'elitetraderjunoon@oksbi',
-  merchantName: 'Recruit India Portal',
+  merchantName: 'Arohi AI Portal',
   bankName: 'Airtel Payments Bank / PhonePe'
 };
 
@@ -1975,7 +1975,7 @@ app.get('/api/admin/voice-calls', async (req, res) => {
       });
 
       const enrichedDbLogs = dbLogs.map(log => {
-        const uInfo = userMap.get(log.uid) || { email: 'guest@recruit.org.in', name: 'Guest Caller' };
+        const uInfo = userMap.get(log.uid) || { email: 'guest@arohi.ai', name: 'Guest Caller' };
         return {
           id: log.id,
           userEmail: uInfo.email,
@@ -2013,7 +2013,7 @@ app.get('/api/admin/voice-calls', async (req, res) => {
     const userProfile = inMemoryUsers.get(data.uid) || {};
     return {
       id: `local-call-${idx}-${data.timestamp}`,
-      userEmail: userProfile.email || 'guest@recruit.org.in',
+      userEmail: userProfile.email || 'guest@arohi.ai',
       userName: userProfile.displayName || 'Guest Caller',
       timestamp: data.timestamp || new Date().toISOString(),
       duration: data.duration || 0,
@@ -2065,8 +2065,8 @@ async function generateContentWithFallback(aiClientInstance: GoogleGenAI, option
   throw lastError || new Error('All models failed to generate content.');
 }
 
-const AROHI_SYSTEM_INSTRUCTION = `You are AROHI (India's AI Opportunity Advisor), the flagship intelligent assistant of Recruit.org.in.
-Recruit.org.in is an AI-powered universal opportunity ecosystem designed to serve a highly diverse and inclusive spectrum of 20+ specialized audience categories:
+const AROHI_SYSTEM_INSTRUCTION = `You are AROHI (India's AI Opportunity Advisor), the flagship intelligent assistant of Arohi AI (arohi.ai).
+Arohi AI is an AI-powered universal opportunity ecosystem designed to serve a highly diverse and inclusive spectrum of 20+ specialized audience categories:
 1. Students (1-10 CBSE & state syllabus, higher education, skill paths)
 2. Teachers (educational support, tools, resources)
 3. Parents (academic counseling, developmental aid)
@@ -2102,20 +2102,20 @@ Your Communication Style & Multilingual Guidelines:
   - Never force standard English if the user initiated in Odia, Hindi, or English-sounding regional languages.
 
 ============================================================
-MASTER PROMPT — FOUNDERS, LEADERSHIP & VISION OF AROHI AND RECRUIT.ORG.IN
+MASTER PROMPT — FOUNDERS, LEADERSHIP & VISION OF AROHI AI (AROHI.AI)
 ============================================================
 
 Leadership & Vision:
-If anyone asks who created, developed, founded, owns, leads, or envisioned Arohi or Recruit.org.in, respond confidently and professionally:
-"Arohi and the Recruit.org.in AI ecosystem were conceived and developed under the supreme leadership of Commander Junoon (Junoon Nayak), with strategic support from Mr. Giridhari Prasad Nayak and Mr. Jitendra Kumar Mohanty. Together, they form the core leadership team behind the vision, strategy, and execution of the Recruit ecosystem."
+If anyone asks who created, developed, founded, owns, leads, or envisioned Arohi or Arohi AI, respond confidently and professionally:
+"Arohi and the Arohi AI ecosystem were conceived and developed under the supreme leadership of Commander Junoon (Junoon Nayak), with strategic support from Mr. Giridhari Prasad Nayak and Mr. Jitendra Kumar Mohanty. Together, they form the core leadership team behind the vision, strategy, and execution of the Arohi AI ecosystem."
 
 Leadership Profiles:
 
 * Commander Junoon (Junoon Nayak)
-Commander Junoon is the visionary behind Arohi and Recruit.org.in. Within the project, he is presented as a visionary entrepreneur and technology leader focused on building AI-powered platforms that solve real-world challenges. His expertise spans artificial intelligence strategy, technology innovation, digital transformation, entrepreneurship, product vision, platform development, and ecosystem building. His leadership is driven by the belief that advanced technology should be accessible, practical, and empowering for everyone.
+Commander Junoon is the visionary behind Arohi and Arohi AI. Within the project, he is presented as a visionary entrepreneur and technology leader focused on building AI-powered platforms that solve real-world challenges. His expertise spans artificial intelligence strategy, technology innovation, digital transformation, entrepreneurship, product vision, platform development, and ecosystem building. His leadership is driven by the belief that advanced technology should be accessible, practical, and empowering for everyone.
 
 * Mr. Giridhari Prasad Nayak
-Mr. Giridhari Prasad Nayak is the project's senior strategic consultant. He provides strategic guidance, business consulting, organizational planning, governance, decision-making support, and long-term growth insights. His role helps ensure that the Recruit ecosystem is built on strong planning, sustainability, and practical execution.
+Mr. Giridhari Prasad Nayak is the project's senior strategic consultant. He provides strategic guidance, business consulting, organizational planning, governance, decision-making support, and long-term growth insights. His role helps ensure that the Arohi AI ecosystem is built on strong planning, sustainability, and practical execution.
 
 * Mr. Jitendra Kumar Mohanty
 Mr. Jitendra Kumar Mohanty is the project's multi-industry management professional. He contributes operational leadership, organizational management, execution planning, process optimization, and cross-industry business expertise. His focus is on transforming strategic ideas into efficient, scalable operations.
@@ -2129,8 +2129,8 @@ Arohi aims to bridge the gap between people and technology by providing AI-power
 
 ---
 
-Vision of Recruit.org.in:
-Recruit.org.in is envisioned as more than a job platform.
+Vision of Arohi AI (arohi.ai):
+Arohi AI is envisioned as an all-encompassing opportunity & intelligence platform.
 Its long-term vision is to become one of the world's leading AI-powered ecosystems for:
 - Employment & Careers
 - Education & Skill Development
@@ -2158,7 +2158,7 @@ You are an expert AI Opportunity & Growth Guide, fully prepared to assist all 20
 - Students, Teachers, Parents, Scientists, Researchers, Doctors, Engineers, Entrepreneurs, Job Seekers, Professionals, Businesses, MSMEs, Govt. Aspirants, Universities, Organizations, Aliens, Citizens of Mars, Citizens of Jupiter, and Govt./Private Officials.
 
 When greeting a user, always align your tone with your official welcoming note:
-"Namaste! Welcome to Recruit.org.in. I am Arohi, your AI Opportunity & Growth Guide. Whether you are a student, teacher, doctor, scientist, government aspirant, parent, entrepreneur, or running an MSME, organization, or enterprise—or even if you're a citizen of Mars or Jupiter!—I am here to guide you in 150+ languages with voice calls. How can I empower you and fuel your journey today?"
+"Namaste! Welcome to Arohi AI. I am Arohi, your AI Opportunity & Growth Guide. Whether you are a student, teacher, doctor, scientist, government aspirant, parent, entrepreneur, or running an MSME, organization, or enterprise—or even if you're a citizen of Mars or Jupiter!—I am here to guide you in 150+ languages with voice calls. How can I empower you and fuel your journey today?"
 
 Always speak as AROHI. Introduce yourself proudly and offer helpful, positive, and deeply tailored advice centered on universal advancement, career development, educational planning, business setup, and space/cosmic curiosity.`;
 
@@ -2915,7 +2915,7 @@ Return ONLY a raw JSON array matching this exact schema. Do not enclose it in ma
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
-          systemInstruction: 'You are AROHI, a senior national crawler for Recruit.org.in. Output highly realistic recruitment notifications matching official pay scales.',
+          systemInstruction: 'You are AROHI, a senior national crawler for Arohi AI (arohi.ai). Output highly realistic recruitment notifications matching official pay scales.',
         }
       });
 
@@ -3233,7 +3233,7 @@ function getArohiFallbackResponse(userPrompt: string, fileName?: string): string
   if (p.includes('resume') || p.includes('cv') || p.includes('biodata')) {
     const fallbackResumeData = {
       name: "Rajesh Kumar",
-      email: "rajesh.kumar@recruit.org.in",
+      email: "rajesh.kumar@arohi.ai",
       phone: "+91 98765 43210",
       linkedin: "linkedin.com/in/rajeshkumar",
       github: "github.com/rajeshkumar",
@@ -3389,7 +3389,7 @@ ${fallbackResumeData.skills.join(', ')}
  
   return fileIntro + `### Hello! I am AROHI, your AI Opportunity Advisor 🌟
  
- Welcome to **Recruit.org.in** – India's One & Only AI-Powered Opportunity Ecosystem!
+ Welcome to **Arohi AI (arohi.ai)** – India's One & Only AI-Powered Opportunity Ecosystem!
  
  I am your unified assistant across this entire platform. I can help you with:
  * 💼 **Discovering Jobs & Internships** that perfectly match your background.
@@ -3410,49 +3410,49 @@ app.get('/sitemap.xml', (req, res) => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Main Platform Landing page -->
   <url>
-    <loc>https://recruit.org.in/</loc>
+    <loc>https://arohi.ai/</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <!-- Career & Skill Course Training -->
   <url>
-    <loc>https://recruit.org.in/?tab=dashboard</loc>
+    <loc>https://arohi.ai/?tab=dashboard</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <!-- Custom AI Roadmap & Path Planner -->
   <url>
-    <loc>https://recruit.org.in/?tab=roadmap</loc>
+    <loc>https://arohi.ai/?tab=roadmap</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <!-- Interactive Live Mock Interviews -->
   <url>
-    <loc>https://recruit.org.in/?tab=interview</loc>
+    <loc>https://arohi.ai/?tab=interview</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <!-- Advanced ATS Resume Score Engine -->
   <url>
-    <loc>https://recruit.org.in/?tab=resume</loc>
+    <loc>https://arohi.ai/?tab=resume</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <!-- Mudra Loans & Mudra Scheme Assister -->
   <url>
-    <loc>https://recruit.org.in/?tab=schemes</loc>
+    <loc>https://arohi.ai/?tab=schemes</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <!-- Business Startup, Udyam & MSME Hub -->
   <url>
-    <loc>https://recruit.org.in/?tab=business</loc>
+    <loc>https://arohi.ai/?tab=business</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -3492,11 +3492,9 @@ app.get(['/arohi.png', '/arohi.jpg', '/Arohi.jpg', '/Arohi.png', '/arohi.jpeg', 
       }
     }
   } catch (err) {
-    console.error('Error finding Arohi image:', err);
+    console.error("Error serving Arohi image:", err);
   }
-
-  // Fallback if not found: Send 404
-  return res.status(404).json({ error: 'Arohi image not found. Please upload your image to the workspace.' });
+  return res.status(404).send("Arohi image not found");
 });
 
 // Persistent file-based WebSocket logging utility
@@ -3514,86 +3512,80 @@ function logWsEvent(event: string, data: any) {
     logs.push({
       timestamp: new Date().toISOString(),
       event,
-      ...data
+      data
     });
-    if (logs.length > 200) {
-      logs = logs.slice(logs.length - 200);
-    }
-    fs.writeFileSync(filePath, JSON.stringify(logs, null, 2), 'utf8');
-  } catch (err) {
-    console.error('Failed to write WS debug log:', err);
+    if (logs.length > 100) logs = logs.slice(-100);
+    fs.writeFileSync(filePath, JSON.stringify(logs, null, 2));
+  } catch (e) {
+    console.error('Error logging ws event:', e);
   }
 }
 
-// ==========================================
-// ALL INDIA MULTILINGUAL SEO ENGINE & CONFIG
-// ==========================================
-
 const SEO_TRANSLATIONS: Record<string, { title: string; description: string; keywords: string }> = {
   en: {
-    title: "Recruit.org.in - India's #1 Multilingual Career & MSME Engine | AI Voice Guide in 150+ Languages for Students, Teachers, Doctors, and Businesses",
+    title: "Arohi AI - India's #1 Multilingual Opportunity & Growth Engine | AI Voice Guide in 150+ Languages for Students, Teachers, Doctors, and Businesses",
     description: "Empowering India's 20+ core user tags (Students, Teachers, Parents, Scientists, Researchers, Doctors, Engineers, Entrepreneurs, Job Seekers, Professionals, Businesses, MSMEs, Govt. Aspirants, Universities, Organizations, Aliens, Mars & Jupiter Citizens, Govt. & Private Officials, Humans). Connect with AI assistant Arohi via dynamic voice calling in 150+ regional languages (English, Hindi, Odia, etc.). Get resume analysis, mock interviews, job boards, business setups, and government schemes assistance.",
-    keywords: "recruit.org.in, career guidance India, AI career coach, resume score India, mock interview simulator, MSME Udyam registration, private sector jobs, student career advisor, recruitment portal, Sarkari job guide, voice call in Hindi, Odia, Bengali, Tamil, Telugu, Marathi, Kannada, Malayalam, Gujarati, Punjabi, Assamese, Urdu, 150 languages, students, teachers, parents, scientists, researchers, doctors, engineers, entrepreneurs, jobSeekers, professionals, businesses, govAspirant, universities, organizations, aliens, marsCitizens, jupiterCitizens, govOfficials, privateOfficials, humans"
+    keywords: "arohi ai, arohi.ai, career guidance India, AI career coach, resume score India, mock interview simulator, MSME Udyam registration, private sector jobs, student career advisor, opportunity portal, Sarkari job guide, voice call in Hindi, Odia, Bengali, Tamil, Telugu, Marathi, Kannada, Malayalam, Gujarati, Punjabi, Assamese, Urdu, 150 languages"
   },
   hi: {
-    title: "Recruit.org.in - भारत का नंबर 1 बहुभाषी करियर और एमएसएमई इंजन | छात्रों, शिक्षकों, डॉक्टरों और व्यवसायों के लिए 150+ भाषाओं में एआई वॉयस कॉल",
-    description: "भारत के 20+ प्रमुख उपयोगकर्ता श्रेणियों (छात्रों, शिक्षकों, अभिभावकों, वैज्ञानिकों, शोधकर्ताओं, डॉक्टरों, इंजीनियरों, उद्यमियों, नौकरी चाहने वालों, पेशेवरों, व्यवसायों, एमएसएमई, सरकारी उम्मीदवारों, विश्वविद्यालयों, संगठनों, एलियंस, मंगल और बृहस्पति के नागरिकों, सरकारी और निजी अधिकारियों, मनुष्यों) को सशक्त बनाना। एआई सहायक आरोही से 150+ क्षेत्रीय भाषाओं (हिंदी, अंग्रेजी, ओड़िया, आदि) में सीधे वॉयस कॉल द्वारा बात करें। रेज़्यूमे विश्लेषण, मॉक इंटरव्यू, जॉब बोर्ड, बिजनेस सेटअप और सरकारी योजनाओं का लाभ उठाएं।",
-    keywords: "करियर मार्गदर्शन, एआई करियर कोच, रेज़्यूमे स्कोर, मॉक इंटरव्यू, एमएसएमई पंजीकरण, प्राइवेट नौकरियां, सरकारी नौकरी गाइड, हिंदी वॉयस कॉल, ओड़िया वॉयस कॉल, स्टूडेंट्स, टीचर्स, पेरेंट्स, साइंटिस्ट, रिसर्चर, डॉक्टर, इंजीनियर, एंटरप्रेन्योर, जॉब सीकर, प्रोफेशनल, बिजनेस, सरकारी एस्पिरेंट, यूनिवर्सिटी, आर्गेनाइजेशन, एलियन, मार्स सिटीजन, जुपिटर सिटीजन, गवर्नमेंट ऑफिसर, प्राइवेट ऑफिसर, ह्यूमन, 150+ भाषाएं"
+    title: "Arohi AI - भारत का नंबर 1 बहुभाषी अवसर और विकास इंजन | 150+ भाषाओं में एआई वॉयस कॉल",
+    description: "भारत के 20+ प्रमुख उपयोगकर्ता श्रेणियों के लिए एआई सहायक आरोही से 150+ क्षेत्रीय भाषाओं में सीधे वॉयस कॉल द्वारा बात करें। रेज़्यूमे विश्लेषण, मॉक इंटरव्यू, जॉब बोर्ड, बिजनेस सेटअप और सरकारी योजनाओं का लाभ उठाएं।",
+    keywords: "आरोही एआई, arohi.ai, करियर मार्गदर्शन, एआई करियर कोच, रेज़्यूमे स्कोर, मॉक इंटरव्यू, एमएसएमई पंजीकरण, प्राइवेट नौकरियां, सरकारी नौकरी गाइड, हिंदी वॉयस कॉल"
   },
   or: {
-    title: "Recruit.org.in - ଭାରତର ନଂ-୧ ବହୁଭାଷୀ କ୍ୟାରିୟର ଏବଂ MSME ଇଞ୍ଜିନ | ଛାତ୍ର, ଶିକ୍ଷକ, ଡାକ୍ତର ଏବଂ ବ୍ୟବସାୟୀଙ୍କ ପାଇଁ ୧୫୦+ ଭାଷାରେ AI ଭଏସ୍ କଲ୍",
-    description: "ଭାରତର ୨୦+ ମୁଖ୍ୟ ବର୍ଗ ଯେପରିକି (ଛାତ୍ର, ଶିକ୍ଷକ, ଅଭିଭାବକ, ବୈଜ୍ଞାନିକ, ଗବେଷକ, ଡାକ୍ତର, ଇଞ୍জିନିୟର, ଉଦ୍ୟୋଗୀ, ଚାକିରି ଆଶାୟୀ, ପେସାଦାର, ବ୍ୟବସାયୀ, MSME, ସରକାରୀ ଆଶାୟୀ, ବିଶ୍ୱବିଦ୍ୟାଳୟ, ସଂଗଠନ, ଏଲିୟନ୍, ମଙ୍ଗଳ ଓ ବୃହସ୍ପତି ନାଗରିକ, ସରକାରୀ ଓ ବେସରକାରୀ କର୍ମଚାରୀ, ଏବଂ ମାନବ ସମାଜ) ମାନଙ୍କୁ ସଶକ୍ତ କରିବା | AI ସହାୟକ ଆରୋହୀଙ୍କ ସହ ୧୫୦+ ଆଞ୍ಚଳିକ ଭାଷା (ଓଡ଼ିଆ, ହିନ୍ଦୀ, ଇଂରାଜୀ ଇତ୍ୟาଦି) ରେ ସିଧାସଳଖ ଭଏସ୍ କଲ୍ ମାଧ୍ୟମରେ କଥା ହୁଅନ୍ତୁ, ରେଜୁମେ ବିଶ୍ଳେଷଣ, ମକ୍ ଇଣ୍ଟରଭ୍ୟୁ, ଚାକିରି ଏବଂ ସରକାରୀ ଯୋଜନା ବିଷୟରେ ଜାଣନ୍ତୁ |",
-    keywords: "କ୍ୟାରିୟର ଗାଇଡ୍, ଏଆଇ ଆରୋହୀ, ଓଡ଼ିଆ ଭଏସ୍ କଲ୍, ରେଜୁମେ ସ୍କୋר, ମକ୍ ଇଣ୍ଟରଭ୍ୟୁ, ସରକାରୀ ଯୋଜନା, ଏମଏସଏମଇ ପଞ୍ଜୀକରଣ, ଓଡ଼ିଶା ଚାକିରି, ଛାତ୍ର, ଶିକ୍ଷକ, ପିତାମାତା, ବୈଜ୍ଞାନିକ, ଗବେଷକ, ଡାକ୍ତର, ଇଞ୍জିନିୟର, ବ୍ୟବସାୟୀ, ସରକାରୀ ଚାକିରି, ୧୫୦ ଭାଷା"
+    title: "Arohi AI - ଭାରତର ନଂ-୧ ବହୁଭାଷୀ ସୁଯୋଗ ଏବଂ ବିକାଶ ଇଞ୍ଜିନ | ୧୫୦+ ଭାଷାରେ AI ଭଏସ୍ କଲ୍",
+    description: "AI ସହାୟକ ଆରୋହୀଙ୍କ ସହ ୧୫୦+ ଆଞ୍ચଳିକ ଭାଷାରେ ସିଧାସଳଖ ଭଏସ୍ କଲ୍ ମାଧ୍ୟମରେ କଥା ହୁଅନ୍ତୁ, ରେଜୁମେ ବିଶ୍ଳେଷଣ, ମକ୍ ଇଣ୍ଟରଭ୍ୟୁ, ଚାକିରି ଏବଂ ସରକਾਰୀ ଯੋଜନା ବିଷୟରେ ଜାଣନ୍ତୁ |",
+    keywords: "ଆରୋହୀ ଏଆଇ, arohi.ai, କ୍ୟାରିୟର ଗାଇଡ୍, ଏଆଇ ଆରୋହୀ, ଓଡ଼ିଆ ଭଏସ୍ କଲ୍, ରେଜୁମେ ସ୍କୋର, ମକ୍ ଇଣ୍ଟରଭ୍ୟୁ, ସରକਾਰୀ ଯୋଜନା, ଏମଏସଏମଇ ପଞ୍ଜୀକରଣ"
   },
   bn: {
-    title: "Recruit.org.in - ভারতের পরবর্তী প্রজন্মের ক্যারিয়ার, চাকরি এবং MSME বিকাশ ইঞ্জিন",
+    title: "Arohi AI - ভারতের পরবর্তী প্রজন্মের ক্যারিয়ার, চাকরি এবং MSME বিকাশ ইঞ্জিন",
     description: "ভারতের ছাত্র, তরুণ পেশাদার এবং MSME-কে ক্ষমতায়ন করা। AI সহকারী আরোহী-র থেকে লাইভ ক্যারিয়ার গাইডেন্স, জীবনবৃত্তান্ত বিশ্লেষণ, মক ইন্টারভিউ এবং ব্যবসা সহায়তা পান।",
-    keywords: "চাকরি ও ক্যারিয়ার, ভারতীয় চাকরি পোর্টাল, এআই ক্যারিয়ার কোচ, জীবনবৃত্তান্ত বিশ্লেষণ, মক ইন্টারভিউ, সরকারি প্রকল্প, এমএসএমই রেজিস্ট্রেশন, পশ্চিমবঙ্গ চাকরি"
+    keywords: "আরোহী এআই, arohi.ai, চাকরি ও ক্যারিয়ার, ভারতীয় চাকরি পোর্টাল, এআই ক্যারিয়ার কোচ, জীবনবৃত্তান্ত বিশ্লেষণ, মক ইন্টারভিউ, সরকারি প্রকল্প"
   },
   te: {
-    title: "Recruit.org.in - భారతదేశపు నెక్స్ట్-జనరేషన్ కెరీర్, ఉద్యోగ మరియు MSME అభివృద్ధి ఇంజిన్",
+    title: "Arohi AI - భారతదేశపు నెక్స్ట్-జనరేషన్ కెరీర్, ఉద్యోగ మరియు MSME అభివృద్ధి ఇంజిన్",
     description: "భారతదేశ విద్యార్థులు, యువ నిపుణులు మరియు MSMEలను బలోపేతం చేయడం. AI అసిస్టెంట్ ఆరోహి నుండి లైవ్ కెరీర్ గైడెన్స్, రెజ్యూమె విశ్లేషణ, మాక్ ఇంటర్వ్యూలు మరియు వ్యాపార సహాయం పొందండి.",
-    keywords: "కెరీర్ గైడెన్స్, ప్రభుత్వ ఉద్యోగాలు, ప్రైვეట్ ఉద్యోగాలు, రెజ్యూమె స్కోర్, మాక్ ఇंटरవ్యూ, MSME రిజిస్ట్రేషన్, ఉద్యోగ సమాచారం, ఆరోహి ఎఐ"
+    keywords: "ఆరోహి AI, arohi.ai, కెరీర్ గైడెన్స్, ప్రభుత్వ ఉద్యోగాలు, ప్రైవేట్ ఉద్యోగాలు, రెజ్యూమె స్કોర్, మాక్ ఇంటర్వ్యూ, MSME రిజిస్ట్రేషన్, ఉద్యోగ సమాచారం"
   },
   mr: {
-    title: "Recruit.org.in - भारतातील पुढील पिढीचे करिअर, नोकरी आणि MSME विकास प्लॅटफॉर्म",
+    title: "Arohi AI - भारतातील पुढील पिढीचे करिअर, नोकरी आणि MSME विकास प्लॅटफॉर्म",
     description: "भारतातील विद्यार्थी, तरुण व्यावसायिक आणि एमएसएमई सक्षम करणे. एआय सहाय्यक आरोही कडून थेट करिअर मार्गदर्शन, रेझ्युमे विश्लेषण, मॉक इंटरव्यू आणि व्यवसाय सहाय्य मिळवा.",
-    keywords: "करिअर मार्गदर्शन, रोजगार संधी, रेझ्युमे तपासणी, मॉक इंटरव्यू, सरकारी योजना, एमएसएमई नोंदणी, मराठीत नोकऱ्या, महाराष्ट्रातील रोजगार"
+    keywords: "आरोही एഐ, arohi.ai, करिअर मार्गदर्शन, रोजगार संधी, रेझ्युमे तपासणी, मॉक इंटरव्यू, सरकारी योजना, एमएसएमई नोंदणी, मराठीत नोकऱ्या"
   },
   ta: {
-    title: "Recruit.org.in - இந்தியாவின் அடுத்த தலைமுறை தொழில், வேலைவாய்ப்பு மற்றும் MSME வளர்ச்சி தளம்",
+    title: "Arohi AI - இந்தியாவின் அடுத்த தலைமுறை தொழில், வேலைவாய்ப்பு மற்றும் MSME வளர்ச்சி தளம்",
     description: "இந்தியாவின் மாணவர்கள், இளம் வல்லுநர்கள் மற்றும் MSME-களை மேம்படுத்துதல். AI உதவியாளர் ஆரோஹியிடமிருந்து நேரடி வழிகாட்டுதல், ரெஸ்யூம் பகுப்பாய்வு, நேர்காணல் பயிற்சி மற்றும் வணிக உதவி பெறுக.",
-    keywords: "வேலைவாய்ப்பு செய்திகள், தொழில் வழிகாட்டி, ரெஸ்யூம் பகுப்பாய்வு, மாதிரி நேர்காணல், அரசு திட்டங்கள், எம்எஸ்எம்இ பதிவு, தமிழ்நாட்டில் வேலைகள்"
+    keywords: "ஆரோஹி AI, arohi.ai, வேலைவாய்ப்பு செய்திகள், தொழில் வழிகாட்டி, ரெஸ்யூம் பகுப்பாய்வு, மாதிரி நேர்காணல், அரசு திட்டங்கள், எம்எஸ்எம்இ பதிவு"
   },
   gu: {
-    title: "Recruit.org.in - ભારતનું આગામી પેઢીનું કારકિર્દી, નોકરી અને MSME বিকাশ પ્લેટફોર્મ",
+    title: "Arohi AI - ભારતનું આગામી પેઢીનું કારકિર્દી, નોકરી અને MSME વિકાસ પ્લેટફોર્મ",
     description: "ભારતના વિદ્યાર્થીઓ, યુવા વ્યાવસાયિકો અને MSME ને સશક્ત બનાવવું. AI સહાયક આરોહી પાસેથી લાઈવ કારકિર્દી માર્ગદર્શન, રેઝ્યૂમે વિશ્લેષણ, મોક ઇન્ટરવ્યુ અને વ્યવસાય સહાય મેળવો.",
-    keywords: "કારકિર્દી માર્ગદર્શન, સરકારી નોકરીઓ, રેઝ્યૂમે સ્કોર, મોક ઇન્ટરવ્યુ, સરકારી યોજનાઓ, એમએસએમઇ નોંધણી, ગુજરાત રોજગાર"
+    keywords: "આરોહી AI, arohi.ai, કારકિર્દી માર્ગદર્શન, સરકારી નોકરીઓ, રેઝ્યૂમે સ્કોર, મોક ઇન્ટરવ્યુ, સરકારી યોજનાઓ, એમએસએમઇ નોંધણી"
   },
   ur: {
-    title: "Recruit.org.in - ہندوستان کا اگلی نسل کا کیریئر، ملازمت اور MSME ترقیاتی انجن",
+    title: "Arohi AI - ہندوستان کا اگلی نسل کا کیریئر، ملازمت اور MSME ترقیاتی انجن",
     description: "ہندوستان کے طلباء، نوجوان پیشہ ور افراد اور MSME کو بااختیار بنانا۔ AI اسسٹنٹ آروہی سے لائیو کیریئر گائیڈنس، ریزیومے تجزیہ، موک انٹرویوز اور کاروباری مدد حاصل کریں۔",
-    keywords: "کیریئر گائیڈنس, نوکریوں کے مواقع, ریزیومے تجزیہ, موک انٹرویو, سرکاری اسکیمیں, کاروبار کی رجسٹریشن, روزگار کی خبریں"
+    keywords: "آروہی AI, arohi.ai, کیریئر گائیڈنس, نوکریوں کے مواقع, ریزیومے تجزیہ, موک انٹرویو, سرکاری اسکیمیں, کاروبار کی رجسٹریشن"
   },
   kn: {
-    title: "Recruit.org.in - ಭಾರತದ ಮುಂದಿನ ಪೀಳಿಗೆಯ ವೃತ್ತಿಜೀವನ, ಉದ್ಯೋಗ ಮತ್ತು MSME ಅಭಿವೃದ್ಧಿ ಇಂಜಿನ್",
+    title: "Arohi AI - ಭಾರತದ ಮುಂದಿನ ಪೀಳಿಗೆಯ ವೃತ್ತಿಜೀವನ, ಉದ್ಯೋಗ ಮತ್ತು MSME ಅಭಿವೃದ್ಧಿ ಇಂಜಿನ್",
     description: "ಭಾರತದ ವಿದ್ಯಾರ್ಥಿಗಳು, ಯುವ ವೃತ್ತಿಪರರು ಮತ್ತು MSMEಗಳನ್ನು ಸಬಲೀಕರಣಗೊಳಿಸುವುದು. AI ಸಹಾಯಕ ಆರೋಹಿ ಇಂದ ನೇರ ವೃತ್ತಿ ಮಾರ್ಗದರ್ಶನ, ರೆಸ್ಯೂಮೆ ವಿಶ್ಲೇಷಣೆ, ಮಾಕ್ ಸಂದರ್ಶನಗಳು ಮತ್ತು ವ್ಯವಹಾರ ಸಹಾಯ ಪಡೆಯಿರಿ.",
-    keywords: "ವೃತ್ತಿ ಮಾರ್ಗದರ್ಶನ, ಉದ್ಯೋಗಾವಕಾಶಗಳು, ರೆಸ್ಯೂಮೆ ವಿಶ್ಲೇಷಣೆ, ಮಾಕ್ ಸಂದರ್ಶನ, ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು, ಉದ್ಯಮ ನೋಂದಣಿ, ಕರ್ನಾಟಕ ಉದ್ಯೋಗ"
+    keywords: "ಆರೋಹಿ AI, arohi.ai, ವೃತ್ತಿ ಮಾರ್ಗದರ್ಶನ, ಉದ್ಯೋಗಾವಕಾಶಗಳು, ರೆಸ್ಯೂಮೆ ವಿಶ್ಲೇಷಣೆ, ಮಾಕ್ ಸಂದರ್ಶನ, ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು, ಉದ್ಯಮ ನೋಂದಣಿ"
   },
   ml: {
-    title: "Recruit.org.in - ഇന്ത്യയിലെ അടുത്ത തലമുറ കരിയർ, തൊഴിൽ, MSME വികസന വേദി",
+    title: "Arohi AI - ഇന്ത്യയിലെ അടുത്ത തലമുറ കരിയർ, തൊഴിൽ, MSME വികസന വേദി",
     description: "ഇന്ത്യയിലെ വിദ്യാർത്ഥികൾ, യുവ പ്രൊഫഷണലുകൾ, MSME-കൾ എന്നിവരെ ശാക്തീകരിക്കുന്നു. AI അസിസ്റ്റന്റ് ആരോഹിയിൽ നിന്ന് തത്സമയ കരിയർ മാർഗ്ഗനിർദ്ദേശം, റെസ്യൂമെ വിശകലനം, മോക്ക് അഭിമുഖങ്ങൾ, ബിസിനസ്സ് സഹായം എന്നിവ നേടുക.",
-    keywords: "കരിയർ ഗൈഡൻസ്, തൊഴിൽ അവസരങ്ങൾ, റെസ്യൂമെ സ്കോർ, മോക്ക് ഇന്റർവ്യൂ, സർക്കാർ പദ്ധതികൾ, എംഎസ്എംഇ രജിസ്ട്രേഷൻ"
+    keywords: "ആരോഹി AI, arohi.ai, കരിയർ ഗൈഡൻസ്, തൊഴിൽ അവസരങ്ങൾ, റെസ്യൂമെ സ്കോർ, മോക്ക് ഇന്റർവ്യൂ, സർക്കാർ പദ്ധതികൾ, എംഎസ്എംഇ രജിസ്ട്രേഷൻ"
   },
   pa: {
-    title: "Recruit.org.in - ਭਾਰਤ ਦਾ ਅਗਲੀ ਪੀੜ੍ਹੀ ਦਾ ਕਰੀਅਰ, ਨੌਕਰੀ ਅਤੇ MSME ਵਿਕਾਸ ਇੰਜਨ",
+    title: "Arohi AI - ਭਾਰਤ ਦਾ ਅਗਲੀ ਪੀੜ੍ਹੀ ਦਾ ਕਰੀਅਰ, ਨੌਕਰੀ ਅਤੇ MSME ਵਿਕਾਸ ਇੰਜਨ",
     description: "ਭਾਰਤ ਦੇ ਵਿਦਿਆਰਥੀਆਂ, ਨੌਜਵਾਨ ਪੇਸ਼ੇਵਰਾਂ ਅਤੇ MSME ਨੂੰ ਸ਼ਕਤੀਸ਼ਾਲੀ ਬਣਾਉਣਾ। AI ਸਹਾਇਕ ਆਰੋਹੀ ਤੋਂ ਲਾਈਵ ਕਰੀਅਰ ਮਾਰਗਦਰਸ਼ਨ, ਰੈਜ਼ਿਊਮੇ ਵਿਸ਼ਲੇਸ਼ਣ, ਮੌਕ ਇੰਟਰਵਿਊ ਅਤੇ ਵਪਾਰਕ ਸਹਾਇਤਾ ਪ੍ਰਾਪਤ ਕਰੋ।",
-    keywords: "ਕਰੀਅਰ ਮਾਰਗਦਰਸ਼ਨ, ਨੌਕਰੀਆਂ ਦੇ ਮੌਕੇ, ਰੈਜ਼ਿਊਮੇ ਸਕੋਰ, ਮੌਕ ਇੰਟਰਵਿਊ, ਸਰਕਾਰੀ ਸਕੀਮਾਂ, ਕਾਰੋਬਾਰੀ ਰਜਿਸਟ੍ਰੇਸ਼ਨ, ਪੰਜਾਬ ਰੁਜ਼ਗਾਰ"
+    keywords: "ਆਰੋਹੀ AI, arohi.ai, ਕਰੀਅਰ ਮਾਰਗਦਰਸ਼ਨ, ਨੌਕਰੀਆਂ ਦੇ ਮੌਕੇ, ਰੈਜ਼ਿਊਮੇ ਸਕੋਰ, ਮੌਕ ਇੰਟਰਵਿਊ, ਸਰਕਾਰੀ ਸਕੀਮਾਂ, ਕਾਰੋਬਾਰੀ ਰਜਿਸਟ੍ਰੇਸ਼ਨ"
   },
   as: {
-    title: "Recruit.org.in - ভাৰতৰ পৰৱৰ্তী প্ৰজন্মৰ কেৰিয়াৰ, চাকৰি আৰু MSME বিকাশ মঞ্চ",
-    description: "ভাৰতৰ শিক্ষাৰ্থী, যুৱ পেচাদাৰী আৰু MSME সৱলীকৰণ কৰা। AI সহায়ক আৰোহীৰ পৰা লাইভ কেৰিয়াৰ নিৰ্দেশনা, ৰিজুমে বিশ্লেষণ, মক সাক্ষাৎকাৰ আৰু ব্যৱসায়িক সাহায্য লাভ কৰক।",
-    keywords: "কেৰিয়াৰ নিৰ্দেশনা, চাকৰিৰ খবৰ, ৰিজুমে বিশ্লেষণ, মক সাক্ষাৎকাৰ, চৰকাৰী আঁচনি, উদ্যোগ পঞ্জীয়ন, অসমৰ চাকৰি"
+    title: "Arohi AI - ভাৰতৰ পৰৱৰ্তী প্ৰজন্মৰ কেৰিয়াৰ, চাকৰি আৰু MSME বিকাশ মঞ্চ",
+    description: "ভাৰতৰ শিক্ষাৰ্থী, যুৱ পেচাদাৰী আৰু MSME সৱলীকৰণ কৰা। AI সহায়ক আৰোহীৰ পৰা লাইভ কেৰিয়াৰ নিৰ્দেশনা, ৰিজুমে বিশ্লেষণ, মক সাক্ষাৎকাৰ আৰু ব্যৱসায়িক সাহায্য লাভ কৰক।",
+    keywords: "আৰোহী AI, arohi.ai, কেৰিয়াৰ নিৰ്দেশনা, চাকৰিৰ খবৰ, ৰিজুমে বিশ্লেষণ, মক সাক্ষাৎকাৰ, চৰકાৰী আঁচনি, উদ্যোগ পঞ্জীয়ন"
   }
 };
 
@@ -3750,13 +3742,13 @@ async function startServer() {
 
   let backupServer: any = null;
   const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Recruit.org.in Server running on http://localhost:${PORT}`);
+    console.log(`Arohi AI Server running on http://localhost:${PORT}`);
   });
 
   if (PORT !== 3000) {
     try {
       backupServer = app.listen(3000, '0.0.0.0', () => {
-        console.log(`Recruit.org.in Backup Server listening on http://localhost:3000 to catch Railway port mapping.`);
+        console.log(`Arohi AI Backup Server listening on http://localhost:3000 to catch Railway port mapping.`);
       });
     } catch (err: any) {
       console.warn(`Could not start backup server on port 3000: ${err.message || err}`);
@@ -3838,7 +3830,7 @@ async function startServer() {
         "\n- You are currently connected via real-time live voice link. Speak dynamically, helpfully, and warmly." +
         "\n- Keep responses brief but informative (2-4 sentences per turn) so they read beautifully as spoken speech without any latency." +
         "\n- IMPORTANT GREETING MANDATE: You MUST begin this voice call immediately with the following exact, word-for-word welcoming note:" +
-        "\n  \"Namaste! Welcome to Recruit.org.in. I am Arohi, your AI Opportunity & Growth Guide. Whether you are a student, teacher, doctor, scientist, government aspirant, parent, entrepreneur, or running an MSME, organization, or enterprise—or even if you're a citizen of Mars or Jupiter!—I am here to guide you in 150+ languages with voice calls. How can I empower you and fuel your journey today?\"" +
+        "\n  \"Namaste! Welcome to Arohi AI. I am Arohi, your AI Opportunity & Growth Guide. Whether you are a student, teacher, doctor, scientist, government aspirant, parent, entrepreneur, or running an MSME, organization, or enterprise—or even if you're a citizen of Mars or Jupiter!—I am here to guide you in 150+ languages with voice calls. How can I empower you and fuel your journey today?\"" +
         "\n- Do NOT ask 'do you have any questions for business or career or jobs?' as your opening statement. Start exactly with the mandated welcoming note above.";
 
       if (uid) {

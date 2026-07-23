@@ -41,6 +41,24 @@ import { INITIAL_REVIEWS, Review } from './data/reviewsData';
 import { Posting, Application, CategoryType } from './types';
 import { Award, Crown, CheckCircle, Landmark, Bell, ArrowUpRight, ShieldCheck, Sparkles, Bot, GraduationCap, Briefcase, ChevronRight, Mic, MicOff, ArrowLeft, Home, Compass, Map, RotateCcw, Star, Users, MapPin, RefreshCw, Quote, Plus, MessageSquare, MessageCircle, Zap, Coins, User, Share2, Copy, X } from 'lucide-react';
 
+// Storage migration helper to seamlessly transition legacy 'recruit_*' keys to 'arohi_*'
+function getStorageItem(key: string): string | null {
+  const arohiKey = key.startsWith('arohi_') ? key : `arohi_${key.replace(/^recruit_/, '')}`;
+  const recruitKey = key.startsWith('recruit_') ? key : `recruit_${key.replace(/^arohi_/, '')}`;
+  return localStorage.getItem(arohiKey) ?? localStorage.getItem(recruitKey);
+}
+
+function setStorageItem(key: string, value: string): void {
+  const arohiKey = key.startsWith('arohi_') ? key : `arohi_${key.replace(/^recruit_/, '')}`;
+  const recruitKey = key.startsWith('recruit_') ? key : `recruit_${key.replace(/^arohi_/, '')}`;
+  try {
+    localStorage.setItem(arohiKey, value);
+    localStorage.setItem(recruitKey, value);
+  } catch (e) {
+    console.warn('LocalStorage error:', e);
+  }
+}
+
 const INITIAL_MOCK_APPLICATIONS: Application[] = [
   {
     id: 'app-mock-1',
@@ -94,13 +112,13 @@ export default function App() {
   // Auto-trigger walkthrough for newly logged-in users or guest users upon entry
   useEffect(() => {
     if (IS_TOUR_ENABLED && hasEntered) {
-      const tourKey = user ? `recruit_walkthrough_seen_${user.uid}` : 'recruit_walkthrough_seen_guest';
-      const hasSeenTour = localStorage.getItem(tourKey);
+      const tourKey = user ? `arohi_walkthrough_seen_${user.uid}` : 'arohi_walkthrough_seen_guest';
+      const hasSeenTour = getStorageItem(tourKey);
       if (!hasSeenTour) {
         // Delay slightly for smooth entering animation transition
         const timer = setTimeout(() => {
           setIsWalkthroughOpen(true);
-          localStorage.setItem(tourKey, 'true');
+          setStorageItem(tourKey, 'true');
         }, 1200);
         return () => clearTimeout(timer);
       }
@@ -112,28 +130,28 @@ export default function App() {
     const queryLang = params.get('lang') as Language;
     const validLanguages: Language[] = ['en', 'hi', 'or', 'bn', 'te', 'mr', 'ta', 'gu', 'ur', 'kn', 'ml', 'pa', 'as'];
     if (queryLang && validLanguages.includes(queryLang)) {
-      localStorage.setItem('recruit_language', queryLang);
+      setStorageItem('arohi_language', queryLang);
       return queryLang;
     }
-    return (localStorage.getItem('recruit_language') as Language) || 'en';
+    return (getStorageItem('arohi_language') as Language) || 'en';
   });
 
   const changeLanguage = (lang: Language) => {
     setLanguage(lang);
-    localStorage.setItem('recruit_language', lang);
+    setStorageItem('arohi_language', lang);
   };
 
   const [selectedCountry, setSelectedCountry] = useState<string>(() => {
-    return localStorage.getItem('recruit_country') || 'Global';
+    return getStorageItem('arohi_country') || 'Global';
   });
 
   const changeCountry = (country: string) => {
     setSelectedCountry(country);
-    localStorage.setItem('recruit_country', country);
+    setStorageItem('arohi_country', country);
   };
 
   const [userName, setUserName] = useState(() => {
-    return localStorage.getItem('recruit_user_name') || 'Honored Guest';
+    return getStorageItem('arohi_user_name') || 'Honored Guest';
   });
   
   // Dynamically derive current user's display name
@@ -141,17 +159,17 @@ export default function App() {
 
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareDetails, setShareDetails] = useState({
-    title: 'Recruit.org.in',
-    text: 'Check out Recruit.org.in - India\'s Futuristic National Career Registry, Jobs, Resume Builder & Courses Platform!',
-    url: 'https://recruit.org.in'
+    title: 'Arohi AI',
+    text: "Check out Arohi AI - India's #1 Multilingual AI Growth & Opportunity Engine! Live voice calling with AI Arohi in 150+ languages.",
+    url: 'https://arohiai.com'
   });
   const [copiedLink, setCopiedLink] = useState(false);
 
   const handleOpenShare = (title?: string, text?: string, url?: string) => {
     setShareDetails({
-      title: title || 'Recruit.org.in',
-      text: text || 'Check out Recruit.org.in - India\'s Futuristic National Career Registry, Jobs, Resume Builder & Courses Platform!',
-      url: url || 'https://recruit.org.in'
+      title: title || 'Arohi AI',
+      text: text || "Check out Arohi AI - India's #1 Multilingual AI Growth & Opportunity Engine! Live voice calling with AI Arohi in 150+ languages.",
+      url: url || 'https://arohiai.com'
     });
     setShareModalOpen(true);
   };
@@ -211,13 +229,13 @@ export default function App() {
   }, [activeTab]);
 
   useEffect(() => {
-    // Initial page load telemetry for Recruit.org.in persistent visitor counter
+    // Initial page load telemetry for Arohiai.com persistent visitor counter
     fetch('/api/track-event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'visit',
-        description: 'Anonymous visitor loaded Recruit.org.in landing interface'
+        description: 'Anonymous visitor loaded Arohiai.com landing interface'
       })
     }).catch(err => console.log('Telemetry offline:', err));
   }, []);
@@ -260,7 +278,7 @@ export default function App() {
     };
 
     const displayTab = tabNameMap[activeTab] || activeTab.charAt(0).toUpperCase() + activeTab.slice(1);
-    const suffix = language === 'hi' ? 'Recruit.org.in - भारत का करियर इंजन' : language === 'or' ? 'Recruit.org.in - ଭାରତର କ୍ୟାରିୟର ଇଞ୍ଜିନ' : 'Recruit.org.in - India\'s Next-Gen Career Engine';
+    const suffix = language === 'hi' ? 'Arohi AI - भारत का AI ग्रोथ इंजन' : language === 'or' ? 'Arohi AI - ଭାରତର AI ଗ୍ରୋଥ୍ ଇଞ୍ଜିନ୍' : 'Arohi AI - India\'s Next-Gen AI Opportunity Engine';
     document.title = `${displayTab} | ${suffix}`;
 
     // Update Meta Description
@@ -281,10 +299,10 @@ export default function App() {
   // Dynamic reviews & ratings system state
   const [reviews, setReviews] = useState<Review[]>(() => {
     try {
-      const saved = localStorage.getItem('recruit_user_reviews');
+      const saved = getStorageItem('arohi_user_reviews');
       return saved ? JSON.parse(saved) : INITIAL_REVIEWS;
     } catch (e) {
-      console.warn("Failed to parse local recruit_user_reviews, falling back to initial reviews.", e);
+      console.warn("Failed to parse local user_reviews, falling back to initial reviews.", e);
       return INITIAL_REVIEWS;
     }
   });
@@ -415,7 +433,7 @@ export default function App() {
 
   // Load subscriptions from local storage
   const [subscriptions, setSubscriptions] = useState<Record<string, boolean>>(() => {
-    const saved = localStorage.getItem('recruit_subscriptions');
+    const saved = getStorageItem('arohi_subscriptions');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -428,7 +446,7 @@ export default function App() {
   });
 
   const [subscriptionDetails, setSubscriptionDetails] = useState<Record<string, { tierName: string; price: number; margin: number }>>(() => {
-    const saved = localStorage.getItem('recruit_subscription_details');
+    const saved = getStorageItem('arohi_subscription_details');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -440,7 +458,7 @@ export default function App() {
   });
 
   const [tokenUsage, setTokenUsage] = useState<Record<string, number>>(() => {
-    const saved = localStorage.getItem('recruit_token_usage');
+    const saved = getStorageItem('arohi_token_usage');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -450,12 +468,12 @@ export default function App() {
   });
 
   const [warningEnabled, setWarningEnabled] = useState<boolean>(() => {
-    const saved = localStorage.getItem('recruit_warning_enabled');
+    const saved = getStorageItem('arohi_warning_enabled');
     return saved !== 'false';
   });
 
   const [warningInterval, setWarningInterval] = useState<number>(() => {
-    const saved = localStorage.getItem('recruit_warning_interval');
+    const saved = getStorageItem('arohi_warning_interval');
     return saved ? parseInt(saved, 10) : 15;
   });
 
@@ -499,7 +517,7 @@ export default function App() {
   // Custom UPI Airtel Payments Bank / PhonePe QR states
   const [upiGatewaySettings, setUpiGatewaySettings] = useState<{ upiId: string; merchantName: string; bankName: string }>({
     upiId: 'elitetraderjunoon@oksbi',
-    merchantName: 'Recruit India Portal',
+    merchantName: 'Arohi AI Portal',
     bankName: 'Airtel Payments Bank / PhonePe'
   });
   const [checkoutSubMode, setCheckoutSubMode] = useState<'instant' | 'qr'>('instant');
@@ -536,7 +554,7 @@ export default function App() {
 
     const updated = { ...subscriptions, [pathId]: isSubscribed };
     setSubscriptions(updated);
-    localStorage.setItem('recruit_subscriptions', JSON.stringify(updated));
+    setStorageItem('arohi_subscriptions', JSON.stringify(updated));
 
     // Update detailed description
     const updatedDetails = { ...subscriptionDetails };
@@ -573,7 +591,7 @@ export default function App() {
     }
     
     setSubscriptionDetails(updatedDetails);
-    localStorage.setItem('recruit_subscription_details', JSON.stringify(updatedDetails));
+    setStorageItem('arohi_subscription_details', JSON.stringify(updatedDetails));
   };
 
   // --- TOKEN LIMIT REPEATED WARNING & TIMER SYSTEM ---
@@ -642,7 +660,7 @@ export default function App() {
       const currentVal = prev[pathId] || 0;
       const nextVal = Math.min(limit, currentVal + step);
       const updated = { ...prev, [pathId]: nextVal };
-      localStorage.setItem('recruit_token_usage', JSON.stringify(updated));
+      setStorageItem('arohi_token_usage', JSON.stringify(updated));
       checkAndTriggerInstantWarning(pathId, nextVal, limit);
       return updated;
     });
@@ -654,7 +672,7 @@ export default function App() {
     const finalVal = Math.min(limit, Math.max(0, value));
     setTokenUsage(prev => {
       const updated = { ...prev, [pathId]: finalVal };
-      localStorage.setItem('recruit_token_usage', JSON.stringify(updated));
+      setStorageItem('arohi_token_usage', JSON.stringify(updated));
       checkAndTriggerInstantWarning(pathId, finalVal, limit);
       return updated;
     });
@@ -663,7 +681,7 @@ export default function App() {
   const handleResetTokenUsage = (pathId: string) => {
     setTokenUsage(prev => {
       const updated = { ...prev, [pathId]: 0 };
-      localStorage.setItem('recruit_token_usage', JSON.stringify(updated));
+      setStorageItem('arohi_token_usage', JSON.stringify(updated));
       setWarningToasts(curr => curr.filter(t => t.pathId !== pathId));
       return updated;
     });
@@ -672,7 +690,7 @@ export default function App() {
   const handleToggleWarningEnabled = () => {
     setWarningEnabled(prev => {
       const next = !prev;
-      localStorage.setItem('recruit_warning_enabled', String(next));
+      setStorageItem('arohi_warning_enabled', String(next));
       if (!next) {
         setWarningToasts([]);
       } else {
@@ -696,7 +714,7 @@ export default function App() {
   const handleSetWarningInterval = (val: number) => {
     setWarningInterval(val);
     setNextReminderIn(val);
-    localStorage.setItem('recruit_warning_interval', String(val));
+    setStorageItem('arohi_warning_interval', String(val));
   };
 
   const handleClearWarningHistory = () => {
@@ -722,18 +740,18 @@ export default function App() {
   const handleTriggerTestLimitWarning = () => {
     const updatedSub = { ...subscriptions, path1: true };
     setSubscriptions(updatedSub);
-    localStorage.setItem('recruit_subscriptions', JSON.stringify(updatedSub));
+    setStorageItem('arohi_subscriptions', JSON.stringify(updatedSub));
 
     const updatedDetails = { 
       ...subscriptionDetails, 
       path1: { tierName: 'Starter Plan', price: 399, margin: 199.5 } 
     };
     setSubscriptionDetails(updatedDetails);
-    localStorage.setItem('recruit_subscription_details', JSON.stringify(updatedDetails));
+    setStorageItem('arohi_subscription_details', JSON.stringify(updatedDetails));
 
     setTokenUsage(prev => {
       const updatedUsage = { ...prev, path1: 820 };
-      localStorage.setItem('recruit_token_usage', JSON.stringify(updatedUsage));
+      setStorageItem('arohi_token_usage', JSON.stringify(updatedUsage));
       
       const limit = 1000;
       const usage = 820;
@@ -917,7 +935,7 @@ export default function App() {
     };
     const updated = [created, ...reviews];
     setReviews(updated);
-    localStorage.setItem('recruit_user_reviews', JSON.stringify(updated));
+    setStorageItem('arohi_user_reviews', JSON.stringify(updated));
     
     // Clear inputs and set success state
     setNewReviewName('');
@@ -936,8 +954,8 @@ export default function App() {
 
   // Load postings & applications from local storage
   useEffect(() => {
-    const storedPostings = localStorage.getItem('recruit_postings');
-    const storedApplications = localStorage.getItem('recruit_applications');
+    const storedPostings = getStorageItem('arohi_postings');
+    const storedApplications = getStorageItem('arohi_applications');
 
     if (storedPostings) {
       try {
@@ -947,17 +965,17 @@ export default function App() {
         if (missingPostings.length > 0) {
           const merged = [...parsed, ...missingPostings];
           setPostings(merged);
-          localStorage.setItem('recruit_postings', JSON.stringify(merged));
+          setStorageItem('arohi_postings', JSON.stringify(merged));
         } else {
           setPostings(parsed);
         }
       } catch (err) {
         setPostings(initialPostings);
-        localStorage.setItem('recruit_postings', JSON.stringify(initialPostings));
+        setStorageItem('arohi_postings', JSON.stringify(initialPostings));
       }
     } else {
       setPostings(initialPostings);
-      localStorage.setItem('recruit_postings', JSON.stringify(initialPostings));
+      setStorageItem('arohi_postings', JSON.stringify(initialPostings));
     }
 
     if (storedApplications) {
@@ -966,11 +984,11 @@ export default function App() {
       } catch (err) {
         console.warn("Failed to parse stored applications, resetting to initial mock applications.", err);
         setApplications(INITIAL_MOCK_APPLICATIONS);
-        localStorage.setItem('recruit_applications', JSON.stringify(INITIAL_MOCK_APPLICATIONS));
+        setStorageItem('arohi_applications', JSON.stringify(INITIAL_MOCK_APPLICATIONS));
       }
     } else {
       setApplications(INITIAL_MOCK_APPLICATIONS);
-      localStorage.setItem('recruit_applications', JSON.stringify(INITIAL_MOCK_APPLICATIONS));
+      setStorageItem('arohi_applications', JSON.stringify(INITIAL_MOCK_APPLICATIONS));
     }
   }, []);
 
@@ -986,19 +1004,19 @@ export default function App() {
   const handleAddPosting = (newPost: Posting) => {
     const updated = [newPost, ...postings];
     setPostings(updated);
-    localStorage.setItem('recruit_postings', JSON.stringify(updated));
+    setStorageItem('arohi_postings', JSON.stringify(updated));
   };
 
   const handleEditPosting = (editedPost: Posting) => {
     const updated = postings.map(p => p.id === editedPost.id ? editedPost : p);
     setPostings(updated);
-    localStorage.setItem('recruit_postings', JSON.stringify(updated));
+    setStorageItem('arohi_postings', JSON.stringify(updated));
   };
 
   const handleDeletePosting = (id: string) => {
     const updated = postings.filter(p => p.id !== id);
     setPostings(updated);
-    localStorage.setItem('recruit_postings', JSON.stringify(updated));
+    setStorageItem('arohi_postings', JSON.stringify(updated));
   };
 
   const handleAddApplication = (newApp: Application) => {
@@ -1014,8 +1032,8 @@ export default function App() {
         description: `Formally submitted candidate registration slip for "${newApp.postingTitle || 'Government Opportunity'}". Receipt ID: ${newApp.registrationNumber || 'REC-' + Math.floor(100000 + Math.random() * 900000)}`,
         timestamp: new Date().toISOString()
       };
-      const existing = JSON.parse(localStorage.getItem('recruit_activities') || '[]');
-      localStorage.setItem('recruit_activities', JSON.stringify([newAct, ...existing].slice(0, 15)));
+      const existing = JSON.parse(getStorageItem('arohi_activities') || '[]');
+      setStorageItem('arohi_activities', JSON.stringify([newAct, ...existing].slice(0, 15)));
     } catch (e) {
       console.error("Error logging application activity:", e);
     }
@@ -1023,7 +1041,7 @@ export default function App() {
     if (user) {
       updateApplications(updated).catch(err => console.error("Failed to sync application to firestore:", err));
     } else {
-      localStorage.setItem('recruit_applications', JSON.stringify(updated));
+      setStorageItem('arohi_applications', JSON.stringify(updated));
     }
   };
 
@@ -1033,7 +1051,7 @@ export default function App() {
     if (user) {
       updateApplications(updated).catch(err => console.error("Failed to sync application status to firestore:", err));
     } else {
-      localStorage.setItem('recruit_applications', JSON.stringify(updated));
+      setStorageItem('arohi_applications', JSON.stringify(updated));
     }
   };
 
@@ -1067,7 +1085,7 @@ export default function App() {
         if (newPostings.length > 0) {
           const updated = [...newPostings, ...postings];
           setPostings(updated);
-          localStorage.setItem('recruit_postings', JSON.stringify(updated));
+          setStorageItem('arohi_postings', JSON.stringify(updated));
           setSyncSuccessMessage(`Successfully synchronized ${newPostings.length} new verified vacancies from Indian Gazette & National Career Service!`);
         } else {
           setSyncSuccessMessage("No new vacancies found. Your opportunity database is fully up to date!");
@@ -1172,7 +1190,7 @@ export default function App() {
       if (newPostings.length > 0) {
         const updated = [...newPostings, ...postings];
         setPostings(updated);
-        localStorage.setItem('recruit_postings', JSON.stringify(updated));
+        setStorageItem('arohi_postings', JSON.stringify(updated));
         setSyncSuccessMessage(`Successfully updated database with ${newPostings.length} premium opportunities!`);
       } else {
         setSyncSuccessMessage("No additional listings available at this moment.");
@@ -1371,7 +1389,7 @@ export default function App() {
             onSubscribe={handleSubscribe} 
             onNavigateTab={(tab) => setActiveTab(tab)} 
             onOpenAuth={() => setIsAuthModalOpen(true)}
-            onShare={() => handleOpenShare('My Career Dashboard', 'Check out Recruit.org.in - India\'s Futuristic National Career Registry, Jobs, Resume Builder & Courses Platform!', 'https://recruit.org.in')}
+            onShare={() => handleOpenShare('My Career Dashboard', "Check out Arohi AI - India's #1 Multilingual AI Growth & Opportunity Engine! Live voice calling with AI Arohi in 150+ languages.", 'https://arohiai.com')}
             tokenUsage={tokenUsage}
             onIncrementTokenUsage={handleIncrementTokenUsage}
             onSetTokenUsage={handleSetTokenUsage}
@@ -2383,6 +2401,7 @@ export default function App() {
             setHasEntered(true);
             setActiveTab('arohi');
           }}
+          onShare={() => handleOpenShare()}
         />
 
         {/* Floating Chat Overlay Container */}
@@ -2551,7 +2570,7 @@ export default function App() {
                     Share Platform with Friends
                   </h3>
                   <p className="text-xs text-slate-400 font-semibold mt-1">
-                    Help your peers discover India's futuristic career ecosystem, interactive 3D roadmap matching, and resume parsing tools.
+                    Help others discover India's #1 Multilingual AI Career & MSME Engine with 20+ specialized audience categories and live voice guidance in 150+ regional languages!
                   </p>
                 </div>
 
@@ -2668,7 +2687,7 @@ export default function App() {
 
                 {/* Sub-text footer */}
                 <div className="text-[10px] text-slate-500 font-bold text-center pt-2 leading-tight">
-                  Thank you for supporting Recruit.org.in and making India self-reliant 🇮🇳
+                  Thank you for supporting Arohi AI and making India self-reliant 🇮🇳
                 </div>
               </div>
             </motion.div>
@@ -2676,109 +2695,110 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* 2. Hot scrolling live notifications marquee */}
-      <MarqueeTicker
-        postings={postings}
-        onSelectPosting={(post) => {
-          setSelectedPosting(post);
-          setActiveTab('jobs');
-        }}
-      />
-
       {/* Main Body */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-8">
-        {activeTab !== 'home' && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-[#120d2a]/60 border border-[#211b3d] p-4 rounded-2xl select-none animate-in fade-in slide-in-from-top-2 duration-200">
-            {/* Left: Breadcrumbs / Back button */}
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-              <button
-                onClick={() => {
-                  setActiveTab('home');
-                  setSelectedPosting(null);
-                }}
-                className="flex items-center gap-1.5 text-slate-300 hover:text-[#00e676] bg-[#1a143c] border border-[#2d2163] px-3 py-1.5 rounded-xl transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
-              >
-                <Home className="w-3.5 h-3.5 text-purple-400" />
-                <span>Home</span>
-              </button>
-              
-              <span className="text-slate-600">/</span>
-
-              {prevTab !== 'home' && prevTab !== activeTab && (
-                <>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+          >
+            {activeTab !== 'home' && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-[#120d2a]/60 border border-[#211b3d] p-4 rounded-2xl select-none animate-in fade-in slide-in-from-top-2 duration-200">
+                {/* Left: Breadcrumbs / Back button */}
+                <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
                   <button
                     onClick={() => {
-                      setActiveTab(prevTab);
+                      setActiveTab('home');
                       setSelectedPosting(null);
                     }}
-                    className="text-slate-400 hover:text-white underline decoration-[#7c3aed]/50 hover:decoration-white transition-all capitalize"
+                    className="flex items-center gap-1.5 text-slate-300 hover:text-[#00e676] bg-[#1a143c] border border-[#2d2163] px-3 py-1.5 rounded-xl transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    {prevTab === 'courses' ? 'Skills' : prevTab === 'arohi' ? 'Arohi Chat' : prevTab}
+                    <Home className="w-3.5 h-3.5 text-purple-400" />
+                    <span>Home</span>
                   </button>
+                  
                   <span className="text-slate-600">/</span>
-                </>
-              )}
 
-              <span className="text-[#a78bfa] font-bold capitalize bg-[#221f42] border border-[#4c3ba0]/40 px-2 py-0.5 rounded-md">
-                {activeTab === 'courses' ? 'Skills' : activeTab === 'arohi' ? 'AROHI Guide' : activeTab}
-              </span>
-            </div>
+                  {prevTab !== 'home' && prevTab !== activeTab && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setActiveTab(prevTab);
+                          setSelectedPosting(null);
+                        }}
+                        className="text-slate-400 hover:text-white underline decoration-[#7c3aed]/50 hover:decoration-white transition-all capitalize"
+                      >
+                        {prevTab === 'courses' ? 'Skills' : prevTab === 'arohi' ? 'Arohi Chat' : prevTab}
+                      </button>
+                      <span className="text-slate-600">/</span>
+                    </>
+                  )}
 
-            {/* Right: History back or direct jump */}
-            <div className="flex items-center gap-2 flex-wrap">
-              {prevTab !== activeTab && (
-                <button
-                  onClick={() => {
-                    const temp = activeTab;
-                    setActiveTab(prevTab);
-                    setPrevTab(temp);
-                    setSelectedPosting(null);
-                  }}
-                  className="flex items-center gap-1 text-[11px] font-black uppercase tracking-wider text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer mr-2"
-                  title={`Go back to ${prevTab}`}
-                >
-                  <RotateCcw className="w-3 h-3" />
-                  <span>Go Back</span>
-                </button>
-              )}
+                  <span className="text-[#a78bfa] font-bold capitalize bg-[#221f42] border border-[#4c3ba0]/40 px-2 py-0.5 rounded-md">
+                    {activeTab === 'courses' ? 'Skills' : activeTab === 'arohi' ? 'AROHI Guide' : activeTab}
+                  </span>
+                </div>
 
-              <span className="text-[10px] uppercase tracking-widest font-black text-slate-500 mr-1 hidden lg:inline">Quick Jump:</span>
-              {[
-                { id: 'jobs', label: 'Jobs' },
-                { id: 'courses', label: 'Skills' },
-                { id: 'business', label: 'Business' },
-                { id: 'arohi', label: 'Arohi Chat' },
-                { id: 'dashboard', label: 'Dashboard' }
-              ].map((link) => {
-                if (link.id === activeTab) return null;
-                return (
-                  <button
-                    key={link.id}
-                    onClick={() => {
-                      setActiveTab(link.id);
-                      setSelectedPosting(null);
-                    }}
-                    className="text-[11px] font-bold text-slate-300 hover:text-white bg-[#151032]/40 hover:bg-[#1f1947]/80 border border-[#281f54]/60 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
-                  >
-                    {link.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-        {renderActiveContent()}
+                {/* Right: History back or direct jump */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {prevTab !== activeTab && (
+                    <button
+                      onClick={() => {
+                        const temp = activeTab;
+                        setActiveTab(prevTab);
+                        setPrevTab(temp);
+                        setSelectedPosting(null);
+                      }}
+                      className="flex items-center gap-1 text-[11px] font-black uppercase tracking-wider text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer mr-2"
+                      title={`Go back to ${prevTab}`}
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      <span>Go Back</span>
+                    </button>
+                  )}
+
+                  <span className="text-[10px] uppercase tracking-widest font-black text-slate-500 mr-1 hidden lg:inline">Quick Jump:</span>
+                  {[
+                    { id: 'jobs', label: 'Jobs' },
+                    { id: 'courses', label: 'Skills' },
+                    { id: 'business', label: 'Business' },
+                    { id: 'arohi', label: 'Arohi Chat' },
+                    { id: 'dashboard', label: 'Dashboard' }
+                  ].map((link) => {
+                    if (link.id === activeTab) return null;
+                    return (
+                      <button
+                        key={link.id}
+                        onClick={() => {
+                          setActiveTab(link.id);
+                          setSelectedPosting(null);
+                        }}
+                        className="text-[11px] font-bold text-slate-300 hover:text-white bg-[#151032]/40 hover:bg-[#1f1947]/80 border border-[#281f54]/60 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                      >
+                        {link.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            {renderActiveContent()}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Footer verified seal and info */}
-      <footer className="max-w-7xl mx-auto px-4 mt-12 mb-8 space-y-6">
+      <footer id="contact-section" className="max-w-7xl mx-auto px-4 mt-12 mb-8 space-y-6 scroll-mt-20">
         {/* Expanded Footer Grid */}
         <div className="bg-[#120d2a]/80 rounded-2xl border border-[#211b3d] p-8 grid grid-cols-1 md:grid-cols-4 gap-8 text-left">
           {/* Col 1: Platform identity */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="text-xl">🎓</span>
-              <span className="font-black text-white text-base tracking-tight">Recruit</span>
+              <span className="text-xl">✨</span>
+              <span className="font-black text-white text-base tracking-tight">Arohi AI</span>
             </div>
             <p className="text-xs text-slate-400 font-medium leading-relaxed">
               Empowering India’s Students, Professionals, and MSMEs. Secure, verified career pipelines, upskilling programs, resume parsing, and business guide tools.
@@ -2891,7 +2911,7 @@ export default function App() {
               </li>
               <li>
                 <span className="text-slate-500 font-medium text-[11px] block leading-relaxed">
-                  Support Email: <a href="mailto:support@recruit.org.in" className="hover:underline text-violet-400">support@recruit.org.in</a>
+                  Support Email: <a href="mailto:support@arohiai.com" className="hover:underline text-violet-400">support@arohiai.com</a>
                 </span>
               </li>
               <li className="pt-1.5">
@@ -2915,7 +2935,7 @@ export default function App() {
             <ShieldCheck className="w-5 h-5 text-[#00e676] shrink-0" /> Verified Career & Opportunity Platform
           </span>
           <div className="text-center lg:text-right space-y-1">
-            <p className="text-slate-300 font-bold">Copyright © 2026 Recruit.org.in. All Rights Reserved.</p>
+            <p className="text-slate-300 font-bold">Copyright © 2026 Arohi AI (Arohiai.com). All Rights Reserved.</p>
             <p className="text-[10px] text-slate-500">
               Development and Maintenance by <span className="text-slate-400 font-bold">BRAGA TECHNOLOGIES PRIVATE LIMITED</span> in association with <span className="text-slate-400 font-bold">ODITREE SERVICES</span>
             </p>
@@ -3245,7 +3265,7 @@ export default function App() {
                               `upi://pay?pa=${upiGatewaySettings.upiId}&pn=${encodeURIComponent(
                                 upiGatewaySettings.merchantName
                               )}&am=${checkoutPath.price.replace(/[^0-9]/g, '') || '399'}&cu=INR&tn=${encodeURIComponent(
-                                `Recruit Premium: ${checkoutPath.title}`
+                                `Arohi AI Premium: ${checkoutPath.title}`
                               )}`
                             )}`}
                             alt="UPI Payment QR Code"
@@ -3403,7 +3423,7 @@ export default function App() {
                     {/* Subscription billing details */}
                     <div className="space-y-1 bg-slate-900/60 border border-[#2d2060] rounded-xl p-3.5">
                       <p className="text-[9px] uppercase tracking-widest text-[#a78bfa] font-black">App / Developer</p>
-                      <p className="text-xs font-black text-white leading-tight">Recruit.org.in — Empowering India’s Students, Professionals, and MSMEs</p>
+                      <p className="text-xs font-black text-white leading-tight">Arohi AI — Empowering India’s Students, Professionals, and MSMEs</p>
                       
                       <p className="text-[9px] uppercase tracking-widest text-[#a78bfa] font-black pt-2">Subscription Option</p>
                       <p className="text-xs font-semibold text-slate-200 leading-tight">{checkoutPath.title}</p>
@@ -3458,7 +3478,7 @@ export default function App() {
                     </div>
 
                     <div className="text-[9px] text-slate-400 font-medium leading-relaxed bg-[#0c0821] p-3 rounded-xl border border-[#201546]">
-                      By clicking "1-Tap Subscribe", you agree to the Google Play Terms of Service and authorize Recruit.org.in to process recurring monthly charges. Cancel anytime via Play Store Subscription panel.
+                      By clicking "1-Tap Subscribe", you agree to the Google Play Terms of Service and authorize Arohi AI to process recurring monthly charges. Cancel anytime via Play Store Subscription panel.
                     </div>
 
                     {/* Action buttons */}
@@ -3731,14 +3751,6 @@ export default function App() {
         warningInterval={warningInterval}
         warningEnabled={warningEnabled}
       />
-
-      {/* Footer of recruit site */}
-      <div className="mt-16 mb-8 pt-8 border-t border-white/10 text-center text-xs font-bold text-slate-300 uppercase tracking-widest space-y-2 z-10 relative max-w-7xl mx-auto px-4 w-full">
-        <p className="text-slate-400 tracking-widest">© 2026 RECRUIT.ORG.IN • ALL RIGHTS RESERVED</p>
-        <p className="text-slate-200 font-semibold text-[10px] sm:text-xs tracking-wide">
-          Development and maintenance by <span className="text-cyan-400 font-extrabold">BRAGA TECHNOLOGIES PRIVATE LIMITED</span> IN ASSOCIATION WITH <span className="text-cyan-400 font-extrabold">ODITREE SERVICES</span>
-        </p>
-      </div>
 
       {/* Progressive Web App Install Suggestion Widget */}
       <PWAInstaller />

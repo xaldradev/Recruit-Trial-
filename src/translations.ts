@@ -2,8 +2,8 @@ export type Language = 'en' | 'hi' | 'or' | 'bn' | 'te' | 'mr' | 'ta' | 'gu' | '
 
 export const translations = {
   en: {
-    appName: "Recruit.org.in",
-    slogan: "Empowering India's Students, Professionals, and MSMEs",
+    appName: "Arohi AI",
+    slogan: "One AI Infinite Opportunities",
     portalVerification: "Verified Portal Integration",
     registryActive: "Official National Career Registry Network Active",
     liveVacancies: "Over 24,500+ Live Government & Corporate Vacancies Synchronized",
@@ -56,7 +56,7 @@ export const translations = {
 
     // Welcome Landing & Categories
     welcomeTo: "WELCOME TO",
-    dreamPrepare: "Dream • Prepare • Achieve",
+    dreamPrepare: "One AI • Infinite Opportunities",
     landingDesc: "India's premier AI-powered ecosystem spanning all our major wings: Find Jobs, learn professional Skill Courses, study School Syllabus (Class 1-10), explore Business & MSME Guides, and access Government Schemes — all under one intelligent hub.",
     enterBtn: "Enter The Journey",
     buildFuture: "Let's build your future, together.",
@@ -74,8 +74,8 @@ export const translations = {
     cat_intern: "Intern"
   },
   hi: {
-    appName: "Recruit.org.in",
-    slogan: "भारत के छात्रों, पेशेवरों और एमएसएमई (MSMEs) को सशक्त बनाना",
+    appName: "Arohi AI",
+    slogan: "एक AI, असीम अवसर",
     portalVerification: "सत्यापित पोर्टल एकीकरण",
     registryActive: "आधिकारिक राष्ट्रीय करियर रजिस्ट्री नेटवर्क सक्रिय",
     liveVacancies: "24,500 से अधिक लाइव सरकारी और कॉर्पोरेट रिक्तियां सिंक्रनाइज़",
@@ -128,7 +128,7 @@ export const translations = {
 
     // Welcome Landing & Categories
     welcomeTo: "स्वागत है आपका",
-    dreamPrepare: "सपना • तैयारी • सफलता",
+    dreamPrepare: "एक एआई • अनंत अवसर",
     landingDesc: "भारत का अग्रणी एआई-संचालित इकोसिस्टम जो हमारे सभी मुख्य क्षेत्रों को जोड़ता है: नौकरियां खोजें, व्यावसायिक कौशल पाठ्यक्रम सीखें, स्कूली पाठ्यक्रम (कक्षा 1-10) पढ़ें, व्यवसाय एवं एमएसएमई गाइड देखें और सरकारी योजनाएं पाएं - सब एक बुद्धिमान मंच पर।",
     enterBtn: "यात्रा शुरू करें",
     buildFuture: "आइए मिलकर आपके भविष्य का निर्माण करें।",
@@ -146,8 +146,8 @@ export const translations = {
     cat_intern: "इंटरन"
   },
   or: {
-    appName: "Recruit.org.in",
-    slogan: "ଓଡ଼ିଶା ଏବଂ ଭାରତର ଛାତ୍ର, ପେସାଦାର ଓ ଏମଏସଏମଇ (MSME) ମାନଙ୍କୁ ସଶକ୍ତ କରିବା",
+    appName: "Arohi AI",
+    slogan: "ଗୋଟିଏ AI, ଅସୀମ ସୁଯୋଗ",
     portalVerification: "ଯାଞ୍ଚ ହୋଇଥିବା ପୋର୍ଟାଲ୍ ଏକୀକରଣ",
     registryActive: "ଆଧିକାରିକ ଜାତୀୟ କ୍ୟାରିୟର ରେଜିଷ୍ଟ୍ରି ନେଟୱର୍କ ସକ୍ରିୟ",
     liveVacancies: "୨୪,୫୦୦+ ରୁ ଅଧିକ ସରକାରୀ ଏବଂ କର୍ପୋରେଟ୍ ନିଯୁକ୍ତି ସିଙ୍କ୍ରୋନାଇଜ୍ ହୋଇଛି",
@@ -200,7 +200,7 @@ export const translations = {
 
     // Welcome Landing & Categories
     welcomeTo: "ସ୍ୱାଗତମ୍",
-    dreamPrepare: "ସ୍ୱପ୍ନ • ପ୍ରସ୍ତୁତି • ସଫଳତା",
+    dreamPrepare: "ଗୋଟିଏ AI • ଅସୀମ ସୁଯୋଗ",
     landingDesc: "ଭାରତର ଅଗ୍ରଣୀ AI-ଚାଳିତ ଇକୋସିଷ୍ଟମ୍ ଯାହା ଆମର ସମସ୍ତ ବିଭାଗକୁ ସଂଯୋଗ କରେ: ଚାକିରି ଖୋଜନ୍ତୁ, ପ୍ରଫେସନାଲ୍ ଦକ୍ଷତା ପାଠ୍ୟକ୍ରମ ଶିଖନ୍ତୁ, ସ୍କୁଲ୍ ସିଲାବସ୍ (୧-୧୦ ଶ୍ରେଣୀ) ପଢନ୍ତୁ, ବ୍ୟବସାୟ ଓ MSME ଗାଇଡ୍ ଦେଖନ୍ତୁ ଏବଂ ସରକାରୀ ଯୋଜନା ପାଆନ୍ତୁ — ସବୁ କିଛି ଏହି ଗୋଟିଏ ମଞ୍ଚରେ |",
     enterBtn: "ପ୍ରବେଶ କରନ୍ତୁ",
     buildFuture: "ଆସନ୍ତୁ ମିଶି ଆପଣଙ୍କ ଭବିଷ୍ୟତ ଗଢିବା |",
@@ -228,7 +228,7 @@ export function getWelcomeContent(lang: Language): string {
   if (lang === 'bn') {
     return `স্বাগতম! আমি **আরোহী (AROHI)**, আপনার ব্যক্তিগত AI ক্যারিয়ার এবং সরকারি স্কিম পরামর্শদাতা। 🌟
 
-আমি পুরো Recruit.org.in প্ল্যাটফর্মে আপনার নির্দেশনার জন্য এখানে আছি। আমাকে যেকোনো প্রশ্ন করতে পারেন:
+আমি পুরো Arohi AI (arohiai.com) প্ল্যাটফর্মে আপনার নির্দেশনার জন্য এখানে আছি। আমাকে যেকোনো প্রশ্ন করতে পারেন:
 * 💼 **চাকরির শূন্যপদ ও যোগ্যতা** (যেমন, SSC, UPSC, ব্যাংক, রেলওয়ে)
 * 📝 **ATS জীবনবৃত্তান্ত বিশ্লেষণ ও ইন্টারভিউ প্রস্তুতি**
 * 🏛️ **সরকারি প্রকল্প ও ভর্তুকি** (মুদ্রা, PMEGP, স্টার্টআপ ইন্ডিয়া)
@@ -239,7 +239,7 @@ export function getWelcomeContent(lang: Language): string {
   } else if (lang === 'te') {
     return `నమస్కారం! నేను **ఆరోహి (AROHI)**, మీ వ్యక్తిగత AI కెరీర్ మరియు ప్రభుత్వ పథకాల సలహాదారుని. 🌟
 
-నేను మీకు Recruit.org.in ప్లాట్‌ఫారమ్‌లో పూర్తి సహాయాన్ని అందిస్తాను. నన్ను ఏదైనా అడగండి:
+నేను మీకు Arohi AI (arohiai.com) ప్లాట్‌ఫారమ్‌లో పూర్తి సహాయాన్ని అందిస్తాను. నన్ను ఏదైనా అడగండి:
 * 💼 **ఉద్యోగ అవకాశాలు & అర్హతలు** (ఉదాహరణకు, SSC, UPSC, బ్యాంక్, రైల్వేలు)
 * 📝 **ATS రెజ్యూమె విశ్లేషణ & ఇంటర్వ్యూ ప్రిపరేషన్**
 * 🏛️ **ప్రభుత్వ పథకాలు & సబ్సిడీలు** (ముద్ర, PMEGP, స్టార్టప్ ఇండియా)
@@ -250,7 +250,7 @@ export function getWelcomeContent(lang: Language): string {
   } else if (lang === 'mr') {
     return `नमस्कार! मी आहे **आरोही (AROHI)**, तुमची वैयक्तिक AI करिअर आणि सरकारी योजना सल्लागार. 🌟
 
-मी तुम्हाला Recruit.org.in प्लॅटफॉर्मवर पूर्ण मदत करण्यासाठी येथे आहे. मला काहीही विचारा:
+मी तुम्हाला Arohi AI (arohiai.com) प्लॅटफॉर्मवर पूर्ण मदत करण्यासाठी येथे आहे. मला काहीही विचारा:
 * 💼 **नोकरीच्या संधी आणि पात्रता** (उदा. SSC, UPSC, बँक, रेल्वे)
 * 📝 **ATS रेझ्युमे विश्लेषण आणि मुलाखतीची तयारी**
 * 🏛️ **सरकारी योजना आणि सबसिडी** (मुद्रा, PMEGP, स्टार्टअप इंडिया)
@@ -261,7 +261,7 @@ export function getWelcomeContent(lang: Language): string {
   } else if (lang === 'ta') {
     return `வணக்கம்! நான் **ஆரோஹி (AROHI)**, உங்கள் தனிப்பட்ட AI தொழில் மற்றும் அரசு திட்டங்களின் ஆலோசகர். 🌟
 
-நான் உங்களுக்கு Recruit.org.in தளத்தில் முழுமையான வழிகாட்டுதலை வழங்குவேன். என்னிடம் ஏதேனும் கேளுங்கள்:
+நான் உங்களுக்கு Arohi AI (arohiai.com) தளத்தில் முழுமையான வழிகாட்டுதலை வழங்குவேன். என்னிடம் ஏதேனும் கேளுங்கள்:
 * 💼 **வேலை வாய்ப்புகள் & தகுதிகள்** (எ.கா., SSC, UPSC, வங்கி, இரயில்வே)
 * 📝 **ATS ரெஸ்யூம் பகுப்பாய்வு & நேர்காணல் தயாரிப்பு**
 * 🏛️ **அரசு திட்டங்கள் & மானியங்கள்** (முத்ரா, PMEGP, ஸ்டார்ட்அப் இந்தியா)
@@ -272,7 +272,7 @@ export function getWelcomeContent(lang: Language): string {
   } else if (lang === 'gu') {
     return `નમસ્તે! હું છું **આરોહી (AROHI)**, તમારા વ્યક્તિગત AI કારકિર્દી અને સરકારી યોજનાઓના સલાહકાર. 🌟
 
-હું તમને Recruit.org.in પ્લેટફોર્મ પર સંપૂર્ણ માર્ગદર્શન આપીશ. મને કંઈપણ પૂછો:
+હું તમને Arohi AI (arohiai.com) પ્લેટફોર્મ પર સંપૂર્ણ માર્ગદર્શન આપીશ. મને કંઈપણ પૂછો:
 * 💼 **નોકરીની તકો અને પાત્રતા** (જેમ કે, SSC, UPSC, બેંક, રેલવે)
 * 📝 **ATS રેઝ્યૂમે વિશ્લેષણ અને ઇન્ટરવ્યુની તૈયારી**
 * 🏛️ **સરકારી યોજનાઓ અને સબસિડી** (મુદ્રા, PMEGP, સ્ટાર્ટઅપ ઇન્ડિયા)
@@ -283,7 +283,7 @@ export function getWelcomeContent(lang: Language): string {
   } else if (lang === 'ur') {
     return `السلام علیکم! میں ہوں **آروہی (AROHI)**، آپ کی ذاتی AI کیریئر اور سرکاری اسکیموں کی مشیر۔ 🌟
 
-میں Recruit.org.in پلیٹ فارم پر آپ کی رہنمائی کے لیے حاضر ہوں۔ مجھ سے کچھ بھی پوچھیں:
+میں Arohi AI (arohiai.com) پلیٹ فارم پر آپ کی رہنمائی کے لیے حاضر ہوں۔ مجھ سے کچھ بھی پوچھیں:
 * 💼 **ملازمتوں کے مواقع اور اہلیت** (جیسے، SSC، UPSC، بینک، ریلوے)
 * 📝 **ATS ریزیومے کا تجزیہ اور انٹرویو کی تیاری**
 * 🏛️ **سرکاری اسکیمیں اور سبسڈیز** (Mudra، PMEGP، اسٹارٹ آپ انڈیا)
@@ -294,7 +294,7 @@ export function getWelcomeContent(lang: Language): string {
   } else if (lang === 'kn') {
     return `ನಮಸ್ಕಾರ! ನಾನು **ಆರೋಹಿ (AROHI)**, ನಿಮ್ಮ ವೈಯಕ್ತಿಕ AI ವೃತ್ತಿಜೀವನ ಮತ್ತು ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಸಲಹೆಗಾರ. 🌟
 
-ನಾನು ನಿಮಗೆ Recruit.org.in ಪ್ಲಾಟ್‌ಫಾರ್ಮ್‌ನಲ್ಲಿ ಸಂಪೂರ್ಣ ಮಾರ್ಗದರ್ಶನ ನೀಡುತ್ತೇನೆ. ನನ್ನನ್ನು ಏನಾದರೂ ಕೇಳಿ:
+ನಾನು ನಿಮಗೆ Arohi AI (arohiai.com) ಪ್ಲಾಟ್‌ಫಾರ್ಮ್‌ನಲ್ಲಿ ಸಂಪೂರ್ಣ ಮಾರ್ಗದರ್ಶನ ನೀಡುತ್ತೇನೆ. ನನ್ನನ್ನು ಏನಾದರೂ ಕೇಳಿ:
 * 💼 **ಉದ್ಯೋಗಾವಕಾಶಗಳು ಮತ್ತು ಅರ್ಹತೆಗಳು** (ಉದಾಹರಣೆಗೆ, SSC, UPSC, ಬ್ಯಾಂಕ್, ರೈಲ್ವೆ)
 * 📝 **ATS ರೆಸ್ಯೂಮೆ ವಿಶ್ಲೇಷಣೆ ಮತ್ತು ಸಂದರ್ಶನದ ತಯಾರಿ**
 * 🏛️ **ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು ಮತ್ತು ಸಬ್ಸಿಡಿಗಳು** (ಮುದ್ರಾ, PMEGP, ಸ್ಟಾರ್ಟ್‌ಅಪ್ ಇಂಡಿಯಾ)
@@ -305,7 +305,7 @@ export function getWelcomeContent(lang: Language): string {
   } else if (lang === 'ml') {
     return `നമസ്കാരം! ഞാൻ **ആരോഹി (AROHI)**, നിങ്ങളുടെ വ്യക്തിഗത AI കരിയർ, സർക്കാർ പദ്ധതി ഉപദേശകയാണ്. 🌟
 
-ഞാൻ നിങ്ങൾക്ക് Recruit.org.in പ്ലാറ്റ്‌ഫോമിൽ പൂർണ്ണമായ സഹായം നൽകും. എന്നോട് ചോദിക്കൂ:
+ഞാൻ നിങ്ങൾക്ക് Arohi AI (arohiai.com) പ്ലാറ്റ്‌ഫോമിൽ പൂർണ്ണമായ സഹായം നൽകും. എന്നോട് ചോദിക്കൂ:
 * 💼 **തൊഴിലവസരങ്ങളും യോഗ്യതയും** (SSC, UPSC, ബാങ്ക്, റെയിൽവേ)
 * 📝 **ATS റെസ്യൂമെ വിശകലനവും അഭിമുഖ തയ്യാറെടുപ്പും**
 * 🏛️ **സർക്കാർ പദ്ധതികളും സബ്‌സിഡികളും** (മുദ്ര, PMEGP, സ്റ്റാർട്ടപ്പ് ഇന്ത്യ)
@@ -316,7 +316,7 @@ export function getWelcomeContent(lang: Language): string {
   } else if (lang === 'pa') {
     return `ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਹਾਂ **ਆਰੋਹੀ (AROHI)**, ਤੁਹਾਡਾ ਨਿੱਜੀ AI ਕਰੀਅਰ ਅਤੇ ਸਰਕਾਰੀ ਯੋਜਨਾਵਾਂ ਦਾ ਸਲਾਹਕਾਰ। 🌟
 
-ਮੈਂ ਤੁਹਾਨੂੰ Recruit.org.in ਪਲੇਟਫਾਰਮ 'ਤੇ ਪੂਰੀ ਸਹਾਇਤਾ ਪ੍ਰਦਾਨ ਕਰਾਂਗੀ। ਮੈਨੂੰ ਕੁਝ ਵੀ ਪੁੱਛੋ:
+ਮੈਂ ਤੁਹਾਨੂੰ Arohi AI (arohiai.com) ਪਲੇਟਫਾਰਮ 'ਤੇ ਪੂਰੀ ਸਹਾਇਤਾ ਪ੍ਰਦਾਨ ਕਰਾਂਗੀ। ਮੈਨੂੰ ਕੁਝ ਵੀ ਪੁੱਛੋ:
 * 💼 **ਨੌਕਰੀਆਂ ਦੇ ਮੌਕੇ ਅਤੇ ਯੋਗਤਾ** (ਜਿਵੇਂ ਕਿ, SSC, UPSC, ਬੈਂਕ, ਰੇਲਵੇ)
 * 📝 **ATS ਰੈਜ਼ਿਊਮੇ ਵਿਸ਼ਲੇਸ਼ਣ ਅਤੇ ਇੰਟਰਵਿਊ ਦੀ ਤਿਆਰੀ**
 * 🏛️ **ਸਰਕਾਰੀ ਸਕੀਮਾਂ ਅਤੇ ਸਬਸਿਡੀਆਂ** (ਮੁਦਰਾ, PMEGP, ਸਟਾਰਟਅੱਪ ਇੰਡੀਆ)
@@ -327,7 +327,7 @@ export function getWelcomeContent(lang: Language): string {
   } else if (lang === 'as') {
     return `নমস্কাৰ! মই **আৰোহী (AROHI)**, আপোনাৰ ব্যক্তিগত AI কেৰিয়াৰ আৰু চৰকাৰী আঁচনিৰ উপদেষ্টা। 🌟
 
-মই আপোনাক Recruit.org.in প্লেটফৰ্মত সম্পূৰ্ণ সহায় কৰিম। মোক যিকোনো প্ৰশ্ন সোধক:
+মই আপোনাক Arohi AI (arohiai.com) প্লেটফৰ্মত সম্পূৰ্ণ সহায় কৰিম। মোক যিকোনো প্ৰশ্ন সোধক:
 * 💼 **চাকৰিৰ খালী পদ আৰু অৰ্হতা** (যেনে, SSC, UPSC, বেংক, ৰে’লৱে)
 * 📝 **ATS ৰিজুমে বিশ্লেষণ আৰু সাক্ষাৎকাৰৰ প্ৰস্তুতি**
 * 🏛️ **চৰকাৰী আঁচনি আৰু ৰেহাই** (মুদ্ৰা, PMEGP, ষ্টার্টআপ ইণ্ডিয়া)
@@ -340,7 +340,7 @@ export function getWelcomeContent(lang: Language): string {
   if (lang === 'hi') {
     return `नमस्ते! मैं हूं **आरोही (AROHI)**, आपकी सार्वभौमिक एआई अवसर सलाहकार। 🌟
 
-मैं पूरे Recruit.org.in प्लेटफॉर्म पर आपकी सहायता के लिए तैयार हूं। हम पृथ्वी से लेकर ब्रह्मांड तक **विशेष श्रेणियों** (जैसे छात्र, शिक्षक, वैज्ञानिक, शोधकर्ता, डॉक्टर, इंजीनियर, उद्यमी, सरकारी और निजी अधिकारी, और यहाँ तक कि मंगल एवं बृहस्पति के नागरिक) को सशक्त बना रहे हैं!
+मैं पूरे Arohi AI प्लेटफॉर्म पर आपकी सहायता के लिए तैयार हूं। हम पृथ्वी से लेकर ब्रह्मांड तक **विशेष श्रेणियों** (जैसे छात्र, शिक्षक, वैज्ञानिक, शोधकर्ता, डॉक्टर, इंजीनियर, उद्यमी, सरकारी और निजी अधिकारी, और यहाँ तक कि मंगल एवं बृहस्पति के नागरिक) को सशक्त बना रहे हैं!
 
 मुझसे कुछ भी पूछें:
 * 💼 **सरकारी एवं कॉर्पोरेट नौकरियां और पात्रता** (नौकरी चाहने वालों और पेशेवरों के लिए)
@@ -353,7 +353,7 @@ export function getWelcomeContent(lang: Language): string {
   } else if (lang === 'or') {
     return `ନମସ୍କାର! ମୁଁ ହେଉଛି **ଆରୋହୀ (AROHI)**, ଆପଣଙ୍କ ସାର୍ବଭୌମ AI ସୁଯୋଗ ପରାମର୍ଶଦାତା | 🌟
 
-ମୁଁ ଆପଣଙ୍କୁ Recruit.org.in ପ୍ଲାଟଫର୍ମରେ ସମ୍ପୂର୍ଣ୍ଣ ସହାୟତା ପ୍ରଦାନ କରିବି | ଆମେ ପୃଥିବୀରୁ ମହାକାଶ ପର୍ଯ୍ୟନ୍ତ **ବିଶେଷ ଶ୍ରେଣୀର ଲୋକଙ୍କୁ** (ଯେପରିକି ଛାତ୍ରଛาତ୍ରୀ, ଶିକ୍ଷକ, ବୈଜ୍ଞାନିକ, ଗବେଷକ, ଡାକ୍ତର, ଇଞ୍जିନିୟର, ଉଦ୍ୟୋଗୀ, ସରକାରୀ ଓ ବେସରକାରୀ ଅଧିକାରୀ, ଏବଂ ମଙ୍ଗଳ ଓ ବୃହସ୍ପତିର ନାଗରିକ) ସଶକ୍ତ କରୁଛୁ!
+ମୁଁ ଆପଣଙ୍କୁ Arohi.ai ପ୍ଲାଟଫର୍ମରେ ସମ୍ପୂର୍ଣ୍ଣ ସହାୟତା ପ୍ରଦାନ କରିବି | ଆମେ ପୃଥିବୀରୁ ମହାକାଶ ପର୍ଯ୍ୟନ୍ତ **ବିଶେଷ ଶ୍ରେଣୀର ଲୋକଙ୍କୁ** (ଯେପରିକି ଛାତ୍ରଛาତ୍ରୀ, ଶିକ୍ଷକ, ବୈଜ୍ଞାନିକ, ଗବେଷକ, ଡାକ୍ତର, ଇଞ୍जିନିୟର, ଉଦ୍ୟୋଗୀ, ସରକାରୀ ଓ ବେସରକାରୀ ଅଧିକାରୀ, ଏବଂ ମଙ୍ଗଳ ଓ ବୃହସ୍ପତିର ନାଗରିକ) ସଶକ୍ତ କରୁଛୁ!
 
 ଆପଣ ମତେ ଯେକୌଣସି ପ୍ରଶ୍ନ ପଚାରିପାରିବେ, ଯେପରିକି:
 * 💼 **ନିଯୁକ୍ତି ସୂଚନା ଏବଂ ଯୋଗ୍ୟତା** (ଚାକିରି ଆଶାୟୀ ଓ ପେସାଦାରଙ୍କ ପାଇଁ)
@@ -366,7 +366,7 @@ export function getWelcomeContent(lang: Language): string {
   }
   return `Namaste! I am **AROHI**, your universal AI Opportunity Advisor. 🌟
 
-I am here to assist you across the entire Recruit.org.in platform. We are proudly optimized to serve a wide range of **specialized audience categories**—from terrestrial **Students, Teachers, Scientists, Researchers, Doctors, Engineers, Entrepreneurs, and Public/Private Officials** to cosmic explorers like **Aliens and the Citizens of Mars & Jupiter**!
+I am here to assist you across the entire Arohi AI platform. We are proudly optimized to serve a wide range of **specialized audience categories**—from terrestrial **Students, Teachers, Scientists, Researchers, Doctors, Engineers, Entrepreneurs, and Public/Private Officials** to cosmic explorers like **Aliens and the Citizens of Mars & Jupiter**!
 
 Ask me anything about:
 * 💼 **Government & Corporate Job Openings** (for Job Seekers & Professionals)

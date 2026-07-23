@@ -160,7 +160,7 @@ export function generateCallSummaryPDF(turnsList: SpeechTurn[], callDuration: nu
     doc.setTextColor(255, 255, 255);
     doc.setFont('Helvetica', 'bold');
     doc.setFontSize(22);
-    doc.text('RECRUIT.ORG.IN', 15, 18);
+    doc.text('AROHI.AI', 15, 18);
     
     doc.setFontSize(10);
     doc.setFont('Helvetica', 'normal');
@@ -272,7 +272,7 @@ export function generateCallSummaryPDF(turnsList: SpeechTurn[], callDuration: nu
     doc.line(15, 280, 195, 280);
     doc.setFontSize(8);
     doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
-    doc.text('RECRUIT.ORG.IN • CONFIDENTIAL CAREER ADVISEMENT SHEET', 15, 285);
+    doc.text('AROHI.AI • CONFIDENTIAL CAREER ADVISEMENT SHEET', 15, 285);
     doc.text('Page 1 of 1', 180, 285);
     
     doc.save(`Arohi_Career_Blueprint_Summary.pdf`);
@@ -373,7 +373,7 @@ export function generateResumePDF() {
     doc.text('Completed 2026', 155, y);
     y += 5;
     doc.setTextColor(100, 100, 100);
-    doc.text('Recruit.org.in Upskilling Hub', 22, y);
+    doc.text('Arohi.ai Upskilling Hub', 22, y);
     y += 12;
     
     // Key Projects

@@ -2,7 +2,7 @@
   "entities": {
     "User": {
       "title": "User",
-      "description": "Represents an authenticated user in Recruit India and stores their career progress, bookmarks, and mock application history.",
+      "description": "Represents an authenticated user in Arohi AI and stores their career progress, bookmarks, and mock application history.",
       "type": "object",
       "properties": {
         "uid": {

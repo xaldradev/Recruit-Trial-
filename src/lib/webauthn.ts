@@ -66,7 +66,7 @@ export async function registerBiometricDevice(
   // Generate a mock user ID byte array
   const userIdBytes = new TextEncoder().encode(userId);
 
-  const rpName = "Recruit India Ecosystem";
+  const rpName = "Arohi AI Ecosystem";
   
   const creationOptions: CredentialCreationOptions = {
     publicKey: {

@@ -1,6 +1,6 @@
 {
-  "name": "Recruit.org.in - India's Next Generation Employment Engine",
-  "description": "Empowering India's Students, Professionals, and MSMEs. Guided by AROHI, assisting with Careers, Jobs, upskilling, school syllabus, resume analysis, mock interviews, MSMEs, and career planning.",
+  "name": "Arohi AI - India's Next Generation Opportunity Engine",
+  "description": "Empowering India's Students, Professionals, and MSMEs. Guided by AROHI AI, assisting with Careers, Jobs, upskilling, school syllabus, resume analysis, mock interviews, MSMEs, and career planning.",
   "requestFramePermissions": ["microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

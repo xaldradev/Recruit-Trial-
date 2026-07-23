@@ -170,20 +170,25 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         }, 1500);
       }
     } catch (err: any) {
-      console.error(err);
-      let errMsg = err.message || 'An error occurred during Google sign-in.';
+      const errCode = err?.code || '';
+      const errMsg = err?.message || '';
       const isPopupClosed = 
-        err.code === 'auth/popup-closed-by-user' || 
+        errCode === 'auth/popup-closed-by-user' || 
         errMsg.includes('popup-closed-by-user') || 
-        err.code === 'auth/cancelled-popup-request' ||
+        errCode === 'auth/cancelled-popup-request' ||
         errMsg.includes('cancelled-popup-request');
 
       if (isPopupClosed) {
-        errMsg = 'The Google Sign-In pop-up was closed or blocked. If you didn\'t close it yourself, please allow pop-ups for this site, or try clicking the "Open in New Tab" button at the top-right of the preview window to sign in easily!';
-      } else if (err.code === 'auth/popup-blocked' || errMsg.includes('popup-blocked')) {
-        errMsg = 'Google Sign-In pop-up was blocked by your browser. Please allow pop-ups, or click the "Open in New Tab" button at the top-right of the preview window to bypass browser blocks.';
+        console.info('Google Sign-In pop-up was closed by user.');
+        setError('Google Sign-In was cancelled because the pop-up was closed. If pop-ups are blocked in the preview, click "Open in New Tab" at the top-right to sign in easily!');
+      } else {
+        console.error('Google Sign-In error:', err);
+        let displayMsg = errMsg || 'An error occurred during Google sign-in.';
+        if (errCode === 'auth/popup-blocked' || errMsg.includes('popup-blocked')) {
+          displayMsg = 'Google Sign-In pop-up was blocked by your browser. Please allow pop-ups, or click "Open in New Tab" at the top-right.';
+        }
+        setError(displayMsg);
       }
-      setError(errMsg);
     } finally {
       setIsLoading(false);
     }
@@ -208,18 +213,25 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         }, 1500);
       }
     } catch (err: any) {
-      console.error(err);
-      let errMsg = err.message || 'An error occurred during Apple sign-in.';
+      const errCode = err?.code || '';
+      const errMsg = err?.message || '';
       const isPopupClosed = 
-        err.code === 'auth/popup-closed-by-user' || 
+        errCode === 'auth/popup-closed-by-user' || 
         errMsg.includes('popup-closed-by-user') || 
-        err.code === 'auth/cancelled-popup-request' ||
+        errCode === 'auth/cancelled-popup-request' ||
         errMsg.includes('cancelled-popup-request');
 
       if (isPopupClosed) {
-        errMsg = 'The Apple Sign-In pop-up was closed or blocked. If you didn\'t close it yourself, please allow pop-ups, or click the "Open in New Tab" button at the top-right of the preview window.';
+        console.info('Apple Sign-In pop-up was closed by user.');
+        setError('Apple Sign-In was cancelled because the pop-up was closed. If pop-ups are blocked in the preview, click "Open in New Tab" at the top-right to sign in easily!');
+      } else {
+        console.error('Apple Sign-In error:', err);
+        let displayMsg = errMsg || 'An error occurred during Apple sign-in.';
+        if (errCode === 'auth/popup-blocked' || errMsg.includes('popup-blocked')) {
+          displayMsg = 'Apple Sign-In pop-up was blocked by your browser. Please allow pop-ups, or click "Open in New Tab" at the top-right.';
+        }
+        setError(displayMsg);
       }
-      setError(errMsg);
     } finally {
       setIsLoading(false);
     }
@@ -349,7 +361,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         }
         const formattedPhone = `+91 ${signupPhone.trim().slice(0, 5)} ${signupPhone.trim().slice(5)}`;
         await signUp(email, password, name, role, formattedPhone);
-        setSuccess(`Account created successfully as ${role === 'recruiter' ? 'Startup Aspirant' : 'Student & Seeker'}! Welcome to Recruit India.`);
+        setSuccess(`Account created successfully as ${role === 'recruiter' ? 'Startup Aspirant' : 'Student & Seeker'}! Welcome to Arohi AI.`);
         setTimeout(() => {
           onClose();
         }, 1500);
@@ -444,7 +456,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <ShieldCheck className="w-6 h-6 text-white" />
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
-            Recruit India Auth Portal
+            Arohi AI Auth Portal
           </h2>
           <p className="text-xs text-slate-400 max-w-[320px] mx-auto leading-normal">
             Sign in securely to save your progress, bookmark courses, track job application statuses, and unlock all interactive dashboards.
@@ -496,7 +508,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 Complete Your Profile Setup
               </h3>
               <p className="text-xs text-slate-400 leading-normal">
-                Name and Mobile number are mandatory to access the Recruit India platform dashboards, courses, and job boards.
+                Name and Mobile number are mandatory to access the Arohi AI platform dashboards, courses, and job boards.
               </p>
             </div>
 

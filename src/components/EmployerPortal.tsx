@@ -164,7 +164,7 @@ export default function EmployerPortal({
   const [jobVacancies, setJobVacancies] = useState(2);
   const [jobSector, setJobSector] = useState('IT & Software');
   const [jobEligibility, setJobEligibility] = useState('');
-  const [jobApplyLink, setJobApplyLink] = useState('https://recruit.org.in/apply-now');
+  const [jobApplyLink, setJobApplyLink] = useState('https://arohi.ai/apply-now');
   const [successMsg, setSuccessMsg] = useState(false);
 
   // AI Matching States
@@ -245,8 +245,8 @@ export default function EmployerPortal({
         }
       ],
       links: {
-        applyOnline: jobApplyLink || "https://recruit.org.in/apply-now",
-        officialWebsite: "https://recruit.org.in"
+        applyOnline: jobApplyLink || "https://arohi.ai/apply-now",
+        officialWebsite: "https://arohi.ai"
       }
     };
 
@@ -363,7 +363,7 @@ Hello! I am **AROHI**, your AI Recruitment co-pilot. I have scanned **${candidat
         dob: '1998-11-05',
         gender: 'Male',
         category: 'General',
-        email: 'aarav.nair@recruit.org.in',
+        email: 'aarav.nair@arohi.ai',
         phone: '9812233445',
         qualification: 'B.Tech in Computer Science - 8.2 CGPA (Experienced with React, Tailwind CSS, REST APIs & SQL)',
         address: 'Fortune Towers, Chandrasekharpur, Bhubaneswar, Odisha - 751024',
@@ -380,7 +380,7 @@ Hello! I am **AROHI**, your AI Recruitment co-pilot. I have scanned **${candidat
         dob: '2000-02-18',
         gender: 'Female',
         category: 'General',
-        email: 'riya.patnaik@recruit.org.in',
+        email: 'riya.patnaik@arohi.ai',
         phone: '9944112233',
         qualification: 'BCA Graduate - 78% (Proficient in HTML, CSS, Figma designs, and Social Media management)',
         address: 'Nayapalli, Near ISKCON Temple, Bhubaneswar, Odisha - 751015',
@@ -397,7 +397,7 @@ Hello! I am **AROHI**, your AI Recruitment co-pilot. I have scanned **${candidat
         dob: '1996-05-24',
         gender: 'Male',
         category: 'OBC',
-        email: 'chandan.sahoo@recruit.org.in',
+        email: 'chandan.sahoo@arohi.ai',
         phone: '9438090122',
         qualification: 'BA Graduate - 64% (Basic computer entry skills, typing speeds of 40 WPM, no software experience)',
         address: 'Link Road, Cuttack, Odisha - 753012',
@@ -611,7 +611,7 @@ Hello! I am **AROHI**, your AI Recruitment co-pilot. I have scanned **${candidat
                   </div>
                   <div>
                     <h4 className="font-extrabold text-white text-xs">Update Candidacy Statuses</h4>
-                    <p className="text-slate-400 mt-0.5 leading-relaxed">Update status markers (Approve / Reject) immediately in the portal to maintain healthy employer response parameters across Recruit.org.in.</p>
+                    <p className="text-slate-400 mt-0.5 leading-relaxed">Update status markers (Approve / Reject) immediately in the portal to maintain healthy employer response parameters across Arohi.ai.</p>
                   </div>
                 </div>
               </div>
@@ -892,7 +892,7 @@ Hello! I am **AROHI**, your AI Recruitment co-pilot. I have scanned **${candidat
 
           {successMsg && (
             <div className="bg-emerald-50 text-emerald-800 p-4 rounded-2xl border border-emerald-100 text-xs md:text-sm font-extrabold animate-pulse">
-              🎉 Job posted successfully! Your listing is now active and immediately searchable on Recruit.org.in. Redirecting...
+              🎉 Job posted successfully! Your listing is now active and immediately searchable on Arohi.ai. Redirecting...
             </div>
           )}
 

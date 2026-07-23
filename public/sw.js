@@ -1,4 +1,4 @@
-const CACHE_NAME = 'recruit-pwa-v1';
+const CACHE_NAME = 'arohi-ai-pwa-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -36,8 +36,17 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests and skip API requests and WebSockets
-  if (event.request.method !== 'GET' || event.request.url.includes('/api/') || event.request.url.includes('/ws')) {
+  const url = event.request.url;
+  // Skip non-GET, API calls, WebSockets, and Vite dev server internal assets
+  if (
+    event.request.method !== 'GET' || 
+    url.includes('/api/') || 
+    url.includes('/ws') || 
+    url.includes('/@vite') || 
+    url.includes('/@id/') || 
+    url.includes('?import') || 
+    url.includes('node_modules')
+  ) {
     return;
   }
 
@@ -56,7 +65,7 @@ self.addEventListener('fetch', (event) => {
       }
 
       return fetch(event.request).then((networkResponse) => {
-        // Cache new GET requests for assets
+        // Cache new GET requests for static assets
         if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -67,9 +76,10 @@ self.addEventListener('fetch', (event) => {
       }).catch(() => {
         // Fallback for offline routing
         if (event.request.mode === 'navigate') {
-          return caches.match('/');
+          return caches.match('/') || caches.match('/index.html');
         }
       });
     })
   );
 });
+

@@ -1818,7 +1818,7 @@ export default function UserDashboard({
             {/* Receipt Header */}
             <div className="border-b-2 border-dashed border-slate-200 pb-4 flex justify-between items-start gap-4">
               <div className="space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">RECRUIT INDIA DIGITAL PORTAL</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">AROHI AI DIGITAL PORTAL</span>
                 <h3 className="text-lg font-black text-slate-900">Official Application Acknowledgement Slip</h3>
                 <p className="text-[9px] text-slate-400 font-bold uppercase">National Employment Verification Service</p>
               </div>

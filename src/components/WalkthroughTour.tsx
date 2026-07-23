@@ -52,8 +52,8 @@ export default function WalkthroughTour({ activeTab, setActiveTab, isOpen, onClo
   const steps: WalkthroughStep[] = [
     {
       tab: 'home',
-      title: 'Welcome to Recruit India!',
-      description: 'Your premium, cloud-synced Career Registry and AI guidance platform. Let\'s take a 60-second interactive tour to discover how to skyrocket your career!',
+      title: 'Welcome to Arohi AI!',
+      description: 'Your premium, cloud-synced Opportunity Registry and AI guidance platform. Let\'s take a 60-second interactive tour to discover how to skyrocket your growth!',
       icon: Compass,
       highlightText: 'Begin your journey with custom counseling, tailored pathways, and verified registries.'
     },
@@ -733,7 +733,7 @@ export default function WalkthroughTour({ activeTab, setActiveTab, isOpen, onClo
 
             <div className="mt-2 text-center">
               <span className="text-[7px] text-slate-500 font-bold uppercase tracking-wider block">
-                Recruit suite includes automated resume scoring & interview review.
+                Arohi AI includes automated resume scoring & interview review.
               </span>
             </div>
           </div>

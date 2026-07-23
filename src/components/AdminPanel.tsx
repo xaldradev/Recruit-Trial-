@@ -78,7 +78,7 @@ export default function AdminPanel({
 
   // Merchant UPI / QR Setup State variables
   const [upiId, setUpiId] = useState('elitetraderjunoon@oksbi');
-  const [merchantName, setMerchantName] = useState('Recruit India Portal');
+  const [merchantName, setMerchantName] = useState('Arohi AI Portal');
   const [bankName, setBankName] = useState('Airtel Payments Bank / PhonePe');
   const [isUpdatingUpi, setIsUpdatingUpi] = useState(false);
   const [upiUpdateSuccess, setUpiUpdateSuccess] = useState(false);
@@ -117,7 +117,7 @@ export default function AdminPanel({
   const [instantApproval, setInstantApproval] = useState(true);
   const [registrationFreeze, setRegistrationFreeze] = useState(false);
   const [verbosity, setVerbosity] = useState('INFO');
-  const [systemBroadcast, setSystemBroadcast] = useState('RECRUIT.ORG.IN Core Quantum Matrix Online. July admissions cycle active.');
+  const [systemBroadcast, setSystemBroadcast] = useState('AROHI.AI Core Quantum Matrix Online. July admissions cycle active.');
   const [broadcastInput, setBroadcastInput] = useState('');
   const [securityLockdown, setSecurityLockdown] = useState(false);
 
@@ -261,14 +261,14 @@ export default function AdminPanel({
 
   // Live Search Engine Optimization (SEO) Pulse & Audit Diagnostic Engine
   const runSeoDiagnostic = () => {
-    const title = document.title || 'Recruit.org.in - India’s Next-Gen Career, Job, and MSME Growth Engine';
+    const title = document.title || 'Arohi.ai - India’s Next-Gen Career, Job, and MSME Growth Engine';
     const description = document.querySelector('meta[name="description"]')?.getAttribute('content') || 'Empowering India\'s students, young professionals, and MSMEs. Get live career guidance from AI assistant Arohi, dynamic resume analysis, mock interviews, job postings, and Udyam business assistance.';
-    const keywords = document.querySelector('meta[name="keywords"]')?.getAttribute('content') || 'recruit.org.in, career guidance India, AI career coach, resume score India, mock interview simulator, MSME Udyam registration, private sector jobs, student career advisor, recruitment portal, Sarkari job guide';
+    const keywords = document.querySelector('meta[name="keywords"]')?.getAttribute('content') || 'arohi.ai, career guidance India, AI career coach, resume score India, mock interview simulator, MSME Udyam registration, private sector jobs, student career advisor, recruitment portal, Sarkari job guide';
     const geoRegion = document.querySelector('meta[name="geo.region"]')?.getAttribute('content') || 'IN';
     const geoPosition = document.querySelector('meta[name="geo.position"]')?.getAttribute('content') || '20.5937;78.9629';
-    const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content') || 'Recruit.org.in - Career & MSME Success Engine';
+    const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content') || 'Arohi.ai - Career & MSME Success Engine';
     const ogDescription = document.querySelector('meta[property="og:description"]')?.getAttribute('content') || 'AI-driven career development, skill pathing, professional resume evaluation, and custom MSME Business support. Connect with India\'s best opportunities.';
-    const ogImage = document.querySelector('meta[property="og:image"]')?.getAttribute('content') || 'https://recruit.org.in/assets/og-banner.jpg';
+    const ogImage = document.querySelector('meta[property="og:image"]')?.getAttribute('content') || 'https://arohi.ai/assets/og-banner.jpg';
     const twitterCard = document.querySelector('meta[name="twitter:card"]')?.getAttribute('content') || 'summary_large_image';
     
     const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
@@ -334,7 +334,7 @@ export default function AdminPanel({
       totalImages,
       withAlt,
       isHttps: window.location.protocol === 'https:',
-      hostName: window.location.hostname || 'recruit.org.in'
+      hostName: window.location.hostname || 'arohi.ai'
     };
   };
 
@@ -899,7 +899,7 @@ export default function AdminPanel({
                     <Shield className="w-7 h-7" />
                   </div>
                   <h2 className="text-2xl font-black text-white tracking-tight flex items-center justify-center gap-1.5">
-                    Recruit <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">Control Panel</span>
+                    Arohi AI <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">Control Panel</span>
                   </h2>
                   <p className="text-slate-400 text-xs font-semibold max-w-sm mx-auto leading-relaxed">
                     Access reserved for authenticated commander personnel. Provide secure keys to decrypted databases.
@@ -1234,7 +1234,7 @@ export default function AdminPanel({
                   </div>
                   <div>
                     <h2 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                      Recruit.org.in Executive Commander Controls
+                      Arohi.ai Executive Commander Controls
                     </h2>
                     <p className="text-[10px] text-slate-400 mt-0.5">
                       Real-time tuning of the conversational Arohi AI, UPI routing gateways, automated application vetting engines, and database synchronization.
@@ -1513,7 +1513,7 @@ export default function AdminPanel({
 
               {/* Status bar */}
               <div className="pt-3 border-t border-[#25174e] flex justify-between items-center text-[10px] font-mono text-slate-500">
-                <span>RECRUIT CONTROL NETWORK v2.4</span>
+                <span>AROHI AI CONTROL NETWORK v2.4</span>
                 <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-[#00e676] animate-pulse"></span> TELEMETRY STREAMING LIVE</span>
               </div>
             </div>
@@ -3040,7 +3040,7 @@ export default function AdminPanel({
                 <div>
                   <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-100 flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-ping" />
-                    RECRUIT.ORG.IN Cumulative Platform Footprint Ledger
+                    AROHI.AI Cumulative Platform Footprint Ledger
                   </h3>
                   <p className="text-[10px] text-slate-400 mt-0.5">
                     Real-time aggregated traffic, consultation volume, and candidate transactions persisted on secure Cloud Database
@@ -3443,7 +3443,7 @@ export default function AdminPanel({
                           <span className="text-[9px] font-mono font-bold text-teal-400">{seoData.titleLen} Characters</span>
                         </div>
                         <p className="text-[10px] text-slate-400 font-mono truncate">{seoData.title}</p>
-                        <p className="text-[9px] text-slate-500 font-semibold italic">Optimal length (45-75 chars). Includes target brand keyword (Recruit.org.in).</p>
+                        <p className="text-[9px] text-slate-500 font-semibold italic">Optimal length (45-75 chars). Includes target brand keyword (Arohi.ai).</p>
                       </div>
                     </div>
 
@@ -3529,8 +3529,8 @@ export default function AdminPanel({
                 
                 <div className="bg-white p-5 rounded-2xl shadow-inner text-left font-sans text-[#4d5156] text-xs space-y-1">
                   <div className="flex items-center gap-1 text-[11px] text-[#202124]">
-                    <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-indigo-600">Recruit.org.in</span>
-                    <span className="text-slate-400 text-[10px]">https://recruit.org.in</span>
+                    <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-indigo-600">Arohi.ai</span>
+                    <span className="text-slate-400 text-[10px]">https://arohi.ai</span>
                   </div>
                   
                   <h5 className="text-[16px] leading-tight font-medium text-[#1a0dab] hover:underline cursor-pointer">
@@ -3569,17 +3569,17 @@ export default function AdminPanel({
                   {`{
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Recruit.org.in",
-  "url": "https://recruit.org.in",
-  "logo": "https://recruit.org.in/assets/logo.png",
+  "name": "Arohi.ai",
+  "url": "https://arohi.ai",
+  "logo": "https://arohi.ai/assets/logo.png",
   "description": "India's next-generation employment engine helping students, professionals, and MSMEs achieve career and business milestones.",
   "address": {
     "@type": "PostalAddress",
     "addressCountry": "IN"
   },
   "sameAs": [
-    "https://twitter.com/RecruitOrgIn",
-    "https://www.linkedin.com/company/recruitorgin"
+    "https://twitter.com/ArohiAi",
+    "https://www.linkedin.com/company/arohiai"
   ]
 }`}
                 </div>

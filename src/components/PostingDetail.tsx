@@ -404,7 +404,7 @@ export default function PostingDetail({ posting, onBack, onAddApplication }: Pos
           </button>
         </div>
 
-        {/* Tab Content 1: Official Recruitment Table Grid (Exact Copy Style of Recruit.org.in) */}
+        {/* Tab Content 1: Official Recruitment Table Grid (Exact Copy Style of Arohi.ai) */}
         {activeTab === 'details' && (
           <div className="bg-white rounded-b-xl shadow-md p-6 border-x border-b border-slate-200">
             
@@ -642,7 +642,7 @@ export default function PostingDetail({ posting, onBack, onAddApplication }: Pos
             {/* Verification Watermark Footer */}
             <div className="mt-6 flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg p-4 text-xs text-slate-500">
               <span className="flex items-center gap-1.5 font-semibold text-emerald-700">
-                <ShieldCheck className="w-4 h-4" /> Official Verified Job Details by Recruit.org.in Team
+                <ShieldCheck className="w-4 h-4" /> Official Verified Job Details by Arohi.ai Team
               </span>
               <span>Ref ID: SR-REC-2026-{posting.id.toUpperCase()}</span>
             </div>
@@ -963,8 +963,8 @@ export default function PostingDetail({ posting, onBack, onAddApplication }: Pos
                     {/* Slip Header */}
                     <div className="border-b-2 border-slate-800 pb-4 text-center">
                       <div className="flex justify-center items-center gap-2 mb-1.5">
-                        <div className="bg-slate-900 p-1.5 rounded text-white text-xs font-black font-mono">REC</div>
-                        <h2 className="text-xl font-extrabold tracking-tight">RECRUIT.ORG.IN</h2>
+                        <div className="bg-slate-900 p-1.5 rounded text-white text-xs font-black font-mono">AROHI</div>
+                        <h2 className="text-xl font-extrabold tracking-tight">AROHI.AI</h2>
                       </div>
                       <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Government of India Recruitment Processing Portal</p>
                       <h3 className="text-sm font-black text-rose-800 uppercase mt-2 border-y border-slate-200 py-1.5 bg-slate-50">
@@ -1087,7 +1087,7 @@ export default function PostingDetail({ posting, onBack, onAddApplication }: Pos
 
                     {/* Disclaimer */}
                     <div className="mt-8 border-t border-slate-200 pt-3 text-[10px] text-slate-400 text-center italic">
-                      This is a computer-generated provisional application slip processed on Recruit.org.in. No physical signature is required. Subject to certificate verification.
+                      This is a computer-generated provisional application slip processed on Arohi.ai. No physical signature is required. Subject to certificate verification.
                     </div>
 
                   </div>
@@ -1184,7 +1184,7 @@ export default function PostingDetail({ posting, onBack, onAddApplication }: Pos
 
                 <div>
                   <h4 className="text-rose-900 font-bold uppercase underline">4. STEPS TO FILL ONLINE FORM:</h4>
-                  <p className="mt-1 pl-3">Step 1: Go to the "Apply Online" tab on Recruit.org.in or click the click here link.</p>
+                  <p className="mt-1 pl-3">Step 1: Go to the "Apply Online" tab on Arohi.ai or click the click here link.</p>
                   <p className="pl-3">Step 2: Enter personal details including candidate name, email address, and active mobile number.</p>
                   <p className="pl-3">Step 3: State highest academic level achievements and input corresponding percentages.</p>
                   <p className="pl-3">Step 4: Upload scanned clear images of passport photograph (size limit 50kb) and signature (size limit 20kb).</p>

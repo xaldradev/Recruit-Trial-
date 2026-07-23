@@ -200,7 +200,7 @@ export default function FranchisePage() {
   const faqs = [
     {
       q: "What is the Arohi Experience Center Network (AECN)?",
-      a: "AECN is India's first tech-forward, franchise-driven AI physical network designed to bridge the gap between online career resources and local communities. Backed by Recruit.org.in, these centers provide secure biometric registry, local language AI advisory, interview preparation, and business development services directly to job seekers and MSMEs."
+      a: "AECN is India's first tech-forward, franchise-driven AI physical network designed to bridge the gap between online career resources and local communities. Backed by Arohi.ai, these centers provide secure biometric registry, local language AI advisory, interview preparation, and business development services directly to job seekers and MSMEs."
     },
     {
       q: "What is Juggernaut OS?",
@@ -236,11 +236,11 @@ export default function FranchisePage() {
     },
     {
       q: "Is the franchise model officially registered with any government bodies?",
-      a: "Yes, Recruit.org.in and AECN operate in alignment with the National Education Policy (NEP) guidelines, MSME development initiatives, and Digital India standards."
+      a: "Yes, Arohi.ai and AECN operate in alignment with the National Education Policy (NEP) guidelines, MSME development initiatives, and Digital India standards."
     },
     {
       q: "What kind of local marketing support will I receive?",
-      a: "We provide localized SEO marketing, geographic target ads, standard printing templates (hoardings, newspaper flyers), official grand opening campaigns, and listing on the central Recruit.org.in map."
+      a: "We provide localized SEO marketing, geographic target ads, standard printing templates (hoardings, newspaper flyers), official grand opening campaigns, and listing on the central Arohi.ai map."
     },
     {
       q: "Can I manage multiple centers under a single dashboard?",
@@ -493,7 +493,7 @@ export default function FranchisePage() {
                 Own an <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#c084fc] via-[#e9d5ff] to-white">Arohi Experience Center</span>
               </h1>
               <p className="text-sm md:text-lg text-slate-300 font-medium max-w-2xl mx-auto lg:mx-0">
-                Become a Franchise Partner in India's leading AI Career &amp; Opportunity Experience Network. Backed by <span className="text-purple-400 font-bold">Recruit.org.in</span>, empowered by next-gen FIDO2 biometric registries, automated resume score tracking, and automated interactive career counselling.
+                Become a Franchise Partner in India's leading AI Career &amp; Opportunity Experience Network. Backed by <span className="text-purple-400 font-bold">Arohi.ai</span>, empowered by next-gen FIDO2 biometric registries, automated resume score tracking, and automated interactive career counselling.
               </p>
             </div>
 
@@ -636,7 +636,7 @@ export default function FranchisePage() {
               </div>
               <h3 className="text-lg font-black text-white mb-3">National Expansion</h3>
               <p className="text-xs text-slate-400 leading-relaxed font-medium">
-                Supported by Recruit.org.in's online cloud engine, franchise centers serve as physical local gateways for offline examinations, MSME business setup, and secure biometric passkey registers.
+                Supported by Arohi.ai's online cloud engine, franchise centers serve as physical local gateways for offline examinations, MSME business setup, and secure biometric passkey registers.
               </p>
             </div>
           </div>
@@ -1405,7 +1405,7 @@ export default function FranchisePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 { label: "AI Powered Advice", desc: "Arohi answers career & MSME queries directly, minimizing staff salaries.", icon: Cpu },
-                { label: "National Brand Trust", desc: "Co-branded with Recruit.org.in's online national database registry.", icon: Award },
+                { label: "National Brand Trust", desc: "Co-branded with Arohi.ai's online national database registry.", icon: Award },
                 { label: "Multiple Income streams", desc: "6 dynamic channels targeting candidates, students, and employers.", icon: DollarSign },
                 { label: "360-Degree Training", desc: "We handle site design layouts, edge installs, and local SEO campaigns.", icon: Workflow }
               ].map((item, idx) => (

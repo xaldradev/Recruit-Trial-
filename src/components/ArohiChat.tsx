@@ -1228,7 +1228,7 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
           <div className="absolute inset-y-0 left-0 z-40 w-72 bg-[#0d091e]/98 backdrop-blur-xl border-r border-[#2d2163] shadow-2xl flex flex-col p-4 animate-in slide-in-from-left duration-300">
             <div className="flex justify-between items-center mb-4 border-b border-[#2d2163] pb-3">
               <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                <History className="w-4 h-4 text-violet-400" /> History Side Tab
+                <History className="w-4 h-4 text-violet-400" /> Chat History
               </h4>
               <button 
                 onClick={() => setIsHistoryDrawerOpen(false)}

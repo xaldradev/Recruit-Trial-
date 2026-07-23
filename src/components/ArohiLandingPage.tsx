@@ -41,8 +41,6 @@ export default function ArohiLandingPage({
   isTourEnabled = false
 }: ArohiLandingPageProps) {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
   const [activeOrbText, setActiveOrbText] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -77,144 +75,9 @@ export default function ArohiLandingPage({
     setIsChatMinimized(false);
   };
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newsletterEmail.trim()) {
-      setNewsletterSubmitted(true);
-      setTimeout(() => {
-        setNewsletterSubmitted(false);
-        setNewsletterEmail('');
-      }, 3000);
-    }
-  };
-
   return (
     <div id="home-landing-root" className="space-y-16 pb-12 text-slate-100 font-sans">
       
-      {/* 1. INTERNAL NAVBAR IN CARD COMPONENT FOR PREMIUM SCREENSHOT ALIGNMENT */}
-      <header className="flex flex-col py-4 px-6 md:px-8 bg-slate-950/40 border border-slate-800/60 rounded-3xl backdrop-blur-xl shadow-lg relative z-20">
-        <div className="flex items-center justify-between w-full">
-          {/* Logo left */}
-          <div className="flex flex-col text-left">
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-500 rounded-xl shadow-lg shadow-indigo-500/20">
-                <Sparkles className="w-4 h-4 text-white animate-pulse" />
-              </span>
-              <span className="text-lg font-black tracking-tight text-white flex items-center">
-                AROHI <span className="text-indigo-400 ml-1 font-extrabold text-sm px-1.5 py-0.5 bg-indigo-500/10 border border-indigo-500/25 rounded-md">AI</span>
-              </span>
-            </div>
-            <span className="text-[10px] text-slate-400 font-bold tracking-wide -mt-0.5 ml-8 uppercase">by Recruit</span>
-          </div>
-
-          {/* Navigation Middle Links */}
-          <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-slate-300">
-            <a href="#home-landing-root" className="hover:text-white transition-colors flex flex-col items-center group">
-              <span>Home</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1"></span>
-            </a>
-            <a href="#features-grid" className="hover:text-white transition-colors flex flex-col items-center group">
-              <span>Features</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-transparent group-hover:bg-indigo-400/50 mt-1 transition-all"></span>
-            </a>
-            <a href="#about-section" className="hover:text-white transition-colors flex flex-col items-center group">
-              <span>About Arohi</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-transparent group-hover:bg-indigo-400/50 mt-1 transition-all"></span>
-            </a>
-            <a href="#contact-section" className="hover:text-white transition-colors flex flex-col items-center group">
-              <span>Contact Us</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-transparent group-hover:bg-indigo-400/50 mt-1 transition-all"></span>
-            </a>
-          </nav>
-
-          {/* Start Free CTA button on right & Mobile Menu Button */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              onClick={() => {
-                if (user) {
-                  setActiveTab('arohi');
-                } else {
-                  setIsAuthModalOpen(true);
-                }
-              }}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs uppercase tracking-wider px-4 sm:px-5 py-2.5 rounded-2xl border border-indigo-500/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg shadow-indigo-600/10"
-            >
-              Start Free
-            </button>
-
-            {/* Mobile Menu Toggle Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-xl bg-purple-900/60 hover:bg-purple-800/70 border border-purple-500/50 hover:border-purple-400/80 text-slate-100 hover:text-white transition-all cursor-pointer flex items-center justify-center min-w-[38px] h-9 active:scale-95"
-              aria-label="Toggle Mobile Menu"
-            >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Dropdown Navigation Menu */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className="md:hidden w-full overflow-hidden border-t border-slate-800/60 mt-4 pt-4"
-            >
-              <div className="flex flex-col gap-3">
-                <a 
-                  href="#home-landing-root" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full text-left py-2 px-3 text-slate-300 hover:text-white font-semibold text-xs tracking-wider uppercase hover:bg-white/5 rounded-lg transition-all block"
-                >
-                  Home
-                </a>
-                <a 
-                  href="#features-grid" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full text-left py-2 px-3 text-slate-300 hover:text-white font-semibold text-xs tracking-wider uppercase hover:bg-white/5 rounded-lg transition-all block"
-                >
-                  Features
-                </a>
-                <a 
-                  href="#about-section" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full text-left py-2 px-3 text-slate-300 hover:text-white font-semibold text-xs tracking-wider uppercase hover:bg-white/5 rounded-lg transition-all block"
-                >
-                  About Arohi
-                </a>
-                <a 
-                  href="#contact-section" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full text-left py-2 px-3 text-slate-300 hover:text-white font-semibold text-xs tracking-wider uppercase hover:bg-white/5 rounded-lg transition-all block"
-                >
-                  Contact Us
-                </a>
-                
-                {/* Mobile Extra Menu Actions */}
-                <div className="pt-4 border-t border-slate-800/40 flex flex-col gap-2">
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      if (user) {
-                        setActiveTab('arohi');
-                      } else {
-                        setIsAuthModalOpen(true);
-                      }
-                    }}
-                    className="w-full py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-extrabold text-[10px] uppercase tracking-widest rounded-xl shadow-lg border border-indigo-500/20 text-center cursor-pointer active:scale-95 transition-all"
-                  >
-                    Start Free
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
-
       {/* 2. SPECTACULAR HERO SECTION */}
       <section className="relative overflow-hidden bg-gradient-to-b from-[#090714] via-[#05030a] to-[#020205] border border-slate-800/50 rounded-[3rem] p-8 md:p-14 shadow-2xl">
         <div className="absolute right-0 bottom-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl -translate-y-10 translate-x-10 animate-pulse pointer-events-none"></div>
@@ -514,7 +377,7 @@ export default function ArohiLandingPage({
               </div>
             </div>
             <div className="text-[9px] text-slate-400 font-black tracking-widest uppercase">
-              RECRUIT PLATFORM ENGINE
+              AROHI AI PLATFORM ENGINE
             </div>
           </div>
 
@@ -967,17 +830,17 @@ export default function ArohiLandingPage({
         </div>
       </section>
 
-      {/* 9. ABOUT RECRUIT BLOCK & STATS */}
+      {/* 9. ABOUT AROHI AI BLOCK & STATS */}
       <section id="about-section" className="bg-[#050309] border border-slate-900 rounded-[2.5rem] p-6 sm:p-10 scroll-mt-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left">
           
           {/* About description */}
           <div className="lg:col-span-6 space-y-4">
             <h3 className="text-2xl font-black text-white">
-              About <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-500">Recruit</span>
+              About <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-500">Arohi AI</span>
             </h3>
             <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
-              Recruit.org.in is the company behind Arohi AI. Dedicated to making professional-grade AI assistance accessible to everyone through one intelligent assistant that empowers learning, research, careers, business, and innovation.
+              Arohi AI is India's premier intelligent opportunity & growth ecosystem. Dedicated to making professional-grade AI assistance accessible to everyone through one intelligent assistant that empowers learning, research, careers, business, and innovation.
             </p>
           </div>
 
@@ -1001,91 +864,6 @@ export default function ArohiLandingPage({
 
         </div>
       </section>
-
-      {/* 10. COMPREHENSIVE SITE FOOTER */}
-      <footer id="contact-section" className="bg-[#030107] border-t border-slate-900/80 pt-10 pb-6 scroll-mt-20">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 text-left">
-          
-          {/* Column 1 Logo */}
-          <div className="md:col-span-4 space-y-4">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="p-1.5 bg-gradient-to-tr from-violet-600 to-indigo-600 rounded-xl">
-                  <Sparkles className="w-3.5 h-3.5 text-white" />
-                </span>
-                <span className="text-sm font-black tracking-tight text-white flex items-center">
-                  AROHI <span className="text-indigo-400 ml-1 font-extrabold text-xs px-1.5 py-0.5 bg-indigo-500/10 border border-indigo-500/25 rounded-md">AI</span>
-                </span>
-              </div>
-              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wide ml-8 mt-0.5">by Recruit</span>
-            </div>
-            <p className="text-[11px] text-slate-400 font-semibold leading-relaxed">
-              One AI, Infinite Possibilities. Bridging standard educational paths and professional guidelines securely.
-            </p>
-          </div>
-
-          {/* Column 2 Quick Links */}
-          <div className="md:col-span-2.5 space-y-3.5 md:col-start-6">
-            <h5 className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Quick Links</h5>
-            <ul className="space-y-2 text-xs font-semibold text-slate-300">
-              <li><a href="#home-landing-root" className="hover:text-white transition-colors">Home</a></li>
-              <li><a href="#features-grid" className="hover:text-white transition-colors">Features</a></li>
-              <li><a href="#pricing-section" className="hover:text-white transition-colors">Pricing</a></li>
-              <li><a href="#about-section" className="hover:text-white transition-colors">About Arohi</a></li>
-            </ul>
-          </div>
-
-          {/* Column 3 Legal */}
-          <div className="md:col-span-2.5 space-y-3.5">
-            <h5 className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Legal</h5>
-            <ul className="space-y-2 text-xs font-semibold text-slate-300">
-              <li><button onClick={() => setActiveTab('privacy')} className="hover:text-white transition-colors text-left cursor-pointer">Privacy Policy</button></li>
-              <li><button onClick={() => setActiveTab('terms')} className="hover:text-white transition-colors text-left cursor-pointer">Terms & Conditions</button></li>
-              <li><button onClick={() => setActiveTab('refunds')} className="hover:text-white transition-colors text-left cursor-pointer">Refund & Cancellation Policy</button></li>
-            </ul>
-          </div>
-
-          {/* Column 4 Stay Connected Newsletter */}
-          <div className="md:col-span-3 space-y-3.5">
-            <h5 className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Stay Connected</h5>
-            <p className="text-[11px] text-slate-400 font-semibold leading-relaxed">
-              Join our community for updates and AI insights.
-            </p>
-            
-            {/* Form */}
-            <form onSubmit={handleNewsletterSubmit} className="flex items-center gap-2 bg-slate-950 border border-slate-900 p-1.5 rounded-2xl">
-              <input 
-                type="email" 
-                required
-                value={newsletterEmail}
-                onChange={(e) => setNewsletterEmail(e.target.value)}
-                placeholder="Enter your email" 
-                className="flex-1 bg-transparent text-xs text-slate-300 font-semibold px-2.5 py-1 outline-none"
-              />
-              <button 
-                type="submit"
-                className="p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md cursor-pointer transition-all active:scale-95 flex items-center justify-center shrink-0"
-              >
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </form>
-            {newsletterSubmitted && (
-              <p className="text-[10px] text-emerald-400 font-bold animate-pulse">
-                ✓ Registered successfully for newsletters!
-              </p>
-            )}
-          </div>
-
-        </div>
-
-        {/* Minimal Footer Signature Block */}
-        <div className="pt-8 mt-8 border-t border-slate-950 text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest space-y-2">
-          <p>© 2026 RECRUIT.ORG.IN • ALL RIGHTS RESERVED</p>
-          <p className="text-slate-400 font-semibold text-[9.5px]">
-            DEVELOPED AND MAINTENANCE BY <span className="text-indigo-400 font-extrabold">BRAGA TECHNOLOGIES PRIVATE LIMITED</span> IN ASSOCIATION WITH <span className="text-indigo-400 font-extrabold">ODITREE SERVICES</span>
-          </p>
-        </div>
-      </footer>
 
     </div>
   );

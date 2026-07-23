@@ -41,7 +41,8 @@ import {
   Twitter,
   ChevronRight,
   Menu,
-  X
+  X,
+  Share2
 } from 'lucide-react';
 import { Language, getTranslation } from '../translations';
 import { LANGUAGES_LIST } from './Header';
@@ -53,6 +54,7 @@ interface WelcomeLandingProps {
   onLanguageChange: (lang: Language) => void;
   setIsChatOpen?: (isOpen: boolean) => void;
   onQuickChat?: (prompt: string) => void;
+  onShare?: () => void;
 }
 
 const categoryColors: Record<string, {
@@ -554,7 +556,8 @@ export default function WelcomeLanding({
   language, 
   onLanguageChange, 
   setIsChatOpen,
-  onQuickChat
+  onQuickChat,
+  onShare
 }: WelcomeLandingProps) {
   const [selectedCategory, setSelectedCategory] = useState('students');
   const [activeOrbText, setActiveOrbText] = useState<string | null>(null);
@@ -814,9 +817,9 @@ export default function WelcomeLanding({
   ];
 
   return (
-    <div className="relative w-full bg-[#020208] text-white overflow-x-hidden font-sans select-none pb-32">
+    <div className="relative w-full bg-[#020208] text-white overflow-x-hidden font-sans select-none pb-2">
       
-      {/* Dynamic Keyframes Styling for Orbit Nodes */}
+      {/* Dynamic Keyframes Styling for Orbit Nodes & Genius Animations */}
       <style>{`
         @keyframes float-orbit {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -859,6 +862,42 @@ export default function WelcomeLanding({
           90% { opacity: 0.8; }
           100% { transform: translateY(-10vh) translateX(50px) scale(1.2); opacity: 0; }
         }
+        @keyframes text-shimmer-sweep {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes orbit-quantum-node-1 {
+          0% { transform: rotate(0deg) translateX(90px) rotate(0deg) scale(0.9); }
+          50% { transform: rotate(180deg) translateX(90px) rotate(-180deg) scale(1.2); }
+          100% { transform: rotate(360deg) translateX(90px) rotate(-360deg) scale(0.9); }
+        }
+        @keyframes orbit-quantum-node-2 {
+          0% { transform: rotate(120deg) translateX(90px) rotate(-120deg) scale(1.1); }
+          50% { transform: rotate(300deg) translateX(90px) rotate(-300deg) scale(0.8); }
+          100% { transform: rotate(480deg) translateX(90px) rotate(-480deg) scale(1.1); }
+        }
+        @keyframes orbit-quantum-node-3 {
+          0% { transform: rotate(240deg) translateX(90px) rotate(-240deg) scale(0.8); }
+          50% { transform: rotate(420deg) translateX(90px) rotate(-420deg) scale(1.2); }
+          100% { transform: rotate(600deg) translateX(90px) rotate(-600deg) scale(0.8); }
+        }
+        @keyframes eq-bar-1 { 0%, 100% { height: 4px; } 50% { height: 16px; } }
+        @keyframes eq-bar-2 { 0%, 100% { height: 14px; } 50% { height: 6px; } }
+        @keyframes eq-bar-3 { 0%, 100% { height: 8px; } 50% { height: 18px; } }
+        @keyframes eq-bar-4 { 0%, 100% { height: 16px; } 50% { height: 4px; } }
+
+        .shimmer-text-glow {
+          background-size: 200% auto;
+          animation: text-shimmer-sweep 6s ease infinite;
+        }
+        .animate-orbit-node-1 { animation: orbit-quantum-node-1 12s linear infinite; }
+        .animate-orbit-node-2 { animation: orbit-quantum-node-2 12s linear infinite; }
+        .animate-orbit-node-3 { animation: orbit-quantum-node-3 12s linear infinite; }
+        .animate-eq-1 { animation: eq-bar-1 1.2s ease-in-out infinite; }
+        .animate-eq-2 { animation: eq-bar-2 0.9s ease-in-out infinite; }
+        .animate-eq-3 { animation: eq-bar-3 1.4s ease-in-out infinite; }
+        .animate-eq-4 { animation: eq-bar-4 1.1s ease-in-out infinite; }
         
         .animate-float-orbit {
           animation: float-orbit 6s ease-in-out infinite;
@@ -1006,24 +1045,24 @@ export default function WelcomeLanding({
       </nav>
 
       {/* 3. Hero Section (Home) - Symmetrical 3D Floating Bubbles & Core Orb */}
-      <section id="home" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16">
+      <section id="home" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-4">
         
         {/* Top Header info matching user's screenshot layout */}
-        <div className="text-center space-y-1 mb-8">
-          <div className="inline-flex items-center justify-center gap-2 bg-[#091515] border border-cyan-500/30 text-[#00e5ff] px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide shadow-sm">
+        <div className="text-center space-y-1 mb-4">
+          <div className="inline-flex items-center justify-center gap-2 bg-[#091515] border border-cyan-500/30 text-[#00e5ff] px-4 py-1 rounded-full text-xs font-semibold tracking-wide shadow-sm uppercase">
             <span className="w-2 h-2 rounded-full bg-[#00e676] animate-pulse"></span>
-            <span>World's #1 AI ASSISTANT FOR LEARNING, Guidance, RESEARCH & GROWTH in career or business ★</span>
+            <span>World's #1 Search Engine on Call ★</span>
           </div>
           
-          <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-pink-500 drop-shadow-[0_0_40px_rgba(236,72,153,0.35)] leading-none pt-2 uppercase font-sans">
-            RECRUIT
+          <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-pink-500 drop-shadow-[0_0_40px_rgba(236,72,153,0.35)] leading-none pt-1 uppercase font-sans shimmer-text-glow">
+            AROHI AI
           </h1>
           
-          <p className="text-[11px] sm:text-xs md:text-sm font-black tracking-[0.3em] uppercase mt-2 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 drop-shadow-[0_0_12px_rgba(6,182,212,0.2)]">
-            Dream • Prepare • Achieve
+          <p className="text-[11px] sm:text-xs md:text-sm font-black tracking-[0.3em] uppercase mt-1 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 drop-shadow-[0_0_12px_rgba(6,182,212,0.2)]">
+            {getTranslation('dreamPrepare', language)}
           </p>
 
-          <div className="inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-[#120d2a]/85 border border-[#7c3aed]/40 text-purple-200 px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-extrabold tracking-wider shadow-[0_4px_20px_rgba(124,58,237,0.15)] mt-4 backdrop-blur-sm uppercase select-none">
+          <div className="inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-[#120d2a]/85 border border-[#7c3aed]/40 text-purple-200 px-4 py-1 rounded-full text-[10px] sm:text-xs font-extrabold tracking-wider shadow-[0_4px_20px_rgba(124,58,237,0.15)] mt-2 backdrop-blur-sm uppercase select-none">
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00e5ff] opacity-80"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00e5ff]"></span>
@@ -1110,11 +1149,18 @@ export default function WelcomeLanding({
                     onEnter();
                   }
                 }}
-                className="relative w-36 h-36 sm:w-40 sm:h-40 rounded-full p-0 bg-transparent active:scale-95 transition-all duration-300 shadow-[0_12px_45px_rgba(124,58,237,0.655)] cursor-pointer overflow-visible group"
+                className="relative w-36 h-36 sm:w-40 sm:h-40 rounded-full p-0 bg-transparent active:scale-95 transition-all duration-300 shadow-[0_12px_45px_rgba(124,58,237,0.655)] cursor-pointer overflow-visible group flex items-center justify-center"
                 title="Talk to AROHI"
               >
+                {/* Revolving Quantum Orbiting Nodes */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="absolute w-3 h-3 bg-cyan-400 rounded-full shadow-[0_0_12px_#00e5ff] animate-orbit-node-1 z-20"></div>
+                  <div className="absolute w-2.5 h-2.5 bg-fuchsia-400 rounded-full shadow-[0_0_12px_#ec4899] animate-orbit-node-2 z-20"></div>
+                  <div className="absolute w-3 h-3 bg-emerald-400 rounded-full shadow-[0_0_12px_#00e676] animate-orbit-node-3 z-20"></div>
+                </div>
+
                 {/* The Arohi animating SVG filling the entire button */}
-                <div className="w-full h-full rounded-full">
+                <div className="w-full h-full rounded-full relative z-10">
                   <ArohiAvatar className="w-full h-full scale-[1.08] transition-transform duration-500 group-hover:scale-115" />
                 </div>
 
@@ -1144,10 +1190,10 @@ export default function WelcomeLanding({
         </div>
 
         {/* Mobile Symmetrical Layout (Visible on Mobile Only) */}
-        <div className="md:hidden flex flex-col items-center justify-center space-y-6 w-full relative">
+        <div className="md:hidden flex flex-col items-center justify-center space-y-3 w-full relative">
           
           {/* Centered Mobile Orb */}
-          <div className="relative flex items-center justify-center py-4 w-full">
+          <div className="relative flex items-center justify-center py-2 w-full">
             
             {/* Background dashed ring */}
             <div className="absolute w-56 h-56 rounded-full border border-dashed border-[#00e5ff]/20 animate-rotate-concentric"></div>
@@ -1238,7 +1284,7 @@ export default function WelcomeLanding({
         </div>
 
         {/* BOTTOM CONTROLS & STATUS TICKER MATCHING USER'S SCREENSHOT */}
-        <div className="mt-10 flex flex-col items-center justify-center space-y-4 max-w-xl mx-auto z-10 relative">
+        <div className="mt-3 flex flex-col items-center justify-center space-y-2 max-w-xl mx-auto z-10 relative">
           
           {/* Primary Solid Neon Blue Journey Button */}
           <button 
@@ -1247,14 +1293,14 @@ export default function WelcomeLanding({
               setActiveTab('home');
               onEnter();
             }}
-            className="w-full bg-[#005cff] hover:bg-[#004cd0] text-white font-black text-sm sm:text-base uppercase tracking-widest py-4 px-8 rounded-full shadow-[0_10px_35px_rgba(0,92,255,0.5)] border border-blue-400/35 transition-all hover:scale-[1.03] active:scale-95 cursor-pointer flex items-center justify-center gap-2 group"
+            className="w-full bg-[#005cff] hover:bg-[#004cd0] text-white font-black text-sm sm:text-base uppercase tracking-widest py-3.5 px-8 rounded-full shadow-[0_10px_35px_rgba(0,92,255,0.5)] border border-blue-400/35 transition-all hover:scale-[1.03] active:scale-95 cursor-pointer flex items-center justify-center gap-2 group"
           >
             <span>Enter The Journey</span>
             <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300" />
           </button>
 
-          {/* "AROHI AI ACTIVE" box */}
-          <div id="arohi-active-status-bar" className="w-full bg-[#031c26]/90 border border-teal-500/30 px-5 py-3.5 rounded-2xl flex items-center justify-between text-xs font-semibold text-slate-200 shadow-lg">
+          {/* "AROHI AI ACTIVE" box with Live Audio EQ Equalizer Bars */}
+          <div id="arohi-active-status-bar" className="w-full bg-[#031c26]/90 border border-teal-500/30 px-4 py-2.5 rounded-2xl flex items-center justify-between text-xs font-semibold text-slate-200 shadow-lg">
             <div className="flex items-center gap-2.5">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00e676] opacity-75"></span>
@@ -1263,20 +1309,32 @@ export default function WelcomeLanding({
               <span className="text-[10px] font-black uppercase text-[#00e676] tracking-widest">AROHI AI ACTIVE</span>
               <span className="text-slate-300 font-medium text-[10px] sm:text-xs">"Hi! I'm Arohi 🤖 Your AI Career Assistant."</span>
             </div>
-            <div className="p-1.5 rounded-lg bg-[#005cff]/15 text-cyan-400 border border-[#005cff]/25 shrink-0">
-              <Laptop className="w-4 h-4" />
+            {/* Live Audio Equalizer Visualizer */}
+            <div className="flex items-end gap-1 px-2 py-1 bg-[#002b36]/60 rounded-lg border border-teal-500/20 shrink-0">
+              <span className="w-1 bg-cyan-400 rounded-full animate-eq-1"></span>
+              <span className="w-1 bg-fuchsia-400 rounded-full animate-eq-2"></span>
+              <span className="w-1 bg-emerald-400 rounded-full animate-eq-3"></span>
+              <span className="w-1 bg-purple-400 rounded-full animate-eq-4"></span>
             </div>
           </div>
 
         </div>
 
-        {/* Footer of recruit site */}
-        <div className="mt-16 pt-8 border-t border-white/10 text-center text-xs font-bold text-slate-300 uppercase tracking-widest space-y-2 z-10 relative">
-          <p className="text-slate-400 tracking-widest">© 2026 RECRUIT.ORG.IN • ALL RIGHTS RESERVED</p>
-          <p className="text-slate-200 font-semibold text-[10px] sm:text-xs tracking-wide">
-            Development and maintenance by <span className="text-cyan-400 font-extrabold">BRAGA TECHNOLOGIES PRIVATE LIMITED</span> IN ASSOCIATION WITH <span className="text-cyan-400 font-extrabold">ODITREE SERVICES</span>
-          </p>
-        </div>
+        {/* FOOTER SECTION AT THE BOTTOM OF THE WELCOME LANDING PAGE */}
+        <footer id="welcome-footer" className="w-full max-w-6xl mx-auto px-4 mt-3 mb-1 z-10 relative">
+          {/* Copyright, Security & Development/Maintenance Credits Banner */}
+          <div className="bg-[#120d2a]/90 rounded-2xl border border-[#211b3d] p-3.5 sm:p-4 flex flex-col lg:flex-row justify-between items-center gap-3 text-xs font-semibold text-slate-400 backdrop-blur-md">
+            <span className="flex items-center gap-2 font-bold text-slate-300">
+              <ShieldCheck className="w-5 h-5 text-[#00e676] shrink-0" /> Verified Career & Opportunity Platform
+            </span>
+            <div className="text-center lg:text-right space-y-1">
+              <p className="text-slate-300 font-bold">Copyright © 2026 Arohi AI (Arohiai.com). All Rights Reserved.</p>
+              <p className="text-[10px] text-slate-500">
+                Development and Maintenance by <span className="text-slate-400 font-bold">BRAGA TECHNOLOGIES PRIVATE LIMITED</span> in association with <span className="text-slate-400 font-bold">ODITREE SERVICES</span>
+              </p>
+            </div>
+          </div>
+        </footer>
 
       </section>
 

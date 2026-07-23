@@ -221,7 +221,7 @@ Your resume lists solid software experience, particularly with **React**, **Node
 
   const downloadReport = () => {
     if (!analysisResult) return;
-    const content = `RECRUIT.ORG.IN - AROHI RESUME ANALYSIS REPORT\n` +
+    const content = `AROHI.AI - RESUME ANALYSIS REPORT\n` +
       `ATS Score: ${analysisResult.atsScore}/100 (${analysisResult.rating})\n\n` +
       `Missing Keywords:\n${analysisResult.missingKeywords.join('\n')}\n\n` +
       `Skills Gaps Identified:\n${analysisResult.skillsGap.join('\n')}\n\n` +
@@ -1134,7 +1134,7 @@ Your resume lists solid software experience, particularly with **React**, **Node
             <div className="bg-[#1c1445] p-5 border-b border-[#30246a] flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <span className="bg-[#c084fc]/20 text-[#c084fc] text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border border-[#c084fc]/30">Secure Payment Gateway</span>
-                <span className="text-xs font-black text-slate-200">Recruit.org.in</span>
+                <span className="text-xs font-black text-slate-200">Arohi.ai</span>
               </div>
               <button 
                 onClick={() => setShowPaymentModal(false)}
