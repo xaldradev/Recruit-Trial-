@@ -14,6 +14,7 @@ interface HeaderProps {
   onOpenAuth: () => void;
   onRevisitWelcome?: () => void;
   onStartTour?: () => void;
+  onOpenSeoHub?: () => void;
   language: Language;
   onLanguageChange: (lang: Language) => void;
   onShare?: () => void;
@@ -48,7 +49,7 @@ export const LANGUAGES_LIST = [
   { code: 'as', native: 'অসমীয়া', english: 'Assamese', symbol: 'অ' }
 ] as const;
 
-export default function Header({ activeTab, onTabChange, onSearchChange, searchQuery, onOpenAuth, onRevisitWelcome, onStartTour, language, onLanguageChange, onShare, selectedCountry, onCountryChange }: HeaderProps) {
+export default function Header({ activeTab, onTabChange, onSearchChange, searchQuery, onOpenAuth, onRevisitWelcome, onStartTour, onOpenSeoHub, language, onLanguageChange, onShare, selectedCountry, onCountryChange }: HeaderProps) {
   const { user, userData, signOutUser } = useAuth();
 
   const [countdown, setCountdown] = useState({ hours: 23, minutes: 45, seconds: 20 });
@@ -256,7 +257,7 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
         <div className="flex items-center gap-2.5">
 
           {/* Trust Seal Logo for Authentic Feel */}
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-[#060e0a]/90 border border-emerald-500/30 rounded-xl shadow-[0_0_12px_rgba(16,185,129,0.08)] select-none">
+          <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 bg-[#060e0a]/90 border border-emerald-500/30 rounded-xl shadow-[0_0_12px_rgba(16,185,129,0.08)] select-none">
             <ShieldCheck className="w-3.5 h-3.5 text-[#00e676] shrink-0 animate-pulse" />
             <div className="flex flex-col text-left">
               <span className="text-[9px] font-black tracking-wider text-[#00e676] leading-none uppercase">
@@ -267,6 +268,18 @@ export default function Header({ activeTab, onTabChange, onSearchChange, searchQ
               </span>
             </div>
           </div>
+
+          {/* Global & India SEO Directory Button */}
+          {onOpenSeoHub && (
+            <button
+              onClick={onOpenSeoHub}
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 bg-gradient-to-r from-cyan-950/80 to-teal-950/80 border border-cyan-500/40 hover:border-cyan-400 rounded-xl text-cyan-300 hover:text-white text-[10px] font-extrabold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(6,182,212,0.15)] cursor-pointer"
+              title="Open Global & India SEO Career Directory (Odisha & States)"
+            >
+              <Globe className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '12s' }} />
+              <span>SEO Hub (Odisha/India)</span>
+            </button>
+          )}
 
           {/* Sleek Globe Language Selector */}
           <div className="relative" ref={headerLangRef}>

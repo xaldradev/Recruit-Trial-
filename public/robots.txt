@@ -1,0 +1,31 @@
+# Robots.txt for Arohi AI (https://arohiai.com)
+# Optimized for Global & Regional Search Engine Indexing
+
+User-agent: *
+Allow: /
+Allow: /assets/
+Allow: /manifest.json
+
+# Allow AI Search Crawlers for Perplexity, ChatGPT, Claude, Gemini, Google Search
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://arohiai.com/sitemap.xml

@@ -33,6 +33,8 @@ import FranchisePage from './components/FranchisePage';
 import PWAInstaller from './components/PWAInstaller';
 import BottomNavBar from './components/BottomNavBar';
 import ArohiLandingPage from './components/ArohiLandingPage';
+import SEOHead from './components/SEOHead';
+import SeoHubModal from './components/SeoHubModal';
 import { PRICING_TIERS, PATH_DETAILS, getTokenLimitForPrice } from './data/pricingData';
 import TokenWarningToastContainer from './components/TokenWarningToastContainer';
 
@@ -164,6 +166,7 @@ export default function App() {
     url: 'https://arohiai.com'
   });
   const [copiedLink, setCopiedLink] = useState(false);
+  const [isSeoHubOpen, setIsSeoHubOpen] = useState(false);
 
   const handleOpenShare = (title?: string, text?: string, url?: string) => {
     setShareDetails({
@@ -2500,6 +2503,9 @@ export default function App() {
   return (
     <div key={language} className="bg-[#090714] min-h-screen flex flex-col font-sans antialiased text-slate-100 selection:bg-purple-500 selection:text-white pb-24 xl:pb-12">
       
+      {/* Dynamic SEO Head Title and Meta Description Updates */}
+      <SEOHead activeTab={activeTab} />
+
       {/* 1. Brand Header */}
       <Header
         activeTab={activeTab}
@@ -2512,6 +2518,7 @@ export default function App() {
           setHasEntered(false);
         }}
         onStartTour={IS_TOUR_ENABLED ? (() => setIsWalkthroughOpen(true)) : undefined}
+        onOpenSeoHub={() => setIsSeoHubOpen(true)}
         language={language}
         onLanguageChange={changeLanguage}
         onShare={() => handleOpenShare()}
@@ -3754,6 +3761,23 @@ export default function App() {
 
       {/* Progressive Web App Install Suggestion Widget */}
       <PWAInstaller />
+
+      {/* Global & India SEO Directory Modal */}
+      <SeoHubModal
+        isOpen={isSeoHubOpen}
+        onClose={() => setIsSeoHubOpen(false)}
+        onSelectVoiceContext={(prompt, lang) => {
+          if (lang === 'Odia') changeLanguage('or');
+          else if (lang === 'Hindi') changeLanguage('hi');
+          setChatInitialPrompt(prompt);
+          setIsChatOpen(true);
+          setIsChatMinimized(false);
+        }}
+        onNavigateTab={(tab) => {
+          setActiveTab(tab);
+          setHasEntered(true);
+        }}
+      />
 
     </div>
   );
