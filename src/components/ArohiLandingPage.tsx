@@ -10,9 +10,11 @@ import {
 } from 'lucide-react';
 import ArohiAvatar from './ArohiAvatar';
 import { PRICING_TIERS } from '../data/pricingData';
+import { Language, getTranslation } from '../translations';
 
 interface ArohiLandingPageProps {
   user: any;
+  language?: Language;
   setActiveTab: (tab: string) => void;
   setIsChatOpen: (isOpen: boolean) => void;
   setIsChatMinimized: (isMinimized: boolean) => void;
@@ -28,6 +30,7 @@ interface ArohiLandingPageProps {
 
 export default function ArohiLandingPage({
   user,
+  language = 'en',
   setActiveTab,
   setIsChatOpen,
   setIsChatMinimized,

@@ -34,7 +34,7 @@ export const COUNTRIES_LIST = [
 ] as const;
 
 export const LANGUAGES_LIST = [
-  { code: 'en', native: 'English', symbol: 'AA', english: '' },
+  { code: 'en', native: 'English', symbol: 'AA', english: 'English' },
   { code: 'hi', native: 'हिंदी', english: 'Hindi', symbol: 'अ' },
   { code: 'or', native: 'ଓଡ଼ିଆ', english: 'Odia', symbol: 'ଅ' },
   { code: 'bn', native: 'বাংলা', english: 'Bengali', symbol: 'বা' },
@@ -46,7 +46,24 @@ export const LANGUAGES_LIST = [
   { code: 'kn', native: 'ಕನ್ನಡ', english: 'Kannada', symbol: 'ಕ' },
   { code: 'ml', native: 'മലയാളം', english: 'Malayalam', symbol: 'മ' },
   { code: 'pa', native: 'ਪੰਜਾਬੀ', english: 'Punjabi', symbol: 'ਪ' },
-  { code: 'as', native: 'অসমীয়া', english: 'Assamese', symbol: 'অ' }
+  { code: 'as', native: 'অসমীয়া', english: 'Assamese', symbol: 'অ' },
+  { code: 'ru', native: 'Русский', english: 'Russian', symbol: 'Ру' },
+  { code: 'es', native: 'Español', english: 'Spanish', symbol: 'Es' },
+  { code: 'fr', native: 'Français', english: 'French', symbol: 'Fr' },
+  { code: 'de', native: 'Deutsch', english: 'German', symbol: 'De' },
+  { code: 'ja', native: '日本語', english: 'Japanese', symbol: '日' },
+  { code: 'zh', native: '中文', english: 'Chinese', symbol: '中' },
+  { code: 'ar', native: 'العربية', english: 'Arabic', symbol: 'ع' },
+  { code: 'pt', native: 'Português', english: 'Portuguese', symbol: 'Pt' },
+  { code: 'it', native: 'Italiano', english: 'Italian', symbol: 'It' },
+  { code: 'ko', native: '한국어', english: 'Korean', symbol: '한' },
+  { code: 'tr', native: 'Türkçe', english: 'Turkish', symbol: 'Tr' },
+  { code: 'id', native: 'Bahasa Indonesia', english: 'Indonesian', symbol: 'Id' },
+  { code: 'sw', native: 'Kiswahili', english: 'Swahili', symbol: 'Sw' },
+  { code: 'am', native: 'አማርኛ', english: 'Amharic', symbol: 'አ' },
+  { code: 'ha', native: 'Hausa', english: 'Hausa', symbol: 'Ha' },
+  { code: 'yo', native: 'Yorùbá', english: 'Yoruba', symbol: 'Yo' },
+  { code: 'zu', native: 'isiZulu', english: 'Zulu', symbol: 'Zu' }
 ] as const;
 
 export default function Header({ activeTab, onTabChange, onSearchChange, searchQuery, onOpenAuth, onRevisitWelcome, onStartTour, onOpenSeoHub, language, onLanguageChange, onShare, selectedCountry, onCountryChange }: HeaderProps) {

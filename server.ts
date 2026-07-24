@@ -3656,9 +3656,69 @@ function logWsEvent(event: string, data: any) {
 
 const SEO_TRANSLATIONS: Record<string, { title: string; description: string; keywords: string }> = {
   en: {
-    title: "Arohi AI - India's #1 Multilingual Opportunity & Growth Engine | AI Voice Guide in 150+ Languages for Students, Teachers, Doctors, and Businesses",
-    description: "Empowering India's 20+ core user tags (Students, Teachers, Parents, Scientists, Researchers, Doctors, Engineers, Entrepreneurs, Job Seekers, Professionals, Businesses, MSMEs, Govt. Aspirants, Universities, Organizations, Aliens, Mars & Jupiter Citizens, Govt. & Private Officials, Humans). Connect with AI assistant Arohi via dynamic voice calling in 150+ regional languages (English, Hindi, Odia, etc.). Get resume analysis, mock interviews, job boards, business setups, and government schemes assistance.",
+    title: "Arohi AI - World & India's #1 Multilingual Opportunity & Growth Engine | AI Voice Guide in 150+ Languages for Students, Teachers, Doctors, and Businesses",
+    description: "Empowering Students, Teachers, Parents, Scientists, Researchers, Doctors, Engineers, Entrepreneurs, Job Seekers, Professionals, Businesses, MSMEs, Govt. Aspirants, Universities, Organizations, Aliens, Mars & Jupiter Citizens, Govt. & Private Officials, Humans. Connect with AI assistant Arohi via dynamic voice calling in 150+ regional languages (English, Hindi, Odia, etc.). Get resume analysis, mock interviews, job boards, business setups, and government schemes assistance.",
     keywords: "arohi ai, arohi.ai, career guidance India, AI career coach, resume score India, mock interview simulator, MSME Udyam registration, private sector jobs, student career advisor, opportunity portal, Sarkari job guide, voice call in Hindi, Odia, Bengali, Tamil, Telugu, Marathi, Kannada, Malayalam, Gujarati, Punjabi, Assamese, Urdu, 150 languages"
+  },
+  ru: {
+    title: "Arohi AI - Платформа ИИ №1 для развития карьеры и бизнеса | Голосовой ИИ-гид на 150+ языках (arohiai.com/ru)",
+    description: "Единая международная ИИ-платформа: вакансии, анализ резюме (ATS), тренажер собеседований, учебная программа и поддержка бизнеса. Общайтесь с Arohi AI на русском языке!",
+    keywords: "arohi ai, arohiai.com, вакансии, составление резюме, подбор работы, курсы, карьера, бизнес ИИ, голосовой помощник"
+  },
+  es: {
+    title: "Arohi AI - Plataforma de IA #1 para Carrera, Empleo y Negocios | Guía de Voz en 150+ Idiomas (arohiai.com/es)",
+    description: "Ecosistema unificado de IA: vacantes de empleo, evaluador de curriculum ATS, simulador de entrevistas y guías de emprendimiento. ¡Habla con Arohi AI en español!",
+    keywords: "arohi ai, arohiai.com, empleos, curriculum vitae, entrevista de trabajo, cursos gratis, orientacion profesional, asistente ia"
+  },
+  fr: {
+    title: "Arohi AI - Plateforme IA #1 Opportunités & Carrière | Assistant Vocal en 150+ Langues (arohiai.com/fr)",
+    description: "Écosystème mondial d'IA : offres d'emploi, analyseur de CV ATS, simulateur d'entretien et conseils PME/Startups. Parlez avec Arohi AI en français !",
+    keywords: "arohi ai, arohiai.com, emploi, analyse cv, entretien d embauche, formation en ligne, orientation professionnelle"
+  },
+  de: {
+    title: "Arohi AI - KI-Plattform #1 für Karriere & Unternehmen | Sprachassistent in 150+ Sprachen (arohiai.com/de)",
+    description: "Internationales KI-Ökosystem: Stellenangebote, ATS-Lebenslauf-Prüfung, KI-Bewerbungstraining und KMU-Leitfaden. Sprechen Sie mit Arohi AI auf Deutsch!",
+    keywords: "arohi ai, arohiai.com, jobs, lebenslauf check, bewerbungstraining, karriereberatung, ki assistent"
+  },
+  ja: {
+    title: "Arohi AI - キャリア・求人・ビジネス支援AIポータル | 150以上の言語に対応 (arohiai.com/ja)",
+    description: "求人検索、AI履歴書診断、音声面接対策、ビジネス支援をひとつに統合したグローバルAIエコシステム。日本語でArohi AIと対話できます！",
+    keywords: "arohi ai, arohiai.com, 求人, 履歴書添削, 面接対策, キャリア相談, AIアシスタント"
+  },
+  zh: {
+    title: "Arohi AI - 全球领先的职业与商业AI发展平台 | 支持150+语言语音交互 (arohiai.com/zh)",
+    description: "一站式AI生态系统：职位招聘、ATS简历诊断、模拟面试、1-10年级课程与创业补贴。立即与Arohi AI用中文实时交流！",
+    keywords: "arohi ai, arohiai.com, 招聘, 简历评估, 模拟面试, 职业规划, 创业指南, AI助手"
+  },
+  ar: {
+    title: "Arohi AI - المنظومة الأولى للذكاء الاصطناعي للتطوير المهني والأعمال | أكثر من 150 لغة (arohiai.com/ar)",
+    description: "منصة ذكاء اصطناعي شاملة: الوظائف المباشرة، تقييم السيرة الذاتية ATS، محاكاة المقابلات، ودعم المشاريع الناشئة. تحدث مع Arohi AI باللغة العربية!",
+    keywords: "arohi ai, arohiai.com, وظائف, سيرة ذاتية, مقابلة عمل, تطوير مهني, ذكاء اصطناعي"
+  },
+  pt: {
+    title: "Arohi AI - Plataforma de IA #1 para Carreira e Empreendedorismo | Guia de Voz em 150+ Idiomas (arohiai.com/pt)",
+    description: "Ecossistema global de IA: vagas de emprego, avaliador de currículo ATS, simulador de entrevistas e suporte para PMEs. Converse com Arohi AI em português!",
+    keywords: "arohi ai, arohiai.com, vagas de emprego, analise de currículo, simulação de entrevista, cursos online"
+  },
+  it: {
+    title: "Arohi AI - La Piattaforma IA #1 per Lavoro e Impresa | Guida Vocale in oltre 150 Lingue (arohiai.com/it)",
+    description: "Ecosistema integrato di IA: offerte di lavoro, analisi CV ATS, simulatore di colloqui e guida PMI. Parla con Arohi AI in italiano!",
+    keywords: "arohi ai, arohiai.com, lavoro, analisi cv, colloquio di lavoro, orientamento professionale, ia vocale"
+  },
+  ko: {
+    title: "Arohi AI - 글로벌 커리어 & 비즈니스 AI 플랫폼 | 전 세계 150+ 언어 지원 (arohiai.com/ko)",
+    description: "채용 정보, AI 이력서 진단, 음성 모의 면접, 중소기업 지원까지 통합 제공하는 글로벌 AI 생태계. 한국어로 Arohi AI와 대화하세요!",
+    keywords: "arohi ai, arohiai.com, 채용, 이력서 첨삭, 모의 면접, 커리어 가이드, AI 보이스"
+  },
+  tr: {
+    title: "Arohi AI - Kariyer ve İş Dünyası için #1 Yapay Zeka Ekosistemi | 150+ Dilde Sesli Destek (arohiai.com/tr)",
+    description: "İş ilanları, ATS CV analizi, mülakat simülatörü ve KOBİ destekleri. Arohi AI ile Türkçe sesli konuşun!",
+    keywords: "arohi ai, arohiai.com, iş ilanları, cv inceleme, mülakat simülatörü, kariyer rehberi"
+  },
+  id: {
+    title: "Arohi AI - Ekosistem AI #1 untuk Karir, Lowongan Kerja & UMKM | Suara dalam 150+ Bahasa (arohiai.com/id)",
+    description: "Lowongan kerja, analisis resume ATS, simulator wawancara, dan panduan usaha UMKM. Bicara dengan Arohi AI dalam bahasa Indonesia!",
+    keywords: "arohi ai, arohiai.com, lowongan kerja, cek cv, simulasi wawancara, pengembangan karir"
   },
   hi: {
     title: "Arohi AI - भारत का नंबर 1 बहुभाषी अवसर और विकास इंजन | 150+ भाषाओं में एआई वॉयस कॉल",
@@ -3723,10 +3783,26 @@ const SEO_TRANSLATIONS: Record<string, { title: string; description: string; key
 };
 
 function serveIndexWithSEO(req: express.Request, res: express.Response) {
-  const validLanguages = ['en', 'hi', 'or', 'bn', 'te', 'mr', 'ta', 'gu', 'ur', 'kn', 'ml', 'pa', 'as'];
-  let lang = req.query.lang as string;
-  if (!lang || !validLanguages.includes(lang)) {
-    lang = 'en';
+  const validLanguages = ['en', 'hi', 'or', 'bn', 'te', 'mr', 'ta', 'gu', 'ur', 'kn', 'ml', 'pa', 'as', 'ru', 'es', 'fr', 'de', 'ja', 'zh', 'ar', 'pt', 'it', 'ko', 'tr', 'id'];
+  
+  const pathParts = req.path.split('/').filter(Boolean);
+  let lang = (req.query.lang as string) || 'en';
+  let customTitle = '';
+  let customDesc = '';
+
+  if (pathParts.length > 0) {
+    const firstSegment = pathParts[0].toLowerCase();
+    if (firstSegment === 'state' && pathParts[1]) {
+      const stateName = pathParts[1].split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      customTitle = `Arohi AI ${stateName} Opportunities, Govt Schemes & Jobs Portal (arohiai.com)`;
+      customDesc = `Explore top jobs, Sarkari Naukri prep, MSME setup, and state government schemes tailored for ${stateName} students and job seekers with Arohi AI.`;
+    } else if (firstSegment === 'country' && pathParts[1]) {
+      const countryCode = pathParts[1].toUpperCase();
+      customTitle = `Arohi AI Global ${countryCode} Career & Opportunity Portal | Arohi AI (arohiai.com)`;
+      customDesc = `Global career opportunities, skills, resume analysis, and AI voice guidance for ${countryCode} on Arohi AI.`;
+    } else if (validLanguages.includes(firstSegment)) {
+      lang = firstSegment;
+    }
   }
 
   const isProd = process.env.NODE_ENV === 'production';
@@ -3742,27 +3818,32 @@ function serveIndexWithSEO(req: express.Request, res: express.Response) {
     let html = fs.readFileSync(filePath, 'utf8');
     const meta = SEO_TRANSLATIONS[lang] || SEO_TRANSLATIONS['en'];
 
-    // Dynamic replacement
-    html = html.replace(/<title>.*?<\/title>/gi, `<title>${meta.title}</title>`);
-    html = html.replace(/<meta name="description" content=".*?"\s*\/?>/gi, `<meta name="description" content="${meta.description}" />`);
+    const titleToUse = customTitle || meta.title;
+    const descToUse = customDesc || meta.description;
+
+    // Dynamic replacements
+    html = html.replace(/<title>.*?<\/title>/gi, `<title>${titleToUse}</title>`);
+    html = html.replace(/<meta name="description" content=".*?"\s*\/?>/gi, `<meta name="description" content="${descToUse}" />`);
     html = html.replace(/<meta name="keywords" content=".*?"\s*\/?>/gi, `<meta name="keywords" content="${meta.keywords}" />`);
     
     // Social Open Graph updates
-    html = html.replace(/<meta property="og:title" content=".*?"\s*\/?>/gi, `<meta property="og:title" content="${meta.title}" />`);
-    html = html.replace(/<meta property="og:description" content=".*?"\s*\/?>/gi, `<meta property="og:description" content="${meta.description}" />`);
-    html = html.replace(/<meta name="twitter:title" content=".*?"\s*\/?>/gi, `<meta name="twitter:title" content="${meta.title}" />`);
-    html = html.replace(/<meta name="twitter:description" content=".*?"\s*\/?>/gi, `<meta name="twitter:description" content="${meta.description}" />`);
+    html = html.replace(/<meta property="og:title" content=".*?"\s*\/?>/gi, `<meta property="og:title" content="${titleToUse}" />`);
+    html = html.replace(/<meta property="og:description" content=".*?"\s*\/?>/gi, `<meta property="og:description" content="${descToUse}" />`);
+    html = html.replace(/<meta name="twitter:title" content=".*?"\s*\/?>/gi, `<meta name="twitter:title" content="${titleToUse}" />`);
+    html = html.replace(/<meta name="twitter:description" content=".*?"\s*\/?>/gi, `<meta name="twitter:description" content="${descToUse}" />`);
 
     const localeMap: Record<string, string> = {
-      en: 'en_IN', hi: 'hi_IN', or: 'or_IN', bn: 'bn_IN', te: 'te_IN',
+      en: 'en_US', hi: 'hi_IN', or: 'or_IN', bn: 'bn_IN', te: 'te_IN',
       mr: 'mr_IN', ta: 'ta_IN', gu: 'gu_IN', ur: 'ur_IN', kn: 'kn_IN',
-      ml: 'ml_IN', pa: 'pa_IN', as: 'as_IN'
+      ml: 'ml_IN', pa: 'pa_IN', as: 'as_IN', ru: 'ru_RU', es: 'es_ES',
+      fr: 'fr_FR', de: 'de_DE', ja: 'ja_JP', zh: 'zh_CN', ar: 'ar_SA',
+      pt: 'pt_BR', it: 'it_IT', ko: 'ko_KR', tr: 'tr_TR', id: 'id_ID'
     };
-    const locale = localeMap[lang] || 'en_IN';
+    const locale = localeMap[lang] || 'en_US';
     html = html.replace(/<meta property="og:locale" content=".*?"\s*\/?>/gi, `<meta property="og:locale" content="${locale}" />`);
 
     // Schema updates
-    html = html.replace(/"description": "India's next-generation employment engine.*?"/gi, `"description": "${meta.description}"`);
+    html = html.replace(/"description": "India's next-generation employment engine.*?"/gi, `"description": "${descToUse}"`);
 
     res.setHeader('Content-Type', 'text/html');
     res.send(html);
@@ -3777,35 +3858,28 @@ function serveSitemap(req: express.Request, res: express.Response) {
   const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
   const baseUrl = `${protocol}://${host}`;
 
-  const pages = [
-    '',
-    'jobs',
-    'career',
-    'resume',
-    'interview',
-    'business',
-    'schemes',
-    'courses',
-    'syllabus',
-    'franchise',
-    'employer',
-    'dashboard',
-    'faqs',
-    'contact'
+  const pages = ['', 'jobs', 'career', 'resume', 'interview', 'business', 'schemes', 'courses', 'syllabus', 'franchise', 'employer', 'dashboard'];
+  const languages = ['en', 'hi', 'or', 'bn', 'te', 'mr', 'ta', 'gu', 'ur', 'kn', 'ml', 'pa', 'as', 'ru', 'es', 'fr', 'de', 'ja', 'zh', 'ar', 'pt', 'it', 'ko', 'tr', 'id'];
+  const indianStateSlugs = [
+    'odisha', 'andhra-pradesh', 'arunachal-pradesh', 'assam', 'bihar', 'chhattisgarh', 'goa', 'gujarat', 'haryana', 'himachal-pradesh',
+    'jharkhand', 'karnataka', 'kerala', 'madhya-pradesh', 'maharashtra', 'manipur', 'meghalaya', 'mizoram', 'nagaland', 'punjab',
+    'rajasthan', 'sikkim', 'tamil-nadu', 'telangana', 'tripura', 'uttar-pradesh', 'uttarakhand', 'west-bengal', 'delhi', 'jammu-and-kashmir'
   ];
-
-  const languages = ['en', 'hi', 'or', 'bn', 'te', 'mr', 'ta', 'gu', 'ur', 'kn', 'ml', 'pa', 'as'];
+  const countryCodes = ['us', 'uk', 'ca', 'au', 'sg', 'de', 'jp', 'ru', 'br', 'fr', 'ae', 'sa', 'kr', 'es', 'it', 'nl', 'se', 'ch', 'za', 'id'];
 
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n';
   xml += '        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n';
 
-  pages.forEach(page => {
-    const relativePath = page === '' ? '' : `/${page}`;
-    languages.forEach(lang => {
-      const locUrl = `${baseUrl}${relativePath}?lang=${lang}`;
-      const lastmod = new Date().toISOString().split('T')[0];
-      const priority = page === '' ? '1.0' : page === 'jobs' || page === 'resume' || page === 'schemes' ? '0.9' : '0.8';
+  const lastmod = new Date().toISOString().split('T')[0];
+
+  // 1. Core pages and Language Sub-directory combinations
+  languages.forEach(lang => {
+    pages.forEach(page => {
+      const langPrefix = lang === 'en' ? '' : `/${lang}`;
+      const pagePath = page === '' ? '' : `/${page}`;
+      const locUrl = `${baseUrl}${langPrefix}${pagePath}` || `${baseUrl}/`;
+      const priority = page === '' ? (lang === 'en' ? '1.0' : '0.9') : '0.8';
 
       xml += '  <url>\n';
       xml += `    <loc>${locUrl}</loc>\n`;
@@ -3813,16 +3887,36 @@ function serveSitemap(req: express.Request, res: express.Response) {
       xml += '    <changefreq>daily</changefreq>\n';
       xml += `    <priority>${priority}</priority>\n`;
 
-      // Multilingual alternate links
       languages.forEach(l => {
-        const hreflang = l === 'en' ? 'en-IN' : `${l}-IN`;
-        xml += `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${baseUrl}${relativePath}?lang=${l}" />\n`;
+        const altLangPrefix = l === 'en' ? '' : `/${l}`;
+        const altHref = `${baseUrl}${altLangPrefix}${pagePath}` || `${baseUrl}/`;
+        xml += `    <xhtml:link rel="alternate" hreflang="${l}" href="${altHref}" />\n`;
       });
-      // x-default point to english
-      xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}${relativePath}" />\n`;
-
+      xml += `    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}${pagePath || '/'}" />\n`;
       xml += '  </url>\n';
     });
+  });
+
+  // 2. Indian State specific portals
+  indianStateSlugs.forEach(stateSlug => {
+    const stateUrl = `${baseUrl}/state/${stateSlug}`;
+    xml += '  <url>\n';
+    xml += `    <loc>${stateUrl}</loc>\n`;
+    xml += `    <lastmod>${lastmod}</lastmod>\n`;
+    xml += '    <changefreq>weekly</changefreq>\n';
+    xml += '    <priority>0.85</priority>\n';
+    xml += '  </url>\n';
+  });
+
+  // 3. Country specific portals
+  countryCodes.forEach(code => {
+    const countryUrl = `${baseUrl}/country/${code}`;
+    xml += '  <url>\n';
+    xml += `    <loc>${countryUrl}</loc>\n`;
+    xml += `    <lastmod>${lastmod}</lastmod>\n`;
+    xml += '    <changefreq>weekly</changefreq>\n';
+    xml += '    <priority>0.8</priority>\n';
+    xml += '  </url>\n';
   });
 
   xml += '</urlset>\n';

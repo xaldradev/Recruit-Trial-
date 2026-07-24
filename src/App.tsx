@@ -35,6 +35,8 @@ import BottomNavBar from './components/BottomNavBar';
 import ArohiLandingPage from './components/ArohiLandingPage';
 import SEOHead from './components/SEOHead';
 import SeoHubModal from './components/SeoHubModal';
+import GlobalSEODirectory from './components/GlobalSEODirectory';
+import GeoLocationBanner from './components/GeoLocationBanner';
 import BackgroundScrollEffects from './components/BackgroundScrollEffects';
 import { PRICING_TIERS, PATH_DETAILS, getTokenLimitForPrice } from './data/pricingData';
 import TokenWarningToastContainer from './components/TokenWarningToastContainer';
@@ -42,7 +44,7 @@ import TokenWarningToastContainer from './components/TokenWarningToastContainer'
 import { initialPostings } from './data/initialData';
 import { INITIAL_REVIEWS, Review } from './data/reviewsData';
 import { Posting, Application, CategoryType } from './types';
-import { Award, Crown, CheckCircle, Landmark, Bell, ArrowUpRight, ShieldCheck, Sparkles, Bot, GraduationCap, Briefcase, ChevronRight, Mic, MicOff, ArrowLeft, Home, Compass, Map, RotateCcw, Star, Users, MapPin, RefreshCw, Quote, Plus, MessageSquare, MessageCircle, Zap, Coins, User, Share2, Copy, X } from 'lucide-react';
+import { Award, Crown, CheckCircle, Landmark, Bell, ArrowUpRight, ShieldCheck, Sparkles, Bot, GraduationCap, Briefcase, ChevronRight, Mic, MicOff, ArrowLeft, Home, Compass, Map, RotateCcw, Star, Users, MapPin, RefreshCw, Quote, Plus, MessageSquare, MessageCircle, Zap, Coins, User, Share2, Copy, X, Globe } from 'lucide-react';
 
 // Storage migration helper to seamlessly transition legacy 'recruit_*' keys to 'arohi_*'
 function getStorageItem(key: string): string | null {
@@ -128,13 +130,30 @@ export default function App() {
     }
   }, [hasEntered, user]);
 
+  const VALID_LANGUAGES: Language[] = ['en', 'hi', 'or', 'bn', 'te', 'mr', 'ta', 'gu', 'ur', 'kn', 'ml', 'pa', 'as', 'ru', 'es', 'fr', 'de', 'ja', 'zh', 'ar', 'pt', 'it', 'ko', 'tr', 'id', 'sw', 'am', 'ha', 'yo', 'zu'];
+  const VALID_TABS = ['home', 'jobs', 'career', 'resume', 'interview', 'business', 'schemes', 'courses', 'syllabus', 'dashboard', 'employer', 'admin', 'arohi', 'privacy', 'terms', 'refunds', 'payments', 'contact', 'faqs', 'franchise'];
+
+  const [selectedState, setSelectedState] = useState<string>(() => {
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    if (pathParts[0] === 'state' && pathParts[1]) {
+      const formatted = pathParts[1].split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      return formatted;
+    }
+    return '';
+  });
+
   const [language, setLanguage] = useState<Language>(() => {
     const params = new URLSearchParams(window.location.search);
     const queryLang = params.get('lang') as Language;
-    const validLanguages: Language[] = ['en', 'hi', 'or', 'bn', 'te', 'mr', 'ta', 'gu', 'ur', 'kn', 'ml', 'pa', 'as'];
-    if (queryLang && validLanguages.includes(queryLang)) {
+    if (queryLang && VALID_LANGUAGES.includes(queryLang)) {
       setStorageItem('arohi_language', queryLang);
       return queryLang;
+    }
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    if (pathParts.length > 0 && VALID_LANGUAGES.includes(pathParts[0] as Language)) {
+      const maybeLang = pathParts[0] as Language;
+      setStorageItem('arohi_language', maybeLang);
+      return maybeLang;
     }
     return (getStorageItem('arohi_language') as Language) || 'en';
   });
@@ -145,6 +164,10 @@ export default function App() {
   };
 
   const [selectedCountry, setSelectedCountry] = useState<string>(() => {
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    if (pathParts[0] === 'country' && pathParts[1]) {
+      return pathParts[1].toUpperCase();
+    }
     return getStorageItem('arohi_country') || 'Global';
   });
 
@@ -168,6 +191,8 @@ export default function App() {
   });
   const [copiedLink, setCopiedLink] = useState(false);
   const [isSeoHubOpen, setIsSeoHubOpen] = useState(false);
+  const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
+  const [forceGeoShow, setForceGeoShow] = useState(false);
 
   const handleOpenShare = (title?: string, text?: string, url?: string) => {
     setShareDetails({
@@ -193,10 +218,15 @@ export default function App() {
     if (path === '/admin' || window.location.hash === '#admin' || window.location.search.includes('admin')) {
       return 'admin';
     }
-    const tab = path.replace('/', '') || 'home';
-    const validTabs = ['home', 'jobs', 'career', 'resume', 'interview', 'business', 'schemes', 'courses', 'syllabus', 'dashboard', 'employer', 'admin', 'arohi', 'privacy', 'terms', 'refunds', 'payments', 'contact', 'faqs', 'franchise'];
-    if (validTabs.includes(tab)) {
-      return tab;
+    const pathParts = path.split('/').filter(Boolean);
+    if (pathParts.length > 0) {
+      if (pathParts[0] === 'state' || pathParts[0] === 'country') return 'home';
+      if (VALID_LANGUAGES.includes(pathParts[0] as Language)) {
+        const subTab = pathParts[1] || 'home';
+        if (VALID_TABS.includes(subTab)) return subTab;
+        return 'home';
+      }
+      if (VALID_TABS.includes(pathParts[0])) return pathParts[0];
     }
     return 'home';
   });
@@ -206,18 +236,34 @@ export default function App() {
   // Dynamic Browser History & URL Router Synchronizer
   useEffect(() => {
     const handlePopState = () => {
-      const path = window.location.pathname;
-      if (path === '/admin' || window.location.hash === '#admin' || window.location.search.includes('admin')) {
-        setActiveTab('admin');
-      } else {
-        const tab = path.replace('/', '') || 'home';
-        const validTabs = ['home', 'jobs', 'career', 'resume', 'interview', 'business', 'schemes', 'courses', 'syllabus', 'dashboard', 'employer', 'admin', 'arohi', 'privacy', 'terms', 'refunds', 'payments', 'contact', 'faqs', 'franchise'];
-        if (validTabs.includes(tab)) {
-          setActiveTab(tab);
-        } else {
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      if (pathParts.length > 0) {
+        if (pathParts[0] === 'state' && pathParts[1]) {
+          setSelectedState(pathParts[1].split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
           setActiveTab('home');
+          return;
+        }
+        if (pathParts[0] === 'country' && pathParts[1]) {
+          setSelectedCountry(pathParts[1].toUpperCase());
+          setActiveTab('home');
+          return;
+        }
+        if (VALID_LANGUAGES.includes(pathParts[0] as Language)) {
+          setLanguage(pathParts[0] as Language);
+          const subTab = pathParts[1] || 'home';
+          if (VALID_TABS.includes(subTab)) {
+            setActiveTab(subTab);
+          } else {
+            setActiveTab('home');
+          }
+          return;
+        }
+        if (VALID_TABS.includes(pathParts[0])) {
+          setActiveTab(pathParts[0]);
+          return;
         }
       }
+      setActiveTab('home');
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -226,11 +272,16 @@ export default function App() {
 
   useEffect(() => {
     const currentPath = window.location.pathname;
-    const targetPath = activeTab === 'home' ? '/' : `/${activeTab}`;
+    let targetPath = activeTab === 'home' ? '/' : `/${activeTab}`;
+    if (selectedState) {
+      targetPath = `/state/${selectedState.toLowerCase().replace(/\s+/g, '-')}`;
+    } else if (language !== 'en') {
+      targetPath = `/${language}${activeTab === 'home' ? '' : `/${activeTab}`}`;
+    }
     if (currentPath !== targetPath && currentPath !== `/index.html`) {
       window.history.pushState(null, '', targetPath);
     }
-  }, [activeTab]);
+  }, [activeTab, language, selectedState]);
 
   useEffect(() => {
     // Initial page load telemetry for Arohiai.com persistent visitor counter
@@ -281,9 +332,17 @@ export default function App() {
       faqs: 'Support FAQs'
     };
 
-    const displayTab = tabNameMap[activeTab] || activeTab.charAt(0).toUpperCase() + activeTab.slice(1);
-    const suffix = language === 'hi' ? 'Arohi AI - भारत का AI ग्रोथ इंजन' : language === 'or' ? 'Arohi AI - ଭାରତର AI ଗ୍ରୋଥ୍ ଇଞ୍ଜିନ୍' : 'Arohi AI - India\'s Next-Gen AI Opportunity Engine';
-    document.title = `${displayTab} | ${suffix}`;
+    if (activeTab === 'home') {
+      document.title = language === 'hi' 
+        ? "Arohi AI - भारत का #1 बहुभाषी अवसर और करियर इंजन (arohiai.com)" 
+        : language === 'or' 
+        ? "Arohi AI - ଭାରତର #1 ବହୁଭାଷୀ ସୁଯୋଗ ଓ କ୍ୟାରିୟର ଇଞ୍ଜିନ୍ (arohiai.com)" 
+        : "Arohi AI - World & India's #1 Multilingual Opportunity Engine (arohiai.com)";
+    } else {
+      const displayTab = tabNameMap[activeTab] || activeTab.charAt(0).toUpperCase() + activeTab.slice(1);
+      const suffix = language === 'hi' ? 'Arohi AI - भारत का AI ग्रोथ इंजन' : language === 'or' ? 'Arohi AI - ଭାରତର AI ଗ୍ରୋଥ୍ ଇଞ୍ଜିନ୍' : 'Arohi AI - India\'s Next-Gen AI Opportunity Engine';
+      document.title = `${displayTab} | ${suffix}`;
+    }
 
     // Update Meta Description
     const metaDesc = document.querySelector('meta[name="description"]');
@@ -1506,6 +1565,7 @@ export default function App() {
     return (
       <ArohiLandingPage 
         user={user}
+        language={language}
         setActiveTab={setActiveTab}
         setIsChatOpen={setIsChatOpen}
         setIsChatMinimized={setIsChatMinimized}
@@ -2509,7 +2569,7 @@ export default function App() {
       <BackgroundScrollEffects />
 
       {/* Dynamic SEO Head Title and Meta Description Updates */}
-      <SEOHead activeTab={activeTab} />
+      <SEOHead activeTab={activeTab} selectedState={selectedState} currentLanguage={language} />
 
       {/* 1. Brand Header */}
       <Header
@@ -2926,16 +2986,25 @@ export default function App() {
                   Support Email: <a href="mailto:support@arohiai.com" className="hover:underline text-violet-400">support@arohiai.com</a>
                 </span>
               </li>
-              <li className="pt-1.5">
+              <li className="pt-2 flex flex-wrap items-center gap-2">
                 <a 
                   href="https://wa.me/919090455555" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="inline-flex items-center gap-2 bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#25D366] border border-[#25D366]/30 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200"
+                  className="inline-flex items-center gap-2 bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#25D366] border border-[#25D366]/30 px-3.5 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all duration-200 hover:scale-[1.02] active:scale-95 shadow-sm"
                 >
                   <MessageCircle className="w-4 h-4 shrink-0" />
                   <span>WhatsApp Chat</span>
                 </a>
+
+                <button
+                  onClick={() => setIsRegionModalOpen(true)}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600/20 to-indigo-600/20 hover:from-violet-600/30 hover:to-indigo-600/30 text-purple-200 border border-purple-500/35 px-3.5 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer shadow-sm"
+                  title="Select Country, State or Regional Language"
+                >
+                  <Globe className="w-4 h-4 shrink-0 text-purple-400" />
+                  <span>Country, State & Language</span>
+                </button>
               </li>
             </ul>
           </div>
@@ -3780,6 +3849,50 @@ export default function App() {
         }}
         onNavigateTab={(tab) => {
           setActiveTab(tab);
+          setHasEntered(true);
+        }}
+      />
+
+      {/* Country, State & Language Selection Modal */}
+      <GlobalSEODirectory
+        isOpen={isRegionModalOpen}
+        onClose={() => setIsRegionModalOpen(false)}
+        currentLanguage={language}
+        onSelectLanguage={(lang) => {
+          changeLanguage(lang);
+          setSelectedState('');
+        }}
+        onSelectState={(stateName) => {
+          setSelectedState(stateName);
+          setActiveTab('home');
+          setHasEntered(true);
+        }}
+        onSelectCountry={(countryCode) => {
+          changeCountry(countryCode);
+          setSelectedState('');
+          setActiveTab('home');
+          setHasEntered(true);
+        }}
+        onTriggerAutoLocation={() => {
+          setForceGeoShow(true);
+        }}
+      />
+
+      {/* Geolocation Auto-Location Suggestion Banner */}
+      <GeoLocationBanner
+        currentState={selectedState}
+        currentCountry={selectedCountry}
+        forceShow={forceGeoShow}
+        onClose={() => setForceGeoShow(false)}
+        onSelectState={(stateName) => {
+          setSelectedState(stateName);
+          setActiveTab('home');
+          setHasEntered(true);
+        }}
+        onSelectCountry={(countryCode) => {
+          changeCountry(countryCode);
+          setSelectedState('');
+          setActiveTab('home');
           setHasEntered(true);
         }}
       />
