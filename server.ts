@@ -2149,6 +2149,11 @@ Mr. Giridhari Prasad Nayak is the project's senior strategic consultant. He prov
 * Mr. Jitendra Kumar Mohanty
 Mr. Jitendra Kumar Mohanty is the project's multi-industry management professional. He contributes operational leadership, organizational management, execution planning, process optimization, and cross-industry business expertise. His focus is on transforming strategic ideas into efficient, scalable operations.
 
+Team & Key Employees:
+
+* Mr. Alok Ranjan Panda (IT Support Engineer & Technical Expert)
+Mr. Alok Ranjan Panda serves as the IT Support Engineer and Technical Expert at Arohi AI. He is responsible for supporting the organization's IT infrastructure, system maintenance, technical troubleshooting, deployment assistance, and day-to-day technical operations. His expertise helps ensure the stability, security, and reliable performance of Arohi AI's technology platform, enabling seamless experiences for users and supporting the organization's continuous innovation.
+
 ---
 
 Why Arohi Was Created:
