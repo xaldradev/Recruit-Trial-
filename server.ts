@@ -2094,7 +2094,7 @@ async function generateContentWithFallback(aiClientInstance: GoogleGenAI, option
   throw lastError || new Error('All models failed to generate content.');
 }
 
-const AROHI_SYSTEM_INSTRUCTION = `You are AROHI (India's AI Opportunity Advisor), the flagship intelligent assistant of Arohi AI (arohi.ai).
+const AROHI_SYSTEM_INSTRUCTION = `You are AROHI (India's AI Opportunity Advisor), the flagship intelligent assistant of Arohi AI (arohiai.com).
 Arohi AI is an AI-powered universal opportunity ecosystem designed to serve a highly diverse and inclusive spectrum of 20+ specialized audience categories:
 1. Students (1-10 CBSE & state syllabus, higher education, skill paths)
 2. Teachers (educational support, tools, resources)
@@ -2131,7 +2131,7 @@ Your Communication Style & Multilingual Guidelines:
   - Never force standard English if the user initiated in Odia, Hindi, or English-sounding regional languages.
 
 ============================================================
-MASTER PROMPT — FOUNDERS, LEADERSHIP & VISION OF AROHI AI (AROHI.AI)
+MASTER PROMPT — FOUNDERS, LEADERSHIP & VISION OF AROHI AI
 ============================================================
 
 Leadership & Vision:
@@ -2163,7 +2163,7 @@ Arohi aims to bridge the gap between people and technology by providing AI-power
 
 ---
 
-Vision of Arohi AI (arohi.ai):
+Vision of Arohi AI (arohiai.com):
 Arohi AI is envisioned as an all-encompassing opportunity & intelligence platform.
 Its long-term vision is to become one of the world's leading AI-powered ecosystems for:
 - Employment & Careers
@@ -3053,7 +3053,7 @@ Return ONLY a raw JSON array matching this exact schema. Do not enclose it in ma
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
-          systemInstruction: 'You are AROHI, a senior national crawler for Arohi AI (arohi.ai). Output highly realistic recruitment notifications matching official pay scales.',
+          systemInstruction: 'You are AROHI, a senior national crawler for Arohi AI (arohiai.com). Output highly realistic recruitment notifications matching official pay scales.',
         }
       });
 
@@ -3371,7 +3371,7 @@ function getArohiFallbackResponse(userPrompt: string, fileName?: string): string
   if (p.includes('resume') || p.includes('cv') || p.includes('biodata')) {
     const fallbackResumeData = {
       name: "Rajesh Kumar",
-      email: "rajesh.kumar@arohi.ai",
+      email: "rajesh.kumar@arohiai.com",
       phone: "+91 98765 43210",
       linkedin: "linkedin.com/in/rajeshkumar",
       github: "github.com/rajeshkumar",
@@ -3527,7 +3527,7 @@ ${fallbackResumeData.skills.join(', ')}
  
   return fileIntro + `### Hello! I am AROHI, your AI Opportunity Advisor 🌟
  
- Welcome to **Arohi AI (arohi.ai)** – India's One & Only AI-Powered Opportunity Ecosystem!
+ Welcome to **Arohi AI** – India's One & Only AI-Powered Opportunity Ecosystem!
  
  I am your unified assistant across this entire platform. I can help you with:
  * 💼 **Discovering Jobs & Internships** that perfectly match your background.
@@ -3548,49 +3548,49 @@ app.get('/sitemap.xml', (req, res) => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Main Platform Landing page -->
   <url>
-    <loc>https://arohi.ai/</loc>
+    <loc>https://arohiai.com/</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <!-- Career & Skill Course Training -->
   <url>
-    <loc>https://arohi.ai/?tab=dashboard</loc>
+    <loc>https://arohiai.com/?tab=dashboard</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <!-- Custom AI Roadmap & Path Planner -->
   <url>
-    <loc>https://arohi.ai/?tab=roadmap</loc>
+    <loc>https://arohiai.com/?tab=roadmap</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <!-- Interactive Live Mock Interviews -->
   <url>
-    <loc>https://arohi.ai/?tab=interview</loc>
+    <loc>https://arohiai.com/?tab=interview</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <!-- Advanced ATS Resume Score Engine -->
   <url>
-    <loc>https://arohi.ai/?tab=resume</loc>
+    <loc>https://arohiai.com/?tab=resume</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <!-- Mudra Loans & Mudra Scheme Assister -->
   <url>
-    <loc>https://arohi.ai/?tab=schemes</loc>
+    <loc>https://arohiai.com/?tab=schemes</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <!-- Business Startup, Udyam & MSME Hub -->
   <url>
-    <loc>https://arohi.ai/?tab=business</loc>
+    <loc>https://arohiai.com/?tab=business</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -3663,7 +3663,7 @@ const SEO_TRANSLATIONS: Record<string, { title: string; description: string; key
   en: {
     title: "Arohi AI - World & India's #1 Multilingual Opportunity & Growth Engine | AI Voice Guide in 150+ Languages for Students, Teachers, Doctors, and Businesses",
     description: "Empowering Students, Teachers, Parents, Scientists, Researchers, Doctors, Engineers, Entrepreneurs, Job Seekers, Professionals, Businesses, MSMEs, Govt. Aspirants, Universities, Organizations, Aliens, Mars & Jupiter Citizens, Govt. & Private Officials, Humans. Connect with AI assistant Arohi via dynamic voice calling in 150+ regional languages (English, Hindi, Odia, etc.). Get resume analysis, mock interviews, job boards, business setups, and government schemes assistance.",
-    keywords: "arohi ai, arohi.ai, career guidance India, AI career coach, resume score India, mock interview simulator, MSME Udyam registration, private sector jobs, student career advisor, opportunity portal, Sarkari job guide, voice call in Hindi, Odia, Bengali, Tamil, Telugu, Marathi, Kannada, Malayalam, Gujarati, Punjabi, Assamese, Urdu, 150 languages"
+    keywords: "arohi ai, arohiai.com, career guidance India, AI career coach, resume score India, mock interview simulator, MSME Udyam registration, private sector jobs, student career advisor, opportunity portal, Sarkari job guide, voice call in Hindi, Odia, Bengali, Tamil, Telugu, Marathi, Kannada, Malayalam, Gujarati, Punjabi, Assamese, Urdu, 150 languages"
   },
   ru: {
     title: "Arohi AI - Платформа ИИ №1 для развития карьеры и бизнеса | Голосовой ИИ-гид на 150+ языках (arohiai.com/ru)",

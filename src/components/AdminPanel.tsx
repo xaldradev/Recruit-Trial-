@@ -261,14 +261,14 @@ export default function AdminPanel({
 
   // Live Search Engine Optimization (SEO) Pulse & Audit Diagnostic Engine
   const runSeoDiagnostic = () => {
-    const title = document.title || 'Arohi.ai - India’s Next-Gen Career, Job, and MSME Growth Engine';
+    const title = document.title || 'Arohi AI - India’s Next-Gen Career, Job, and MSME Growth Engine';
     const description = document.querySelector('meta[name="description"]')?.getAttribute('content') || 'Empowering India\'s students, young professionals, and MSMEs. Get live career guidance from AI assistant Arohi, dynamic resume analysis, mock interviews, job postings, and Udyam business assistance.';
-    const keywords = document.querySelector('meta[name="keywords"]')?.getAttribute('content') || 'arohi.ai, career guidance India, AI career coach, resume score India, mock interview simulator, MSME Udyam registration, private sector jobs, student career advisor, recruitment portal, Sarkari job guide';
+    const keywords = document.querySelector('meta[name="keywords"]')?.getAttribute('content') || 'arohiai.com, career guidance India, AI career coach, resume score India, mock interview simulator, MSME Udyam registration, private sector jobs, student career advisor, recruitment portal, Sarkari job guide';
     const geoRegion = document.querySelector('meta[name="geo.region"]')?.getAttribute('content') || 'IN';
     const geoPosition = document.querySelector('meta[name="geo.position"]')?.getAttribute('content') || '20.5937;78.9629';
-    const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content') || 'Arohi.ai - Career & MSME Success Engine';
+    const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content') || 'Arohi AI - Career & MSME Success Engine';
     const ogDescription = document.querySelector('meta[property="og:description"]')?.getAttribute('content') || 'AI-driven career development, skill pathing, professional resume evaluation, and custom MSME Business support. Connect with India\'s best opportunities.';
-    const ogImage = document.querySelector('meta[property="og:image"]')?.getAttribute('content') || 'https://arohi.ai/assets/og-banner.jpg';
+    const ogImage = document.querySelector('meta[property="og:image"]')?.getAttribute('content') || 'https://arohiai.com/assets/og-banner.jpg';
     const twitterCard = document.querySelector('meta[name="twitter:card"]')?.getAttribute('content') || 'summary_large_image';
     
     const scripts = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
@@ -334,7 +334,7 @@ export default function AdminPanel({
       totalImages,
       withAlt,
       isHttps: window.location.protocol === 'https:',
-      hostName: window.location.hostname || 'arohi.ai'
+      hostName: window.location.hostname || 'arohiai.com'
     };
   };
 
@@ -3529,8 +3529,8 @@ export default function AdminPanel({
                 
                 <div className="bg-white p-5 rounded-2xl shadow-inner text-left font-sans text-[#4d5156] text-xs space-y-1">
                   <div className="flex items-center gap-1 text-[11px] text-[#202124]">
-                    <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-indigo-600">Arohi.ai</span>
-                    <span className="text-slate-400 text-[10px]">https://arohi.ai</span>
+                    <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-indigo-600">Arohi AI</span>
+                    <span className="text-slate-400 text-[10px]">https://arohiai.com</span>
                   </div>
                   
                   <h5 className="text-[16px] leading-tight font-medium text-[#1a0dab] hover:underline cursor-pointer">
@@ -3569,9 +3569,9 @@ export default function AdminPanel({
                   {`{
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Arohi.ai",
-  "url": "https://arohi.ai",
-  "logo": "https://arohi.ai/assets/logo.png",
+  "name": "Arohi AI",
+  "url": "https://arohiai.com",
+  "logo": "https://arohiai.com/assets/logo.png",
   "description": "India's next-generation employment engine helping students, professionals, and MSMEs achieve career and business milestones.",
   "address": {
     "@type": "PostalAddress",
