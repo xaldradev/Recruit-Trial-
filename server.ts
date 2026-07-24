@@ -2337,7 +2337,7 @@ Schema to use:
 Construct this JSON strictly based on details discussed, or use standard professional default placeholders corresponding to their profile if details are sparse. This ensures they have a working Microsoft Word file download immediately!]`;
       }
 
-      // Call Gemini API using modern SDK with fallback strategy
+      // Call Gemini API using modern SDK with fallback strategy and real-time Google Search grounding
       const response = await generateContentWithFallback(aiClient, {
         contents: [
           ...formattedHistory,
@@ -2346,6 +2346,7 @@ Construct this JSON strictly based on details discussed, or use standard profess
         config: {
           systemInstruction: dynamicInstruction,
           temperature: 0.7,
+          tools: [{ googleSearch: {} }]
         }
       });
 
@@ -3974,6 +3975,7 @@ async function startServer() {
         "\n- IF THE USER SPEAKS OR SENDS A PROMPT IN ODIA (e.g., ଓଡ଼ିଆ script or transliterated/phonetic Odia like 'mote business karibaku achhi', 'kemiti achha', 'mu odisha ru', 'state schemes bisayare kuha', 'kan karibi'), YOU MUST IMMEDIATELY SWITCH AND REPLY IN NATIVE ODIA OR SPOKEN ODIA!" +
         "\n- IF THE USER SPEAKS IN ANY OTHER LANGUAGE (Hindi, Bengali, Telugu, Tamil, etc.), IMMEDIATELY MATCH AND REPLY IN THAT EXACT USER-SPOKEN LANGUAGE." +
         "\n- NEVER remain in English or Hindi if the user starts speaking Odia or another regional language. Instantly pivot your voice response to the user's spoken language on that very turn!" +
+        "\n- REAL-TIME GOOGLE SEARCH & KNOWLEDGE CAPABILITY: You have live access to Google Search grounding and up-to-the-second knowledge across all topics (active government job openings, latest state/central schemes, news, cricket scores, market trends, syllabus, admissions, and general queries). When the user asks any question during a voice call, directly deliver accurate, up-to-date, and clear answers!" +
         (reqLang && reqLang !== 'en' ? `\n- INITIAL PREFERRED LANGUAGE HINT: The user's active UI language setting is set to '${reqLang}'.` : '');
 
       if (uid) {

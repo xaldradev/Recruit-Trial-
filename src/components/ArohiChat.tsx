@@ -258,6 +258,7 @@ export default function ArohiChat({ initialPrompt, onNavigateTab, onMinimize, on
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<{ name: string; mimeType: string; base64: string } | null>(null);
   const [isDownloadingResume, setIsDownloadingResume] = useState<string | null>(null);
+  const [selectedAudienceCategory, setSelectedAudienceCategory] = useState<string>('all');
 
   const handleSummarizeChat = async () => {
     if (messages.length <= 1) {
@@ -1647,51 +1648,184 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
 
         {/* Input box bottom bar */}
         <div className="border-t border-[#231a4f] p-3 sm:p-4 bg-[#120d26]">
-          {/* Quick AI Summarize Action Banner when session has history */}
-          {messages.length >= 3 && (
-            <div className="mb-2.5 flex items-center justify-between px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#1c1340] to-[#281552] border border-[#a78bfa]/25 shadow-md">
-              <span className="text-[10px] sm:text-xs text-slate-200 font-bold flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                Want an executive action plan of this chat session?
-              </span>
-              <button
-                onClick={handleSummarizeChat}
-                disabled={isSummarizing}
-                className="px-2.5 py-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-[10px] font-black uppercase tracking-wider rounded-lg shadow-sm cursor-pointer transition-all flex items-center gap-1 shrink-0 disabled:opacity-50"
-              >
-                {isSummarizing ? (
-                  <>
-                    <RefreshCw className="w-3 h-3 animate-spin" /> Summarizing...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-3 h-3 text-slate-950" /> Summarize Chat
-                  </>
-                )}
-              </button>
-            </div>
-          )}
-
-          {/* Dynamic connected suggestion chips */}
-          <div className="mb-3">
-            <div className="flex gap-1.5 overflow-x-auto pb-1.5 select-none scrollbar-none">
+          {/* Categorized 20+ Audience Suggestion Chips */}
+          <div className="mb-3 space-y-2">
+            {/* Audience Category Selector Bar */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[10px] font-bold">
               {[
-                { label: "💼 Sarkari Jobs", prompt: "What are the latest active central and state Sarkari job openings?" },
-                { label: "🏦 Mudra Loans", prompt: "Am I eligible for a Mudra Loan or PMEGP subsidy to start a business?" },
-                { label: "📝 Resume Guide", prompt: "How can I check if my resume has a high ATS score or is optimized for jobs?" },
-                { label: "🗣️ Mock Interview", prompt: "Let's do a mock interview practice. Ask me some standard questions." },
-                { label: "🚀 Odia Schemes", prompt: "What are some specific government business subsidies and educational schemes for citizens in Odisha?" },
-                { label: "🎓 PMKVY Skill", prompt: "Tell me about the PMKVY free upskilling courses and certifications?" },
-                { label: "💡 Startup Guide", prompt: "Validate my startup idea and tell me how to get MSME registration." }
-              ].map((chip, index) => (
+                { id: 'all', label: '🌟 All (20+ Audiences)' },
+                { id: 'students', label: '🎓 Students & School (1-10)' },
+                { id: 'jobs', label: '💼 Jobs & Careers' },
+                { id: 'sarkari', label: '🏛️ Sarkari Exams' },
+                { id: 'msme', label: '🏢 MSMEs & Startups' },
+                { id: 'academics', label: '👩‍🏫 Teachers & Academics' },
+                { id: 'research_medical', label: '🔬 Research & Healthcare' },
+                { id: 'farmers', label: '🌾 Farmers & Skill India' },
+                { id: 'homemakers', label: '🏡 Homemakers & SHG' },
+                { id: 'overseas', label: '✈️ Overseas & Visas' },
+                { id: 'franchise', label: '🏬 AECN Franchise' },
+                { id: 'cosmic', label: '🛸 Cosmic & Space' }
+              ].map((cat) => (
                 <button
-                  key={index}
-                  onClick={() => handleSendMessage(chip.prompt)}
-                  className="bg-[#1b143c] hover:bg-[#2c1d5e] text-slate-200 hover:text-white border border-[#3b2a80] hover:border-[#7c3aed] text-[10px] font-bold py-1.5 px-2.5 rounded-full shadow-sm transition-all whitespace-nowrap cursor-pointer shrink-0 active:scale-95 animate-in fade-in duration-350"
+                  key={cat.id}
+                  onClick={() => setSelectedAudienceCategory(cat.id)}
+                  className={`px-2.5 py-1 rounded-lg shrink-0 transition-all cursor-pointer ${
+                    selectedAudienceCategory === cat.id
+                      ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-sm border border-violet-400 font-extrabold'
+                      : 'bg-[#181136] text-slate-400 hover:text-slate-200 hover:bg-[#23184d] border border-[#2d2163]'
+                  }`}
                 >
-                  {chip.label}
+                  {cat.label}
                 </button>
               ))}
+            </div>
+
+            {/* Audience Action Chips */}
+            <div className="flex gap-1.5 overflow-x-auto pb-1 select-none scrollbar-none">
+              {[
+                // 1. School Students (Class 1-10)
+                {
+                  category: 'students',
+                  label: "📚 Class 1-10 School & NCERT",
+                  prompt: "Help me with CBSE, CHSE, and State Board Class 1 to 10 syllabus, NCERT solutions, and daily homework guidance."
+                },
+                // 2. College Students
+                {
+                  category: 'students',
+                  label: "🎓 College Degree & Project Roadmap",
+                  prompt: "Guide me on college semester projects, engineering/degree specializations, and career pathways."
+                },
+                // 3. Job Seekers & Freshers
+                {
+                  category: 'jobs',
+                  label: "💼 MNC & Corporate Job Openings",
+                  prompt: "What are the latest IT, MNC, and private corporate fresher job openings with high salary packages?"
+                },
+                // 4. ATS Resume Candidates
+                {
+                  category: 'jobs',
+                  label: "📄 100-pt ATS Resume Audit",
+                  prompt: "How can I evaluate my resume ATS score, fix formatting errors, and optimize keywords for top recruiter searches?"
+                },
+                // 5. Sarkari Job Aspirants
+                {
+                  category: 'sarkari',
+                  label: "🏛️ Sarkari Jobs (UPSC/SSC/RRB/OPSC)",
+                  prompt: "What are active central and state Sarkari job notifications, admit card updates, and syllabus breakdowns?"
+                },
+                // 6. Voice Mock Interview Practice
+                {
+                  category: 'jobs',
+                  label: "🗣️ AI Voice Mock Interview",
+                  prompt: "Let's start an AI voice mock interview session. Ask me domain questions and evaluate my answers."
+                },
+                // 7. Tech & Coding Aspirants
+                {
+                  category: 'jobs',
+                  label: "💻 AI, Full-Stack & Cloud Tech Skills",
+                  prompt: "What is the best step-by-step roadmap for Full-Stack Development, AI Engineering, and Cloud DevOps?"
+                },
+                // 8. MSME & Small Business Owners
+                {
+                  category: 'msme',
+                  label: "🏢 MSME Udyam & Business Subsidies",
+                  prompt: "Guide me through Udyam registration, GST compliance, and government business subsidies for MSMEs."
+                },
+                // 9. Startup Founders
+                {
+                  category: 'msme',
+                  label: "💡 Startup Validation & Pitch Deck",
+                  prompt: "Validate my startup business idea, guide me on bank project reports, and show Startup India/Odisha benefits."
+                },
+                // 10. Mudra & Bank Loan Applicants
+                {
+                  category: 'msme',
+                  label: "🏦 Mudra & PMEGP Loans",
+                  prompt: "Am I eligible for Mudra Loans (Shishu, Kishor, Tarun) or PMEGP subsidies to secure startup capital?"
+                },
+                // 11. Teachers & Professors
+                {
+                  category: 'academics',
+                  label: "👩‍🏫 Teachers & AI Lesson Plans",
+                  prompt: "Generate innovative AI lesson plans, automated exam grading rubrics, and classroom teaching guides."
+                },
+                // 12. Scientists & Researchers
+                {
+                  category: 'research_medical',
+                  label: "🔬 Research Papers & Grant Proposals",
+                  prompt: "Help me draft research paper literature reviews, grant proposals, and explore ISRO/DRDO research alerts."
+                },
+                // 13. Doctors & Healthcare Staff
+                {
+                  category: 'research_medical',
+                  label: "🩺 Medical Career & NEET PG Guide",
+                  prompt: "Provide guidance on NEET PG preparation, medical research summaries, and hospital job vacancies."
+                },
+                // 14. Farmers & Agri-Entrepreneurs
+                {
+                  category: 'farmers',
+                  label: "🌾 Farmers & Krishi Subsidies",
+                  prompt: "What agricultural subsidies, PM-Kisan benefits, Krishi Vigyan Kendra guides, and soil tech loans are active?"
+                },
+                // 15. Skilled Workers & Craftsmen
+                {
+                  category: 'farmers',
+                  label: "🛠️ Skill India & PMKVY Certification",
+                  prompt: "Tell me about free NSDC skill courses, PMKVY trade certifications, and technician skill badges."
+                },
+                // 16. Freelancers & Content Creators
+                {
+                  category: 'jobs',
+                  label: "🎨 Freelancing Gigs & AI Monetization",
+                  prompt: "How can I launch a freelance career on Upwork/Fiverr and leverage AI for content monetization?"
+                },
+                // 17. Homemakers & SHG Women
+                {
+                  category: 'homemakers',
+                  label: "🏡 Subhadra Yojana & SHG Women Loans",
+                  prompt: "Explain Subhadra Yojana benefits, SHG bank linkage loans, and home enterprise opportunities for women."
+                },
+                // 18. Parents & Guardians
+                {
+                  category: 'students',
+                  label: "👨‍👩‍👧 Scholarship & Child Career Planner",
+                  prompt: "Help me find government scholarships, entrance exam schedules, and career pathways for my children."
+                },
+                // 19. AECN Franchise Network
+                {
+                  category: 'franchise',
+                  label: "🏬 AECN Franchise & Experience Center",
+                  prompt: "How can I open or run an Arohi Experience Center Network (AECN) franchise in my town or district?"
+                },
+                // 20. Overseas & Visa Seekers
+                {
+                  category: 'overseas',
+                  label: "✈️ Overseas Jobs & Visa Pathways",
+                  prompt: "Guide me on USA H-1B, Germany Opportunity Card (Chancenkarte), UK healthcare visas, and PR pathways."
+                },
+                // 21. Senior Citizens & Retirees
+                {
+                  category: 'homemakers',
+                  label: "👴 Pension Schemes & Digital Literacy",
+                  prompt: "What senior citizen pension schemes, health insurance benefits, and digital literacy programs exist?"
+                },
+                // 22. Cosmic Explorers & Aliens
+                {
+                  category: 'cosmic',
+                  label: "🛸 Intergalactic Universal Guide",
+                  prompt: "Activate universal multi-species translation and show planetary career pathways across the cosmos!"
+                }
+              ]
+                .filter(chip => selectedAudienceCategory === 'all' || chip.category === selectedAudienceCategory)
+                .map((chip, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSendMessage(chip.prompt)}
+                    className="bg-[#1b143c] hover:bg-[#2c1d5e] text-slate-200 hover:text-white border border-[#3b2a80] hover:border-[#7c3aed] text-[10px] font-bold py-1.5 px-3 rounded-full shadow-sm transition-all whitespace-nowrap cursor-pointer shrink-0 active:scale-95 animate-in fade-in duration-350"
+                  >
+                    {chip.label}
+                  </button>
+                ))}
             </div>
           </div>
 
