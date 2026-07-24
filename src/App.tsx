@@ -35,6 +35,7 @@ import BottomNavBar from './components/BottomNavBar';
 import ArohiLandingPage from './components/ArohiLandingPage';
 import SEOHead from './components/SEOHead';
 import SeoHubModal from './components/SeoHubModal';
+import BackgroundScrollEffects from './components/BackgroundScrollEffects';
 import { PRICING_TIERS, PATH_DETAILS, getTokenLimitForPrice } from './data/pricingData';
 import TokenWarningToastContainer from './components/TokenWarningToastContainer';
 
@@ -2386,6 +2387,7 @@ export default function App() {
   if (!hasEntered) {
     return (
       <div className="relative w-full min-h-screen bg-[#020208] overflow-x-hidden">
+        <BackgroundScrollEffects />
         <WelcomeLanding 
           language={language}
           onLanguageChange={changeLanguage}
@@ -2501,8 +2503,11 @@ export default function App() {
   }
 
   return (
-    <div key={language} className="bg-[#090714] min-h-screen flex flex-col font-sans antialiased text-slate-100 selection:bg-purple-500 selection:text-white pb-24 xl:pb-12">
+    <div key={language} className="relative bg-[#090714] min-h-screen flex flex-col font-sans antialiased text-slate-100 selection:bg-purple-500 selection:text-white pb-24 xl:pb-12">
       
+      {/* Interactive Parallax Background Scroll Effects */}
+      <BackgroundScrollEffects />
+
       {/* Dynamic SEO Head Title and Meta Description Updates */}
       <SEOHead activeTab={activeTab} />
 

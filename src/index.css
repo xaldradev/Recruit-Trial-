@@ -155,6 +155,59 @@ html, body {
   animation: float-y 6s ease-in-out infinite;
 }
 
+/* Background Scrolling Effects & Cyber Patterns */
+.bg-grid-cyber {
+  background-image: 
+    linear-gradient(to right, rgba(124, 58, 237, 0.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(124, 58, 237, 0.18) 1px, transparent 1px);
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.38;
+    transform: scale(1.08);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 10s ease-in-out infinite;
+}
+
+@keyframes grid-flow {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 80px;
+  }
+}
+
+.animate-grid-flow {
+  animation: grid-flow 8s linear infinite;
+}
+
+@keyframes scanline-beam {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+.animate-scanline-beam {
+  animation: scanline-beam 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
 /* Print optimizations */
 @media print {
   /* Reset the canvas background to white for paper printing */

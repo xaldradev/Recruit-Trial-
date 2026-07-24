@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User, Sparkles, Plus, RefreshCw, Trash2, Mic, Paperclip, CheckCircle, ArrowRight, Lightbulb, MapPin, Briefcase, Landmark, Award, Minus, X, Globe, Phone, History } from 'lucide-react';
+import { Send, Bot, User, Sparkles, Plus, RefreshCw, Trash2, Mic, Paperclip, CheckCircle, ArrowRight, Lightbulb, MapPin, Briefcase, Landmark, Award, Minus, X, Globe, Phone, History, Download, FileText, FileSpreadsheet } from 'lucide-react';
 import ArohiAvatar from './ArohiAvatar';
 import { Language, getTranslation, getWelcomeContent, getSuggestedPrompts } from '../translations';
 import ArohiVoiceCall from './ArohiVoiceCall';
 import { generateCallSummaryPDF, generateResumePDF, analyzeTurns } from '../lib/pdfGenerator';
+import { exportToPDF, exportToWord, exportToExcel } from '../lib/documentExporter';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -83,7 +84,28 @@ function renderMarkdown(content: string) {
     const trimmed = line.trim();
     
     // Check for Headers
-    if (trimmed.startsWith('### ')) {
+    if (trimmed.startsWith('![')) {
+      pushList(index);
+      const match = trimmed.match(/^!\[(.*?)\]\((.*?)\)$/);
+      if (match) {
+        const alt = match[1];
+        const src = match[2];
+        elements.push(
+          <div key={index} className="my-3 rounded-xl overflow-hidden border border-[#7c3aed]/50 shadow-2xl bg-[#0b081f] p-2 text-center group">
+            <img src={src} alt={alt} className="w-full h-auto max-h-[420px] object-cover rounded-lg shadow-md transition-all group-hover:scale-[1.01]" referrerPolicy="no-referrer" />
+            <p className="text-[11px] text-slate-300 mt-2 font-semibold flex items-center justify-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-violet-400" /> {alt || 'Generated Image'}
+            </p>
+          </div>
+        );
+      } else {
+        elements.push(
+          <p key={index} className="text-xs md:text-sm font-medium leading-relaxed text-slate-200 mb-1">
+            {parseInline(line)}
+          </p>
+        );
+      }
+    } else if (trimmed.startsWith('### ')) {
       pushList(index);
       elements.push(
         <h4 key={index} className="text-xs md:text-sm font-extrabold text-white mt-4 mb-2 tracking-tight">
@@ -231,10 +253,72 @@ export default function ArohiChat({ initialPrompt, onNavigateTab, onMinimize, on
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSummarizing, setIsSummarizing] = useState(false);
   const [recording, setRecording] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<{ name: string; mimeType: string; base64: string } | null>(null);
   const [isDownloadingResume, setIsDownloadingResume] = useState<string | null>(null);
+
+  const handleSummarizeChat = async () => {
+    if (messages.length <= 1) {
+      alert("Please engage in a conversation first before generating an AI summary.");
+      return;
+    }
+
+    setIsSummarizing(true);
+    try {
+      const response = await fetch('/api/summarize-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          history: messages.map(m => ({ role: m.role, content: m.content })),
+          language,
+          uid: user?.uid
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to summarize conversation');
+      }
+
+      const data = await response.json();
+      const summaryContent = data.summary;
+
+      const summaryMessage: Message = {
+        id: `summary-${Date.now()}`,
+        role: 'assistant',
+        content: summaryContent,
+        timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+      };
+
+      setMessages(prev => [...prev, summaryMessage]);
+
+      logActivity('chat', 'AI Session Summary Generated', 'Condensed conversation history into an actionable step-by-step plan.');
+
+      const uEmail = user?.email || localStorage.getItem('recruit_user_email') || 'guest@recruitindia.org';
+      const uName = userData?.profile?.name || user?.displayName || localStorage.getItem('recruit_user_name') || 'Honored Guest';
+      try {
+        fetch('/api/admin/sync-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userEmail: uEmail,
+            userName: uName,
+            sender: 'arohi',
+            text: `[AI Action Plan Summary]\n\n${summaryContent}`,
+            topic: 'Session Summary'
+          })
+        });
+      } catch (e) {
+        // ignore
+      }
+    } catch (error) {
+      console.error('Error generating AI summary:', error);
+      alert('Failed to generate session summary. Please check your network connection.');
+    } finally {
+      setIsSummarizing(false);
+    }
+  };
 
   const logActivity = (type: string, title: string, description: string) => {
     try {
@@ -259,59 +343,35 @@ export default function ArohiChat({ initialPrompt, onNavigateTab, onMinimize, on
     }
   };
 
-  const handleVoiceCallComplete = (summaryData: {
+  const handleVoiceCallComplete = async (summaryData: {
     duration: number;
     turns: any[];
     date: string;
     summaryText: string;
     analysis?: any;
   }) => {
-    const analysis = summaryData.analysis || analyzeTurns(summaryData.turns);
-    const summaryJson = JSON.stringify(summaryData);
-    
-    // Construct dynamic bullet points for the discussion log
-    const discussionBullets = analysis.priorities.map((prio: string) => `* **Key Focus:** ${prio}`).join('\n');
-    const completedTasksList = analysis.completedTasks.map((task: string) => `* **Completed Task:** ${task}`).join('\n');
-    
-    const title = analysis.topics.business ? "AROHI Live Voice Business Consultation Summary" : "AROHI Live Voice Career Consultation Summary";
-    const reportName = analysis.topics.business ? "Custom Entrepreneurial Briefing & Business Action Plan" : "Custom Career Blueprint";
-    
+    const durationFormatted = summaryData.duration > 0 
+      ? `${Math.floor(summaryData.duration / 60)}m ${summaryData.duration % 60}s`
+      : '0m';
+
     const newMsg: Message = {
-      id: `call-summary-${Date.now()}`,
+      id: `call-end-${Date.now()}`,
       role: 'assistant',
-      content: `### 📞 ${title}
-      
-Thank you for connecting with AROHI over the secure live voice link. I have captured your objectives and prepared your **${reportName}**.
-
-**Call Metadata:**
-* **Session Date:** ${summaryData.date}
-* **Active Duration:** ${summaryData.duration > 0 ? Math.floor(summaryData.duration / 60).toString().padStart(2, '0') + ':' + (summaryData.duration % 60).toString().padStart(2, '0') : '00:00'}
-* **Voice Channel:** Zephyr (Fidelity Codec Link)
-
-**Discussion Summary:**
-${analysis.summary}
-
-**Identified Task Completions:**
-${completedTasksList}
-
-**Action Plan & Strategic Priorities:**
-${discussionBullets}
-
-[CALL_SUMMARY_DATA_START]${summaryJson}[CALL_SUMMARY_DATA_END]`,
+      content: `📞 **Voice Consultation Ended** (${durationFormatted})\n\nThank you for speaking with AROHI. How else can I assist you today?`,
       timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
     };
     
     const updatedMessages = [...messages, newMsg];
     setMessages(updatedMessages);
 
-    // Save and sync the updated chat with the new call summary directly to Firestore/localStorage
+    // Save and sync the updated chat
     let targetChatId = activeChatId;
     let currentSavedChats = [...savedChats];
     if (!targetChatId || currentSavedChats.length === 0) {
       targetChatId = 'chat-' + Date.now();
       const newChatContainer = {
         id: targetChatId,
-        title: analysis.topics.business ? 'Voice Business Session' : 'Voice Career Session',
+        title: 'Voice Session',
         date: 'Today',
         messages: [
           {
@@ -329,13 +389,8 @@ ${discussionBullets}
     } else {
       currentSavedChats = currentSavedChats.map(chat => {
         if (chat.id === targetChatId) {
-          let title = chat.title;
-          if (title === 'New Conversation' || title === 'New Discussion' || title === 'New Chat') {
-            title = analysis.topics.business ? 'Voice Business Session' : 'Voice Career Session';
-          }
           return {
             ...chat,
-            title,
             messages: updatedMessages
           };
         }
@@ -350,15 +405,14 @@ ${discussionBullets}
       localStorage.setItem('guest_arohi_chats', JSON.stringify(currentSavedChats));
     }
 
-    // Sync call summary to saved calls
+    // Sync call item
     const newCallItem = {
       id: `call-${Date.now()}`,
       duration: summaryData.duration,
       turns: summaryData.turns,
       date: summaryData.date,
-      summaryText: summaryData.summaryText || analysis.summary,
-      isCareerRelated: !analysis.topics.business,
-      analysis: analysis
+      summaryText: `Voice call completed (${durationFormatted})`,
+      isCareerRelated: true
     };
 
     const updatedCalls = [newCallItem, ...savedCalls];
@@ -370,51 +424,11 @@ ${discussionBullets}
     }
 
     // Track voice call completion in User Panel activities
-    const uEmail = user?.email || localStorage.getItem('recruit_user_email') || 'guest@recruitindia.org';
-    const uName = userData?.profile?.name || user?.displayName || localStorage.getItem('recruit_user_name') || 'Honored Guest';
-    const activeTopic = analysis.topics.business ? "Bakery Business Plan" : "General Consultation";
-
     logActivity(
-      analysis.topics.business ? 'business' : 'chat',
-      analysis.topics.business ? 'Arohi Business Briefing Finished' : 'Arohi Voice Consultation Finished',
-      `Completed a secure ${Math.floor(summaryData.duration / 60)}m ${summaryData.duration % 60}s live voice call. ${analysis.summary.substring(0, 140)}...`
+      'chat',
+      'Arohi Voice Consultation Finished',
+      `Completed a voice call (${durationFormatted}).`
     );
-
-    // Sync turns to Admin panel live
-    summaryData.turns.forEach(async (turn) => {
-      try {
-        await fetch('/api/admin/sync-chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userEmail: uEmail,
-            userName: uName,
-            sender: turn.speaker === 'user' ? 'user' : 'arohi',
-            text: turn.text,
-            topic: activeTopic
-          })
-        });
-      } catch (e) {
-        console.error("Failed to sync call turn to admin portal:", e);
-      }
-    });
-
-    // Also sync overall summary message
-    try {
-      fetch('/api/admin/sync-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userEmail: uEmail,
-          userName: uName,
-          sender: 'arohi',
-          text: `[Call Summary Generated] ${analysis.summary}`,
-          topic: activeTopic
-        })
-      });
-    } catch (e) {
-      // ignore
-    }
   };
 
   const handleDownloadResumeDocx = async (resumeData: any, messageId: string) => {
@@ -749,13 +763,28 @@ Here is your customized learning journey:
   };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const simulationIntervalRef = useRef<any>(null);
 
-  // Auto-scroll to bottom of messages
+  // Auto-scroll to bottom of messages / speech-to-text transcript
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+    const scrollToBottom = () => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      }
+    };
+
+    scrollToBottom();
+    const frameId = requestAnimationFrame(scrollToBottom);
+    const timeoutId = setTimeout(scrollToBottom, 50);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      clearTimeout(timeoutId);
+    };
+  }, [messages, isLoading, input, recording]);
 
   // Cleanup speech recognition and simulation on unmount
   useEffect(() => {
@@ -826,6 +855,49 @@ Here is your customized learning journey:
       });
     } catch (e) {
       console.error('Error syncing user message to admin:', e);
+    }
+
+    // Check if user is asking for image generation
+    const lowerText = text.toLowerCase().trim();
+    const isImageRequest = lowerText.startsWith('generate image') || 
+                           lowerText.startsWith('create image') || 
+                           lowerText.startsWith('draw') || 
+                           lowerText.startsWith('/image') || 
+                           lowerText.includes('generate an image of') || 
+                           lowerText.includes('generate image of') || 
+                           lowerText.includes('create a logo for') ||
+                           lowerText.includes('create an image of');
+
+    if (isImageRequest) {
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `Currently, I am unable to generate images as the AI image generation feature is temporarily unavailable.
+
+However, I can assist you with text-based consultations, business plan blueprints, government scheme guidance, resume optimization, mock interview practice, and career counseling!`,
+        timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+      setIsLoading(false);
+
+      // Sync assistant response to admin portal
+      try {
+        fetch('/api/admin/sync-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userEmail: uEmail,
+            userName: uName,
+            sender: 'arohi',
+            text: `[Image generation requested - informed user feature is currently unavailable]`,
+            topic: activeTopic
+          })
+        });
+      } catch (e) {
+        // ignore
+      }
+      return;
     }
 
     try {
@@ -1038,7 +1110,8 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
           rec.onresult = (event: any) => {
             let fullTranscript = '';
             for (let i = 0; i < event.results.length; ++i) {
-              fullTranscript += event.results[i][0].transcript;
+              const transcriptSegment = event.results[i][0].transcript;
+              fullTranscript += transcriptSegment;
             }
             const cleanText = fullTranscript.trim();
             if (cleanText) {
@@ -1396,6 +1469,7 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
               <Phone className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
               <span className="text-[10px] font-extrabold uppercase tracking-wide hidden xs:inline">Live Call</span>
             </button>
+
             <button
               onClick={() => {
                 setMessages((prev) => [prev[0]]);
@@ -1431,7 +1505,7 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
         </div>
 
         {/* Messages Scrolling Container */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 bg-[#090714]">
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 bg-[#090714]">
           {messages.map((msg) => {
             const summaryParsed = msg.role === 'assistant'
               ? parseMessageCallSummary(msg.content)
@@ -1461,91 +1535,6 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
                   <div className="prose prose-sm max-w-none text-xs md:text-sm">
                     {renderMarkdown(parsed.cleanedContent)}
                   </div>
-
-                  {summaryParsed.summaryData && (
-                    <div className="mt-4 p-4 rounded-xl bg-gradient-to-br from-[#0c0a21] to-[#1a123a] border border-[#7c3aed]/40 shadow-lg flex flex-col gap-4 text-left">
-                      <div className="flex items-center gap-3 border-b border-[#2d1b5a] pb-3">
-                        <div className="p-2 bg-[#7c3aed]/25 rounded-lg text-[#a78bfa] border border-[#7c3aed]/45">
-                          <Phone className="w-4.5 h-4.5 text-indigo-300 animate-pulse" />
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-black text-white uppercase tracking-widest">AROHI Voice Consultation</h4>
-                          <p className="text-[9px] text-emerald-400 font-black mt-0.5 uppercase tracking-wide">Ready for Export • 100% Secure</p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2 text-[10px] sm:text-xs text-slate-300">
-                        <div className="bg-[#120c35]/40 p-2 rounded-lg border border-[#2d1f65]">
-                          <span className="text-[8px] text-slate-400 uppercase font-extrabold tracking-wider">Duration</span>
-                          <p className="font-extrabold text-white mt-0.5">
-                            {summaryParsed.summaryData.duration > 0 
-                              ? Math.floor(summaryParsed.summaryData.duration / 60).toString().padStart(2, '0') + ':' + (summaryParsed.summaryData.duration % 60).toString().padStart(2, '0') 
-                              : '02:45'}
-                          </p>
-                        </div>
-                        <div className="bg-[#120c35]/40 p-2 rounded-lg border border-[#2d1f65]">
-                          <span className="text-[8px] text-slate-400 uppercase font-extrabold tracking-wider">Format</span>
-                          <p className="font-extrabold text-white mt-0.5">PDF Document</p>
-                        </div>
-                      </div>
-
-                      {/* Summary Actions List */}
-                      {(() => {
-                        const chatAnalysis = summaryParsed.summaryData.analysis || analyzeTurns(summaryParsed.summaryData.turns);
-                        return (
-                          <div className="space-y-2 pt-1">
-                            {/* Download PDF call summary - Always shown */}
-                            <button
-                              onClick={() => generateCallSummaryPDF(summaryParsed.summaryData.turns, summaryParsed.summaryData.duration, chatAnalysis)}
-                              className="w-full py-2.5 px-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-lg font-extrabold text-[10px] uppercase tracking-wider text-white shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
-                            >
-                              <Sparkles className="w-3.5 h-3.5 text-emerald-200" /> Download Call Summary (PDF)
-                            </button>
-
-                            {/* Export Professional Resume PDF - Only if resume discussed */}
-                            {chatAnalysis.topics.resume && (
-                              <button
-                                onClick={generateResumePDF}
-                                className="w-full py-2.5 px-3 bg-[#17103a] hover:bg-[#20164e] border border-[#442c94] rounded-lg font-extrabold text-[10px] uppercase tracking-wider text-slate-200 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
-                              >
-                                <Briefcase className="w-3.5 h-3.5 text-violet-400" /> Export Professional Resume (PDF)
-                              </button>
-                            )}
-
-                            {/* Apply to Matched Jobs - Only if jobs discussed */}
-                            {chatAnalysis.topics.jobs && (
-                              <button
-                                onClick={() => {
-                                  if (onNavigateTab) {
-                                    onNavigateTab('jobs');
-                                  }
-                                }}
-                                className="w-full py-2.5 px-3 bg-[#17103a] hover:bg-[#20164e] border border-[#442c94] rounded-lg font-extrabold text-[10px] uppercase tracking-wider text-slate-200 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
-                              >
-                                <ArrowRight className="w-3.5 h-3.5 text-amber-400" /> Apply to Matched Jobs
-                              </button>
-                            )}
-
-                            {/* Save Bakery Business Plan - Only if business discussed */}
-                            {chatAnalysis.topics.business && (
-                              <button
-                                onClick={() => {
-                                  localStorage.setItem('arohi_business_plan', JSON.stringify({
-                                    savedAt: new Date().toISOString(),
-                                    model: 'Bakery Business Model',
-                                    priorities: chatAnalysis.priorities
-                                  }));
-                                }}
-                                className="w-full py-2.5 px-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 rounded-lg font-extrabold text-[10px] uppercase tracking-wider text-white shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
-                              >
-                                <CheckCircle className="w-3.5 h-3.5 text-amber-200 animate-pulse" /> Save Bakery Business Plan
-                              </button>
-                            )}
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  )}
 
                   {parsed.resumeData && (
                     <div className="mt-4 p-4 rounded-xl bg-gradient-to-br from-[#1c1445] to-[#26165e] border border-[#a78bfa]/40 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
@@ -1632,11 +1621,57 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
             </div>
           )}
 
+          {recording && (
+            <div className="flex gap-4 justify-end animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="max-w-[85%] md:max-w-[75%] rounded-2xl p-4 shadow-md bg-gradient-to-r from-violet-900/80 to-purple-900/80 text-white rounded-tr-none border border-violet-500/40 font-medium text-left">
+                <div className="flex items-center gap-2 text-[11px] text-violet-300 font-extrabold uppercase tracking-wider mb-1.5">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                  <Mic className="w-3.5 h-3.5 text-rose-400" /> Live Speech-to-Text...
+                </div>
+                <p className="text-xs sm:text-sm text-slate-100 italic">
+                  {input ? (
+                    <span className="inline">
+                      {input}
+                      <span className="inline-block w-1.5 h-4 ml-1 bg-violet-400 animate-pulse align-middle rounded-full" />
+                    </span>
+                  ) : (
+                    "Listening for speech..."
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
+
           <div ref={messagesEndRef} />
         </div>
 
         {/* Input box bottom bar */}
         <div className="border-t border-[#231a4f] p-3 sm:p-4 bg-[#120d26]">
+          {/* Quick AI Summarize Action Banner when session has history */}
+          {messages.length >= 3 && (
+            <div className="mb-2.5 flex items-center justify-between px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#1c1340] to-[#281552] border border-[#a78bfa]/25 shadow-md">
+              <span className="text-[10px] sm:text-xs text-slate-200 font-bold flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                Want an executive action plan of this chat session?
+              </span>
+              <button
+                onClick={handleSummarizeChat}
+                disabled={isSummarizing}
+                className="px-2.5 py-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-[10px] font-black uppercase tracking-wider rounded-lg shadow-sm cursor-pointer transition-all flex items-center gap-1 shrink-0 disabled:opacity-50"
+              >
+                {isSummarizing ? (
+                  <>
+                    <RefreshCw className="w-3 h-3 animate-spin" /> Summarizing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3 h-3 text-slate-950" /> Summarize Chat
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
           {/* Dynamic connected suggestion chips */}
           <div className="mb-3">
             <div className="flex gap-1.5 overflow-x-auto pb-1.5 select-none scrollbar-none">
@@ -1888,21 +1923,7 @@ As **AROHI**, your opportunity advisor, let me recommend checking out our **Jobs
             </div>
 
             {/* Footer Actions */}
-            <div className="bg-[#140e2b] px-6 py-4 flex flex-col sm:flex-row gap-3 items-center justify-between border-t border-[#2d2163]">
-              <button
-                onClick={() => {
-                  try {
-                    generateCallSummaryPDF(selectedCallDetail.turns || [], selectedCallDetail.duration || 0, selectedCallDetail.analysis);
-                  } catch (err) {
-                    console.error("PDF generation failed:", err);
-                    alert("PDF Generation Failed");
-                  }
-                }}
-                className="w-full sm:w-auto bg-[#1b153c] hover:bg-slate-700 text-white text-xs font-black uppercase tracking-wider py-3 px-5 rounded-2xl border border-[#3b2a80] cursor-pointer flex items-center justify-center gap-2 active:scale-95 transition-all"
-              >
-                <Award className="w-4 h-4 text-amber-400" /> Export Summary PDF
-              </button>
-
+            <div className="bg-[#140e2b] px-6 py-4 flex flex-col sm:flex-row gap-3 items-center justify-end border-t border-[#2d2163]">
               <button
                 onClick={() => {
                   const discussChatId = 'discuss-call-' + Date.now();

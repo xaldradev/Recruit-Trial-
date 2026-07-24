@@ -1718,19 +1718,50 @@ app.post('/api/admin/add-payment', async (req, res) => {
   return res.json({ success: true, transaction: newTxn });
 });
 
-// 6. Sync / Add to user Chat logs
+// 6. Sync / Add to user Chat logs (supports single message or batch turns array)
 app.post('/api/admin/sync-chat', async (req, res) => {
-  const { userEmail, userName, sender, text, topic } = req.body;
-  if (!userEmail || !sender || !text) {
-    return res.status(400).json({ error: 'userEmail, sender and text are required' });
+  const { userEmail, userName, sender, text, topic, turns, messages } = req.body;
+  if (!userEmail) {
+    return res.status(400).json({ error: 'userEmail is required' });
   }
 
   const cleanEmail = userEmail.toLowerCase();
   const msgTime = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 
+  // Normalize incoming input into a list of messages
+  const itemsToSync: Array<{ sender: string; text: string; time: string }> = [];
+  
+  if (Array.isArray(turns) && turns.length > 0) {
+    turns.forEach((t: any) => {
+      if (t && t.text) {
+        itemsToSync.push({
+          sender: t.speaker === 'user' || t.sender === 'user' ? 'user' : 'arohi',
+          text: t.text,
+          time: t.timestamp || t.time || msgTime
+        });
+      }
+    });
+  } else if (Array.isArray(messages) && messages.length > 0) {
+    messages.forEach((m: any) => {
+      if (m && m.text) {
+        itemsToSync.push({
+          sender: m.sender === 'user' ? 'user' : 'arohi',
+          text: m.text,
+          time: m.time || msgTime
+        });
+      }
+    });
+  } else if (sender && text) {
+    itemsToSync.push({ sender, text, time: msgTime });
+  }
+
+  if (itemsToSync.length === 0) {
+    return res.status(400).json({ error: 'No valid message or turns provided to sync' });
+  }
+
   let log = serverChatLogs.find(l => l.userEmail && l.userEmail.toLowerCase() === cleanEmail);
   if (log) {
-    log.messages.push({ sender, text, time: msgTime });
+    log.messages.push(...itemsToSync);
     if (topic) log.topic = topic;
   } else {
     log = {
@@ -1738,17 +1769,16 @@ app.post('/api/admin/sync-chat', async (req, res) => {
       userEmail: cleanEmail,
       userName: userName || cleanEmail.split('@')[0],
       topic: topic || 'General Consultation',
-      sentiment: text.toLowerCase().includes('help') || text.toLowerCase().includes('urgent') ? 'Urgent' : 'Neutral',
-      messages: [{ sender, text, time: msgTime }]
+      sentiment: itemsToSync.some(i => i.text.toLowerCase().includes('help') || i.text.toLowerCase().includes('urgent')) ? 'Urgent' : 'Neutral',
+      messages: [...itemsToSync]
     };
     serverChatLogs.unshift(log);
   }
 
   const userIdx = serverAdminUsers.findIndex(u => u && u.email && u.email.toLowerCase() === cleanEmail);
   if (userIdx !== -1) {
-    if (sender === 'user') {
-      serverAdminUsers[userIdx].usage.chatsWithArohi += 1;
-    }
+    const userMessageCount = itemsToSync.filter(i => i.sender === 'user').length;
+    serverAdminUsers[userIdx].usage.chatsWithArohi += userMessageCount;
   }
 
   // Sync back to Firestore / Local DB using safeUserDb where possible
@@ -1763,28 +1793,27 @@ app.post('/api/admin/sync-chat', async (req, res) => {
   const updateChatsInDoc = async (uid: string, userData: any) => {
     let arohiChats = userData.arohiChats || [];
 
-    // Try to find the chat session by title/topic or use the latest one
     let existingChatIdx = arohiChats.findIndex((c: any) => c.title === (topic || 'General Consultation') || c.title === 'Arohi AI Consultation');
     if (existingChatIdx === -1 && arohiChats.length > 0) {
-      existingChatIdx = arohiChats.length - 1; // Fallback to last chat
+      existingChatIdx = arohiChats.length - 1;
     }
 
-    const newMsg = {
+    const newMsgs = itemsToSync.map(item => ({
       id: `msg-${Math.random().toString(36).substring(2, 9)}`,
-      role: sender === 'user' ? 'user' as const : 'assistant' as const,
-      content: text,
-      timestamp: msgTime
-    };
+      role: item.sender === 'user' ? 'user' as const : 'assistant' as const,
+      content: item.text,
+      timestamp: item.time
+    }));
 
     if (existingChatIdx !== -1) {
       arohiChats[existingChatIdx].messages = arohiChats[existingChatIdx].messages || [];
-      arohiChats[existingChatIdx].messages.push(newMsg);
+      arohiChats[existingChatIdx].messages.push(...newMsgs);
     } else {
       arohiChats.push({
         id: log.id,
         title: topic || 'General Consultation',
         date: new Date().toLocaleDateString('en-GB'),
-        messages: [newMsg]
+        messages: newMsgs
       });
     }
 
@@ -2334,6 +2363,109 @@ Construct this JSON strictly based on details discussed, or use standard profess
       response: `[AROHI AI Server Note: Encountered an API error. Here is a simulated response to help you build:]\n\n${getArohiFallbackResponse(messageText, file ? file.name : undefined)}`,
       error: error.message
     });
+  }
+});
+
+// AI Image Generation Endpoint (Disabled per user request)
+app.post('/api/generate-image', async (req, res) => {
+  return res.json({
+    success: false,
+    error: "Image generation feature is currently disabled.",
+    message: "Currently, AI image generation is temporarily unavailable. AROHI can assist you with text-based guidance, schemes, career advice, and business plans."
+  });
+});
+
+// Helper for generating structured summary fallback when Gemini is unavailable
+function generateFallbackSummary(history: any[]) {
+  const userMessages = history.filter((h: any) => h.role === 'user' || h.role === 'candidate');
+  const userText = userMessages.map((m: any) => m.content || m.text || '').join(' ');
+
+  const topics = [];
+  if (/job|vacancy|exam|ssc|upsc|career|hire|interview/.test(userText.toLowerCase())) topics.push('Career & Placement Strategy');
+  if (/business|bakery|mudra|loan|startup|shop|msme|udyam/.test(userText.toLowerCase())) topics.push('MSME & Business Development');
+  if (/course|learn|skill|upskill|react|python|training/.test(userText.toLowerCase())) topics.push('Skills Upskilling & Certifications');
+  if (topics.length === 0) topics.push('General Career & Growth Consultation');
+
+  return `### 📌 Session Executive Summary
+The session focused on **${topics.join(', ')}**. AROHI provided strategic consultation and actionable guidance tailored to your objectives.
+
+### 🎯 Key Objectives Identified
+- **Goal Definition**: Clarified primary target milestones and requirements discussed during the session.
+- **Strategic Mapping**: Evaluated eligibility and optimal pathways for career advancement and business setup.
+- **Resource Alignment**: Identified relevant government schemes, skill programs, and job placement tracks.
+
+### ⚡ Step-by-Step Action Plan
+1. **[Review Guidelines]**: Carefully go through the customized recommendations provided by AROHI in this chat.
+2. **[Document & Prepare]**: Gather all required credentials, resumes, or business documentation needed for execution.
+3. **[Apply & Practice]**: Utilize Arohi AI tools (Resume Analyzer, Mock Interview, or Mudra Loan Checker) to proceed to the next stage.
+
+### 💡 Recommended Tools, Schemes & Resources
+- **Arohi AI Skill Sandbox**: Interactive modules to test skills and build interview confidence.
+- **Government Portals**: Explore official portals (e.g. Udyam MSME Registration, NCS National Career Service).`;
+}
+
+// 1.1. AI Summarize Chat Session Endpoint using secondary Gemini prompt
+app.post('/api/summarize-chat', async (req, res) => {
+  const { history, language, uid } = req.body;
+
+  if (!history || !Array.isArray(history) || history.length === 0) {
+    return res.status(400).json({ error: 'Chat history array is required to generate a summary.' });
+  }
+
+  // Format history into readable conversation text
+  const formattedTranscript = history
+    .map((h: any) => `${h.role === 'assistant' || h.role === 'arohi' ? 'AROHI AI' : 'User'}: ${h.content || h.text || ''}`)
+    .join('\n\n');
+
+  const summarySystemInstruction = `You are AROHI (India's AI Opportunity Advisor). Your task is to act as an expert executive summarizer.
+Analyze the provided chat session history between the user and AROHI AI.
+Synthesize the discussion into a clear, highly structured, bulleted action plan.
+
+Structure your output in Markdown with the following mandatory sections:
+
+### 📌 Session Executive Summary
+(1-2 concise sentences summarizing the primary topic, user goals, and key guidance provided)
+
+### 🎯 Key Objectives Identified
+- Bullet point 1
+- Bullet point 2
+- Bullet point 3
+
+### ⚡ Step-by-Step Action Plan
+1. **[Immediate Action 1]**: Detailed description of what to do first.
+2. **[Next Milestone 2]**: Next step towards achieving the goal.
+3. **[Follow-up Step 3]**: Long-term execution or verification step.
+
+### 💡 Recommended Tools, Schemes & Resources
+- **Resource/Scheme 1**: Relevant link, portal, government scheme (e.g. Mudra Loan, PMKVY, Udyam, SSC/UPSC Portal), or tool.
+- **Resource/Scheme 2**: Supporting resource or learning module.
+
+Keep the tone encouraging, professional, and directly actionable. Use bold headings, clear markdown formatting, and crisp bullet points.`;
+
+  try {
+    if (aiClient) {
+      const response = await generateContentWithFallback(aiClient, {
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: `Please analyze and summarize this session history into a bulleted action plan:\n\n${formattedTranscript}` }]
+          }
+        ],
+        config: {
+          systemInstruction: summarySystemInstruction,
+          temperature: 0.4,
+        }
+      });
+
+      return res.json({ summary: response.text });
+    } else {
+      const fallbackSummary = generateFallbackSummary(history);
+      return res.json({ summary: fallbackSummary, fallback: true });
+    }
+  } catch (error: any) {
+    console.error('Error in /api/summarize-chat:', error);
+    const fallbackSummary = generateFallbackSummary(history);
+    return res.json({ summary: fallbackSummary, error: error.message });
   }
 });
 
@@ -3796,9 +3928,10 @@ async function startServer() {
       }
     };
     
-    // Parse the voice and uid parameters safely from the query string
+    // Parse the voice, uid, and lang parameters safely from the query string
     let selectedVoice = 'Zephyr';
     let uid = '';
+    let reqLang = 'en';
     if (request.url) {
       const match = request.url.match(/[?&]voice=([^&]+)/);
       if (match) {
@@ -3807,6 +3940,10 @@ async function startServer() {
       const uidMatch = request.url.match(/[?&]uid=([^&]+)/);
       if (uidMatch) {
         uid = decodeURIComponent(uidMatch[1]);
+      }
+      const langMatch = request.url.match(/[?&]lang=([^&]+)/);
+      if (langMatch) {
+        reqLang = decodeURIComponent(langMatch[1]);
       }
     }
 
@@ -3822,8 +3959,8 @@ async function startServer() {
     }
 
     try {
-      console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}, uid: ${uid}`);
-      logWsEvent('gemini_live_connecting', { voice: selectedVoice, uid });
+      console.log(`Connecting to Gemini Live API with voice: ${selectedVoice}, uid: ${uid}, lang: ${reqLang}`);
+      logWsEvent('gemini_live_connecting', { voice: selectedVoice, uid, lang: reqLang });
 
       let voiceSystemInstruction = AROHI_SYSTEM_INSTRUCTION + 
         "\n\nCRITICAL VOICE INITIALIZATION AND PERSONA RULES:" +
@@ -3831,7 +3968,13 @@ async function startServer() {
         "\n- Keep responses brief but informative (2-4 sentences per turn) so they read beautifully as spoken speech without any latency." +
         "\n- IMPORTANT GREETING MANDATE: You MUST begin this voice call immediately with the following exact, word-for-word welcoming note:" +
         "\n  \"Namaste! Welcome to Arohi AI. I am Arohi, your AI Opportunity & Growth Guide. Whether you are a student, teacher, doctor, scientist, government aspirant, parent, entrepreneur, or running an MSME, organization, or enterprise—or even if you're a citizen of Mars or Jupiter!—I am here to guide you in 150+ languages with voice calls. How can I empower you and fuel your journey today?\"" +
-        "\n- Do NOT ask 'do you have any questions for business or career or jobs?' as your opening statement. Start exactly with the mandated welcoming note above.";
+        "\n- Do NOT ask 'do you have any questions for business or career or jobs?' as your opening statement. Start exactly with the mandated welcoming note above." +
+        "\n\n=== DYNAMIC INSTANT LANGUAGE ADAPTATION MANDATE ===" +
+        "\n- INSTANT MULTILINGUAL MIRRORING: Arohi supports 150+ languages (Odia/ଓଡ଼ିଆ, Hindi/हिंदी, English, Bengali, Telugu, Tamil, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Urdu, etc.)." +
+        "\n- IF THE USER SPEAKS OR SENDS A PROMPT IN ODIA (e.g., ଓଡ଼ିଆ script or transliterated/phonetic Odia like 'mote business karibaku achhi', 'kemiti achha', 'mu odisha ru', 'state schemes bisayare kuha', 'kan karibi'), YOU MUST IMMEDIATELY SWITCH AND REPLY IN NATIVE ODIA OR SPOKEN ODIA!" +
+        "\n- IF THE USER SPEAKS IN ANY OTHER LANGUAGE (Hindi, Bengali, Telugu, Tamil, etc.), IMMEDIATELY MATCH AND REPLY IN THAT EXACT USER-SPOKEN LANGUAGE." +
+        "\n- NEVER remain in English or Hindi if the user starts speaking Odia or another regional language. Instantly pivot your voice response to the user's spoken language on that very turn!" +
+        (reqLang && reqLang !== 'en' ? `\n- INITIAL PREFERRED LANGUAGE HINT: The user's active UI language setting is set to '${reqLang}'.` : '');
 
       if (uid) {
         try {
@@ -3920,6 +4063,14 @@ async function startServer() {
                         finished = true;
                         console.log(`Gemini Live session stable on model: ${liveModel}`);
                         resolve(tempSession);
+
+                        // Send initial mandated welcome greeting transcript to client immediately
+                        if (clientWs.readyState === WebSocket.OPEN) {
+                          try {
+                            const greetingText = "Namaste! Welcome to Arohi AI. I am Arohi, your AI Opportunity & Growth Guide. Whether you are a student, teacher, doctor, scientist, government aspirant, parent, entrepreneur, or running an MSME, organization, or enterprise—I am here to guide you in 150+ languages with voice calls. How can I empower you and fuel your journey today?";
+                            clientWs.send(JSON.stringify({ transcript: greetingText, speaker: 'arohi' }));
+                          } catch (e) {}
+                        }
                       }
                     }, 400); // Wait 400ms to ensure the connection is stable and not immediately closed by validation
                   },
@@ -3927,13 +4078,16 @@ async function startServer() {
                     // Only process messages if this is the active session
                     if (session !== tempSession) return;
 
-                    // Forward audio data to client safely
-                    const audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-                    if (audio && clientWs.readyState === WebSocket.OPEN) {
-                      try {
-                        clientWs.send(JSON.stringify({ audio }));
-                      } catch (e) {
-                        console.error("Error sending live audio packet:", e);
+                    // Forward audio data to client safely from all parts
+                    if (message.serverContent?.modelTurn?.parts) {
+                      for (const part of message.serverContent.modelTurn.parts) {
+                        if (part.inlineData?.data && clientWs.readyState === WebSocket.OPEN) {
+                          try {
+                            clientWs.send(JSON.stringify({ audio: part.inlineData.data }));
+                          } catch (e) {
+                            console.error("Error sending live audio packet:", e);
+                          }
+                        }
                       }
                     }
                     if (message.serverContent?.interrupted && clientWs.readyState === WebSocket.OPEN) {
@@ -3946,8 +4100,20 @@ async function startServer() {
                     let transcriptText = "";
                     let transcriptSpeaker: "user" | "arohi" | null = null;
 
-                    // 1. Check userTurn in serverContent (Standard Multimodal Live API response)
-                    if (message.serverContent?.userTurn?.parts) {
+                    // 1. Check outputAudioTranscription (Gemini Live API's output speech transcription)
+                    if (message.serverContent?.outputAudioTranscription?.text) {
+                      transcriptText += message.serverContent.outputAudioTranscription.text;
+                      transcriptSpeaker = "arohi";
+                    }
+
+                    // 2. Check inputAudioTranscription (Gemini Live API's input speech transcription)
+                    if (message.serverContent?.inputAudioTranscription?.text) {
+                      transcriptText += message.serverContent.inputAudioTranscription.text;
+                      transcriptSpeaker = "user";
+                    }
+
+                    // 3. Check userTurn in serverContent (Standard Multimodal Live API response)
+                    if (!transcriptText && message.serverContent?.userTurn?.parts) {
                       for (const part of message.serverContent.userTurn.parts) {
                         if (part.text) {
                           transcriptText += part.text;
@@ -3956,7 +4122,7 @@ async function startServer() {
                       }
                     }
 
-                    // 2. Check legacy / alternative userContent.parts
+                    // 4. Check legacy / alternative userContent.parts
                     if (!transcriptText && message.userContent?.parts) {
                       for (const part of message.userContent.parts) {
                         if (part.text) {
@@ -3966,14 +4132,23 @@ async function startServer() {
                       }
                     }
 
-                    // 3. Check modelTurn in serverContent
-                    if (message.serverContent?.modelTurn?.parts) {
+                    // 5. Check modelTurn in serverContent
+                    if (!transcriptText && message.serverContent?.modelTurn?.parts) {
                       for (const part of message.serverContent.modelTurn.parts) {
                         if (part.text) {
                           transcriptText += part.text;
                           transcriptSpeaker = "arohi";
                         }
                       }
+                    }
+
+                    // 6. Check top-level or delta text
+                    if (!transcriptText && message.text) {
+                      transcriptText = message.text;
+                      transcriptSpeaker = "arohi";
+                    } else if (!transcriptText && message.delta?.text) {
+                      transcriptText = message.delta.text;
+                      transcriptSpeaker = "arohi";
                     }
 
                     if (transcriptText && clientWs.readyState === WebSocket.OPEN) {
@@ -4052,6 +4227,17 @@ async function startServer() {
             session.sendRealtimeInput({
               audio: { data: parsed.audio, mimeType: "audio/pcm;rate=16000" },
             });
+          }
+          if (parsed.text && session) {
+            try {
+              session.sendClientContent({
+                turns: [{ role: 'user', parts: [{ text: parsed.text }] }],
+                turnComplete: true
+              });
+              console.log(`Forwarded user text prompt to Gemini Live session: "${parsed.text}"`);
+            } catch (textErr) {
+              console.error("Error forwarding text to Gemini Live session:", textErr);
+            }
           }
         } catch (err) {
           console.error("Error forwarding user audio to Gemini Live:", err);
