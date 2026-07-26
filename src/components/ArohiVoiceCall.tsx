@@ -552,6 +552,12 @@ export default function ArohiVoiceCall({ onClose, language = 'en', onNavigateTab
           const vol = Math.min(100, Math.floor(rms * 450));
           setUserVolume(vol);
 
+          // Instant Client-side Barge-In: If user speaks into mic (vol > 16) while Arohi is playing audio, stop audio playback immediately so Arohi listens
+          if (vol > 16 && audioQueueRef.current.length > 0) {
+            stopAllPlayback();
+            setStatus(isMutedRef.current ? 'muted' : 'listening');
+          }
+
           const rawBuffer = floatTo16BitPCM(float32Data);
           const base64Pcm = arrayBufferToBase64(rawBuffer);
 

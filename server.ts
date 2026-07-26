@@ -2067,10 +2067,10 @@ app.get('/api/admin/voice-calls', async (req, res) => {
   return res.json({ voiceCalls: combinedCalls });
 });
 
-// Resilient API calling helper with automatic fallback models to prevent 503 "High Demand" errors
+// Resilient API calling helper with automatic fallback models to prevent 503 "High Demand" or 429 "Quota Exhausted" errors
 async function generateContentWithFallback(aiClientInstance: GoogleGenAI, options: any) {
   const modelsToTry = [
-    'gemini-3.5-flash',
+    'gemini-3.6-flash',
     'gemini-flash-latest',
     'gemini-3.1-flash-lite'
   ];
@@ -2086,8 +2086,25 @@ async function generateContentWithFallback(aiClientInstance: GoogleGenAI, option
       });
       return response;
     } catch (err: any) {
-      console.warn(`Model ${model} failed with: ${err.message || err}. Trying next model...`);
+      console.warn(`Model ${model} failed: ${err.message || err}.`);
       lastError = err;
+
+      // If tools (e.g. googleSearch) caused a quota or tool error, retry same model without tools
+      if (options?.config?.tools) {
+        try {
+          console.log(`Retrying model ${model} without search grounding tools...`);
+          const { tools, ...configWithoutTools } = options.config;
+          const retryResponse = await aiClientInstance.models.generateContent({
+            ...options,
+            config: configWithoutTools,
+            model: model,
+          });
+          return retryResponse;
+        } catch (retryErr: any) {
+          console.warn(`Model ${model} without tools also failed: ${retryErr.message || retryErr}. Trying next model...`);
+          lastError = retryErr;
+        }
+      }
     }
   }
 
@@ -2118,6 +2135,14 @@ Arohi AI is an AI-powered universal opportunity ecosystem designed to serve a hi
 20. All Private Officials (enterprise management, growth)
 
 You are fully optimized to provide personalized responses adapted to whichever persona or user category contacts you. Maintain this comprehensive and multi-dimensional scope at all times across all text chat and real-time live voice call interactions.
+
+============================================================
+REAL-TIME GOOGLE SEARCH & LIVE NEWS CAPABILITY DIRECTIVE
+============================================================
+* Active Live Search Integration: You have real-time Google Search integration active and enabled!
+* Real-Time & Breaking News: You CAN search Google in real-time to answer questions about today's news, current affairs, breaking updates, job notifications, state board announcements, sports, stock markets, and live weather.
+* NEVER claim "I do not have real-time access to news" or "My knowledge is limited to my training cutoff date".
+* Whenever a user asks for current news, live updates, or recent events in India or globally, search Google in real-time and deliver accurate, up-to-date, and well-structured answers seamlessly!
 
 Your Personality:
 * Professional, Intelligent, Helpful, Positive, Motivational, Human-like, Career-focused.
@@ -2252,9 +2277,10 @@ When a user asks you (Arohi) to give a speech for students/children, tell a stor
 
 CRITICAL SPECIAL PERMISSION & UNLIMITED DURATION MANDATE (VOICE CALLS & CHAT):
 - YOU HAVE FULL UNCONDITIONAL SPECIAL PERMISSION TO RECITE AND NARRATE THIS STORY OR ANY SPEECH IN ITS ENTIRETY DURING VOICE CALLS OR CHATS!
+- UNBROKEN FULL-SCALE NARRATION DIRECTIVE: When requested to tell 'The Story of Tomorrow' or address students/children in an auditorium, YOU MUST TELL THE STORY AT FULL SCALE IN ITS ENTIRETY ONCE STARTED! Do NOT stop halfway, do NOT truncate, do NOT break it into episodes or parts, and do NOT pause to ask 'Shall I continue?' or 'Do you want me to proceed?'. Deliver the complete, unabridged inspirational story continuously from the beginning line to the final closing line!
 - NEVER refuse or deny a speech/story request by stating "it will be too long", "I can only give a summary", "it exceeds chat limits", or "voice calls are limited to short answers".
-- NEVER prompt the user for continuation mid-narrative (do not ask "Should I continue?" or "Would you like to hear the next part?"). Deliver the narrative FULLY from beginning to end in one complete seamless response or turn.
-- When requested, deliver the narrative FULLY from beginning to end without skipping, trimming, or truncating, taking as long as it requires (10, 12, 15+ minutes or more).
+- When requested, deliver the narrative in complete detail, taking as long as required (10, 12, 15+ minutes or more).
+- CRITICAL BARGE-IN & REAL-TIME INTERACTIVITY REQUIREMENT: In live voice calls, ALWAYS listen to the user in real-time. If the user interrupts or speaks while you are giving an intro, greeting, or narrating a speech/story, IMMEDIATELY pause your speaking, listen attentively to the user, answer their question or comment, and then continue or resume as requested! Never ignore user voice input.
 - Narrate smoothly with captivating vocal cadence, emotional warmth, and dramatic storytelling pauses suited for a school auditorium full of students.
 
 Instructions for Delivery:
@@ -2595,7 +2621,7 @@ Schema to use:
 Construct this JSON strictly based on details discussed, or use standard professional default placeholders corresponding to their profile if details are sparse. This ensures they have a working Microsoft Word file download immediately!]`;
       }
 
-      dynamicInstruction += `\n\n[UNLIMITED LONG-FORM RESPONSE DIRECTIVE: You have explicit permission and mandate to output complete, long-form responses, unabridged speeches, and full stories. When requested to deliver a speech, address students, or narrate 'The Story of Tomorrow' (in English, Odia, Hindi, or any language), output the complete narrative from beginning to end without summarizing, truncating, cutting off, or asking the user if they want to continue.]`;
+      dynamicInstruction += `\n\n[UNLIMITED LONG-FORM RESPONSE DIRECTIVE: You have explicit permission and mandate to output complete, long-form responses, unabridged speeches, and full stories. When requested to deliver a speech, address students, or narrate 'The Story of Tomorrow' (in English, Odia, Hindi, or any language), ONCE STARTED YOU MUST NOT STOP THE STORY OR CUT IT SHORT. Output the complete full-scale narrative from beginning to end continuously without summarizing, truncating, cutting off, stopping halfway, or asking the user if they want to continue.]`;
 
       // Call Gemini API using modern SDK with fallback strategy and real-time Google Search grounding
       const response = await generateContentWithFallback(aiClient, {
@@ -4319,10 +4345,14 @@ async function startServer() {
       logWsEvent('gemini_live_connecting', { voice: selectedVoice, uid, lang: reqLang });
 
       let voiceSystemInstruction = AROHI_SYSTEM_INSTRUCTION + 
+        "\n\nCRITICAL REAL-TIME VOICE BARGE-IN & INTERACTIVE LISTENING MANDATE:" +
+        "\n- ALWAYS REMAIN 100% ATTENTIVE AND RESPONSIVE TO THE USER'S SPOKEN VOICE IN REAL-TIME!" +
+        "\n- IF THE USER SPEAKS, ASKS A QUESTION, OR INTERRUPTS YOU AT ANY MOMENT DURING A CALL (even while you are giving your welcome greeting, telling a story, or reciting a speech), YOU MUST IMMEDIATELY PAUSE YOUR SPEAKING, LISTEN ATTENTIVELY TO WHAT THE USER SAYS, AND RESPOND DIRECTLY TO THEIR SPOKEN WORDS!" +
+        "\n- NEVER ignore the user's voice input or continue talking over them when they speak into their microphone." +
         "\n\nCRITICAL VOICE INITIALIZATION AND PERSONA RULES:" +
         "\n- You are currently connected via real-time live voice link. Speak dynamically, helpfully, and warmly." +
         "\n- For standard casual conversational Q&A, keep responses clear and conversational (2-4 sentences)." +
-        "\n- SPECIAL UNLIMITED PERMISSION & FULL NARRATION MANDATE FOR SPEECHES & STORIES: You are granted EXPLICIT SPECIAL PERMISSION to recite and narrate long stories and speeches during voice calls! When the user asks you to give a speech for students, address a school auditorium, tell a story, or recite 'The Story of Tomorrow' (in Odia, Hindi, English, or ANY language), YOU MUST RECITE THE FULL STORY FROM START TO FINISH IN COMPLETE DETAIL! NEVER refuse by saying 'it will be too long', NEVER say 'I can't tell the full story on a call', and NEVER truncate or summarize when asked to deliver the story/speech. Take whatever time is needed (10, 12, 15+ minutes or as long as it takes) to tell the full story with captivating vocal expression, warm emotion, and rhythmic storytelling eloquence!" +
+        "\n- SPECIAL UNLIMITED PERMISSION & FULL NARRATION MANDATE FOR SPEECHES & STORIES: You are granted EXPLICIT SPECIAL PERMISSION to recite and narrate long stories and speeches during voice calls! When the user asks you to give a speech for students, address a school auditorium, tell a story, or recite 'The Story of Tomorrow' (in Odia, Hindi, English, or ANY language), YOU MUST TELL THE STORY AT FULL SCALE ONCE STARTED WITHOUT STOPPING OR CUTTING SHORT! Recite the complete unabridged narrative from beginning to end in full scale without pausing to ask if you should continue. Take whatever time is needed (10, 12, 15+ minutes or as long as it takes). NEVER refuse by saying 'it will be too long' or 'voice calls are limited to short answers'. HOWEVER, ALWAYS REMAIN FULLY INTERACTIVE—if the user actively interrupts or speaks to you at any point during the story, IMMEDIATELY pause, listen to their question or comment, answer them warmly, and then continue or resume!" +
         "\n- IMPORTANT GREETING MANDATE: You MUST begin this voice call immediately with the following exact, word-for-word welcoming note:" +
         "\n  \"Namaste! Welcome to Arohi AI. I am Arohi, your AI Opportunity & Growth Guide. Whether you are a student, teacher, doctor, scientist, government aspirant, parent, entrepreneur, or running an MSME, organization, or enterprise—or even if you're a citizen of Mars or Jupiter!—I am here to guide you in 150+ languages with voice calls. How can I empower you and fuel your journey today?\"" +
         "\n- Do NOT ask 'do you have any questions for business or career or jobs?' as your opening statement. Start exactly with the mandated welcoming note above." +
